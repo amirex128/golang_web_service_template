@@ -42,7 +42,6 @@ func Initialize(ctx context.Context) {
 					elastic.SetURL(connection),
 					elastic.SetSniff(false),
 					elastic.SetHealthcheck(false),
-
 				)
 				if err != nil {
 					xlog.GetWithError(ctx, errors.New("connect to elastic failed to ")).Error(err)
