@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="amirex128@192.168.241.128:22" type="ssh/sftp" uuid="efc7dd19-3843-4314-b0ff-5a11e110ead1">
+        <config>
+          <option name="projectRootOnTarget" value="/home/amirex128/workspace/backend" />
+          <option name="serverName" value="amirex128@192.168.241.128:22" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/home/amirex128/go" />
+            <option name="goRoot" value="/usr/local/go/bin/go" />
+            <option name="goVersion" value="go1.19 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

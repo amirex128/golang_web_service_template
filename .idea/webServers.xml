@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="045fd0b4-e6e5-4e9c-b4bc-9ef70b16a3b8" name="local_server" url="http://192.168.241.128">
+        <fileTransfer rootFolder="/home/amirex128" host="192.168.241.128" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
