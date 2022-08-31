@@ -1,0 +1,8 @@
+### register
+POST {{host}}/register
+accept: application/json
+
+{
+"mobile": "09224809750",
+"password": "a6766581"
+}

@@ -1,7 +1,12 @@
 package models
 
+import (
+	"encoding/gob"
+	"io"
+)
+
 type Product struct {
-	Id               int64   `json:"id"`
+	ID               int64   `json:"id"`
 	UserId           string  `json:"user_id"`
 	ManufacturerId   int     `json:"manufacturer_id"`
 	GuildId          int     `json:"guild_id"`
@@ -48,4 +53,23 @@ type Product struct {
 	Delivery         string  `json:"delivery"` // مدت زمان ارسال
 	IsOriginal       string  `json:"is_original"`
 	OptionItemID     int     `json:"option_item_id"`
+}
+type ProductArr []Product
+
+func (s ProductArr) Len() int {
+	return len(s)
+}
+func (s ProductArr) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s ProductArr) Less(i, j int) bool {
+	return s[i].ID < s[j].ID
+}
+
+func (c *Product) Encode(iw io.Writer) error {
+	return gob.NewEncoder(iw).Encode(c)
+}
+
+func (c *Product) Decode(ir io.Reader) error {
+	return gob.NewDecoder(ir).Decode(c)
 }

@@ -1,0 +1,34 @@
+"-2","همه استان ها","all","-2",,NULL,NULL
+"-1","استان انتخاب نشده","not set","-1",,NULL,NULL
+"1","تهران","‍‍Tehran","21","active1,active2",NULL,NULL
+"2","گيلان","Gilan","13","active1,active2",NULL,NULL
+"3","آذربايجان شرقي","Azarbayejan sharghi","41","active1,active2",NULL,NULL
+"4","خوزستان","Khozestan","61","active1,active2",NULL,NULL
+"5","فارس","Fars","71","active1,active2",NULL,NULL
+"6","اصفهان","Esfehan","31","active1,active2",NULL,NULL
+"7","خراسان رضوي","Khorasan razavi","51","active1,active2",NULL,NULL
+"8","قزوين","Gazvin","28","active1,active2",NULL,NULL
+"9","سمنان","Semnan","23","active1,active2",NULL,NULL
+"10","قم","Qom","25","active1,active2",NULL,NULL
+"11","مركزي","Markazi","86","active1,active2",NULL,NULL
+"12","زنجان","Zanjan","24","active1,active2",NULL,NULL
+"13","مازندران","Mazandaran","15","active1,active2",NULL,NULL
+"14","گلستان","Golestan","17","active1,active2",NULL,NULL
+"15","اردبيل","Ardebil","45","active1,active2",NULL,NULL
+"16","آذربايجان غربي","Azarbayejan Gharbi","44","active1,active2",NULL,NULL
+"17","همدان","Hamedan","81","active1,active2",NULL,NULL
+"18","كردستان","Kordestan","87","active1,active2",NULL,NULL
+"19","كرمانشاه","Kermanshah","83","active1,active2",NULL,NULL
+"20","لرستان","Lorestan","66","active1,active2",NULL,NULL
+"21","بوشهر","Booshehr","77","active1,active2",NULL,NULL
+"22","كرمان","Kerman","34","active1,active2",NULL,NULL
+"23","هرمزگان","Hormozgan","76","active1,active2",NULL,NULL
+"24","چهارمحال و بختياري","Chararmahal & bakhtiyari","38","active1,active2",NULL,NULL
+"25","يزد","Yazd","35","active1,active2",NULL,NULL
+"26","سيستان و بلوچستان","Sistan & baloochestan","54","active1,active2",NULL,NULL
+"27","ايلام","Ilam","84","active1,active2",NULL,NULL
+"28","كهگيلويه و بويراحمد","Kohgilooyeh & boyerahmad","74","active1,active2",NULL,NULL
+"29","خراسان شمالي","Khorasan shomali","58","active1,active2",NULL,NULL
+"30","خراسان جنوبي","Khorasan jonobi","56","active1,active2",NULL,NULL
+"31","البرز","Alborz","26","active1,active2",NULL,NULL
+"1013","تهران","Tehran13","1013","active1,active2",NULL,NULL

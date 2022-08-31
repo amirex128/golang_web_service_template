@@ -152,12 +152,11 @@ func Register(cnt string, m ...initializer.Simple) {
 	allLock.Unlock()
 }
 
-func MustGetMysqlConn(ctx context.Context, cnt string) *SingleManager {
+func MustGetMysqlConn(cnt string) *SingleManager {
 	dbLock.RLock()
 	defer dbLock.RUnlock()
 	res, ok := dbMap[cnt]
 	assert.True(ok)
 	assert.NotNil(res)
-	//res.dbMap = gorm.WithContext(ctx, res.dbMap)
 	return res
 }

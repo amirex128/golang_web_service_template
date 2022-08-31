@@ -1,7 +1,7 @@
 {
   "mysql": [
     {
-      "name": "mysql",
+      "name": "mysql_main",
       "env_host": "host",
       "env_port": "port",
       "env_database": "db",

@@ -1,5 +1,12 @@
 package models
 
+import (
+	"backend/internal/app/DTOs"
+	"backend/internal/app/helpers"
+	"encoding/gob"
+	"io"
+)
+
 type User struct {
 	ID          int64  `json:"id"`
 	Gender      string `json:"gender"`
@@ -23,4 +30,35 @@ type User struct {
 	PostalCode  string `json:"postal_code"`
 	UpdatedAt   string `json:"updated_at"`
 	CreatedAt   string `json:"created_at"`
+}
+type UserArr []User
+
+func (s UserArr) Len() int {
+	return len(s)
+}
+func (s UserArr) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s UserArr) Less(i, j int) bool {
+	return s[i].ID < s[j].ID
+}
+
+func (c *User) Encode(iw io.Writer) error {
+	return gob.NewEncoder(iw).Encode(c)
+}
+
+func (c *User) Decode(ir io.Reader) error {
+	return gob.NewDecoder(ir).Decode(c)
+}
+
+func (m *MysqlManager) CreateUser(user *User) error {
+	return m.GetConn().Create(user).Error
+}
+func (m *MysqlManager) FindUserByMobilePassword(user DTOs.Login) (*User, error) {
+	res := &User{}
+	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, helpers.GeneratePasswordHash(user.Password)).First(res).Error
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
