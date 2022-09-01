@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -36,7 +37,13 @@ func (c *Province) Encode(iw io.Writer) error {
 func (c *Province) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
+func initProvince(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Province{})
+	manager.GetConn().AutoMigrate(&ProductProvince{})
+	provinces := helpers.ReadCsvFile("../../csv/provinces.csv")
+	manager.CreateAllProvinces(provinces)
 
+}
 func (m *MysqlManager) CreateAllProvinces(files [][]string) {
 	province := make([]Province, 0)
 	for i := range files {

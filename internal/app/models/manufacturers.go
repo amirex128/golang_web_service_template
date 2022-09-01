@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -33,6 +34,11 @@ func (c *Manufacturer) Encode(iw io.Writer) error {
 
 func (c *Manufacturer) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+func initManufacturer(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Manufacturer{})
+	manufacturer := helpers.ReadCsvFile("../../csv/manufacturers.csv")
+	manager.CreateAllManufacturer(manufacturer)
 }
 
 func (m *MysqlManager) CreateAllManufacturer(files [][]string) {

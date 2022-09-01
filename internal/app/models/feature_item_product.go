@@ -32,3 +32,6 @@ func (c *FeatureItemProduct) Encode(iw io.Writer) error {
 func (c *FeatureItemProduct) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
+func initFeatureItemProduct(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&FeatureItemProduct{})
+}

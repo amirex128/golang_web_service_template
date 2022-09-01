@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"encoding/gob"
 	"io"
 )
@@ -28,4 +29,10 @@ func (c *OrderItem) Encode(iw io.Writer) error {
 
 func (c *OrderItem) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+func initOrderItem(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&OrderItem{})
+	optionItems := helpers.ReadCsvFile("../../csv/option_items.csv")
+	manager.CreateAllOptionItems(optionItems)
+
 }

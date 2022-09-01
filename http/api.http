@@ -6,3 +6,46 @@ accept: application/json
 "mobile": "09224809750",
 "password": "a6766581"
 }
+
+### login
+POST {{host}}/login
+accept: application/json
+
+{
+"mobile": "09224809750",
+"password": "a6766581"
+}
+
+### index product
+GET {{host}}/v1/products
+accept: application/json
+Authorization: Bearer {{token}}
+
+{
+"search": "آموزش"
+}
+
+### create product
+POST {{host}}/v1/products/create
+accept: application/json
+Authorization: Bearer {{token}}
+
+{
+"manufacturer_id":"",
+"description":"",
+"name":"",
+"short_description":"",
+"price":"",
+"free_send":"",
+"weight":"",
+"height":"",
+"width":"",
+"active":"",
+"created_at":"",
+"updated_at":"",
+"started_at":"",
+"ended_at":"",
+"delivery_time":"",
+"option_id":"",
+"option_item_id":""
+}

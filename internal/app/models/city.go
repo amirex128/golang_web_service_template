@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -41,7 +42,12 @@ func (c *City) Encode(iw io.Writer) error {
 func (c *City) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
-
+func initCity(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&City{})
+	manager.GetConn().AutoMigrate(&CityProduct{})
+	cities := helpers.ReadCsvFile("../../csv/cities.csv")
+	manager.CreateAllCities(cities)
+}
 func (m *MysqlManager) CreateAllCities(files [][]string) {
 	cities := make([]City, 0)
 	for i := range files {

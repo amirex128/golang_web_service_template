@@ -1,7 +1,6 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
 	"backend/internal/pkg/framework/mysql"
 	"database/sql"
 	"strconv"
@@ -44,68 +43,28 @@ func NewMainManager() *MysqlManager {
 }
 func (r *MysqlManager) Initial() {
 	manager := NewMainManager()
-	manager.GetConn().AutoMigrate(&Category{})
-	manager.GetConn().AutoMigrate(&CategoryOption{})
-	manager.GetConn().AutoMigrate(&CategoryProduct{})
-	manager.GetConn().AutoMigrate(&CategoryRelated{})
-	manager.GetConn().AutoMigrate(&City{})
-	manager.GetConn().AutoMigrate(&CityProduct{})
-	manager.GetConn().AutoMigrate(&Customer{})
-	manager.GetConn().AutoMigrate(&Discount{})
-	manager.GetConn().AutoMigrate(&Event{})
-	manager.GetConn().AutoMigrate(&FeatureGroup{})
-	manager.GetConn().AutoMigrate(&FeatureItem{})
-	manager.GetConn().AutoMigrate(&FeatureItemProduct{})
-	manager.GetConn().AutoMigrate(&FeatureItemValue{})
-	manager.GetConn().AutoMigrate(&Gallery{})
-	manager.GetConn().AutoMigrate(&GroupDiscount{})
-	manager.GetConn().AutoMigrate(&Guild{})
-	manager.GetConn().AutoMigrate(&GuildProduct{})
-	manager.GetConn().AutoMigrate(&Manufacturer{})
-	manager.GetConn().AutoMigrate(&Option{})
-	manager.GetConn().AutoMigrate(&OptionItem{})
-	manager.GetConn().AutoMigrate(&Order{})
-	manager.GetConn().AutoMigrate(&OrderItem{})
-	manager.GetConn().AutoMigrate(&Product{})
-	manager.GetConn().AutoMigrate(&Province{})
-	manager.GetConn().AutoMigrate(&ProductProvince{})
-	manager.GetConn().AutoMigrate(&User{})
 
-	categories := helpers.ReadCsvFile("../../csv/categories.csv")
-	manager.CreateAllCategories(categories)
+	if !initCategory(manager) {
+		return
+	}
+	initCity(manager)
+	initCustomer(manager)
+	initDiscount(manager)
+	initEvent(manager)
+	initFeatureGroup(manager)
+	initFeatureItem(manager)
+	initFeatureItemValue(manager)
+	initGallery(manager)
+	initGroupDiscount(manager)
+	initGuild(manager)
+	initManufacturer(manager)
+	initOption(manager)
+	initOrder(manager)
+	initOrderItem(manager)
+	InitProduct(manager)
+	initProvince(manager)
+	initUser(manager)
 
-	categoryRelated := helpers.ReadCsvFile("../../csv/category_related.csv")
-	manager.CreateAllCategoryRelated(categoryRelated)
-
-	cities := helpers.ReadCsvFile("../../csv/cities.csv")
-	manager.CreateAllCities(cities)
-
-	events := helpers.ReadCsvFile("../../csv/events.csv")
-	manager.CreateAllEvents(events)
-
-	featureGroups := helpers.ReadCsvFile("../../csv/feature_groups.csv")
-	manager.CreateAllFeatureGroups(featureGroups)
-
-	featureItemValues := helpers.ReadCsvFile("../../csv/feature_item_values.csv")
-	manager.CreateAllFeatureItemValues(featureItemValues)
-
-	featureItems := helpers.ReadCsvFile("../../csv/feature_items.csv")
-	manager.CreateAllFeatureItems(featureItems)
-
-	guilds := helpers.ReadCsvFile("../../csv/guilds.csv")
-	manager.CreateAllGuilds(guilds)
-
-	manufacturer := helpers.ReadCsvFile("../../csv/manufacturers.csv")
-	manager.CreateAllManufacturer(manufacturer)
-
-	optionItems := helpers.ReadCsvFile("../../csv/option_items.csv")
-	manager.CreateAllOptionItems(optionItems)
-
-	options := helpers.ReadCsvFile("../../csv/options.csv")
-	manager.CreateAllOptions(options)
-
-	provinces := helpers.ReadCsvFile("../../csv/provinces.csv")
-	manager.CreateAllProvinces(provinces)
 }
 
 func init() {

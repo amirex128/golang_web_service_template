@@ -1,13 +1,12 @@
 package routers
 
 import (
-	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/routers/v1/controllers"
+	"backend/internal/app/routers/v1/validations"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 	"time"
@@ -19,7 +18,7 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
-		Timeout:     time.Hour,
+		Timeout:     999999 * time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: "mobile",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -49,49 +48,9 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var login DTOs.Login
-			if err := c.ShouldBind(&login); err != nil {
-				return "", jwt.ErrMissingLoginValues
-			}
-			validate := validator.New()
-			err := validate.Struct(login)
+			login, err := validations.Login(c)
 			if err != nil {
-				if _, ok := err.(*validator.InvalidValidationError); ok {
-					c.JSON(http.StatusInternalServerError, gin.H{
-						"message": "مقادیر ارسال شده نا درست میباشد",
-						"error":   err.Error(),
-					})
-					return "", jwt.ErrMissingLoginValues
-				}
-				var errors []gin.H
-				for _, err := range err.(validator.ValidationErrors) {
-					if err.StructField() == "Mobile" {
-						errors = append(errors, gin.H{
-							"message": "شماره موبایل نامعتبر میباشد",
-						})
-					}
-					if err.StructField() == "Password" {
-						if err.Tag() == "min" {
-							errors = append(errors, gin.H{
-								"message": "رمز عبور باید حداقل 8 کاراکتر باشد",
-							})
-						}
-						if err.Tag() == "max" {
-							errors = append(errors, gin.H{
-								"message": "رمز عبور باید حداکثر 20 کاراکتر باشد",
-							})
-						}
-						if err.Tag() == "required" {
-							errors = append(errors, gin.H{
-								"message": "رمز عبور باید وارد شود",
-							})
-						}
-
-					}
-
-					c.JSON(http.StatusBadRequest, errors)
-					return "", jwt.ErrMissingLoginValues
-				}
+				return nil, jwt.ErrFailedAuthentication
 			}
 			user, err := models.NewMainManager().FindUserByMobilePassword(login)
 			if err != nil {
@@ -101,11 +60,11 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			return user, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*models.User); ok && v.Mobile == "09024809750" {
-				return true
-			}
+			//if v, ok := data.(*models.User); ok && v.Mobile == "09024809750" {
+			//	return true
+			//}
 
-			return false
+			return true
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

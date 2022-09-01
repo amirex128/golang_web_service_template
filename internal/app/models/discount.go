@@ -35,3 +35,7 @@ func (c *Discount) Encode(iw io.Writer) error {
 func (c *Discount) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
+
+func initDiscount(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Discount{})
+}

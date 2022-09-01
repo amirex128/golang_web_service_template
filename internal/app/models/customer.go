@@ -10,12 +10,8 @@ type Customer struct {
 	Name       string `json:"name"`
 	Family     string `json:"family"`
 	Mobile     string `json:"mobile"`
-	Phone      string `json:"phone"`
-	Email      string `json:"email"`
 	Address    string `json:"address"`
 	PostalCode string `json:"postal_code"`
-	Lat        string `json:"lat"`
-	Lng        string `json:"lng"`
 	CreatedAt  string `json:"created_at"`
 }
 type CustomerArr []Customer
@@ -36,4 +32,7 @@ func (c *Customer) Encode(iw io.Writer) error {
 
 func (c *Customer) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+func initCustomer(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Customer{})
 }

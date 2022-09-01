@@ -13,8 +13,6 @@ type Gallery struct {
 	Type      string `json:"type"` // image video cover
 	Sort      uint   `json:"sort"`
 	IsMain    byte   `json:"is_main"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
 }
 type GalleryArr []Gallery
 
@@ -34,4 +32,7 @@ func (c *Gallery) Encode(iw io.Writer) error {
 
 func (c *Gallery) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+func initGallery(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Gallery{})
 }

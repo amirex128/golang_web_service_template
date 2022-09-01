@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -36,6 +37,13 @@ func (c *FeatureItem) Encode(iw io.Writer) error {
 
 func (c *FeatureItem) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+
+func initFeatureItem(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&FeatureItem{})
+	initFeatureItemProduct(manager)
+	featureItems := helpers.ReadCsvFile("../../csv/feature_items.csv")
+	manager.CreateAllFeatureItems(featureItems)
 }
 
 func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {

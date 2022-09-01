@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -36,6 +37,11 @@ func (c *FeatureGroup) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
 
+func initFeatureGroup(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&FeatureGroup{})
+	featureGroups := helpers.ReadCsvFile("../../csv/feature_groups.csv")
+	manager.CreateAllFeatureGroups(featureGroups)
+}
 func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
 	featureGroups := make([]FeatureGroup, 0)
 	for i := range files {

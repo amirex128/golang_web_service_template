@@ -32,7 +32,9 @@ func (c *OptionItem) Encode(iw io.Writer) error {
 func (c *OptionItem) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
-
+func initOptionItem(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&OptionItem{})
+}
 func (m *MysqlManager) CreateAllOptionItems(files [][]string) {
 	optionItems := make([]OptionItem, 0)
 	for i := range files {

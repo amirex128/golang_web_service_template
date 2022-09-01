@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -52,6 +53,25 @@ func (c *Category) Encode(iw io.Writer) error {
 
 func (c *Category) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+
+func initCategory(manager *MysqlManager) bool {
+	manager.GetConn().AutoMigrate(&Category{})
+	manager.GetConn().AutoMigrate(&CategoryOption{})
+	manager.GetConn().AutoMigrate(&CategoryProduct{})
+	manager.GetConn().AutoMigrate(&CategoryRelated{})
+
+	if manager.GetConn().First(&Category{}).Error == nil {
+		return false
+	}
+
+	categories := helpers.ReadCsvFile("../../csv/categories.csv")
+	manager.CreateAllCategories(categories)
+	categoryRelated := helpers.ReadCsvFile("../../csv/category_related.csv")
+	manager.CreateAllCategoryRelated(categoryRelated)
+
+	return true
+
 }
 
 func (m *MysqlManager) GetAllCategories() ([]*Category, error) {

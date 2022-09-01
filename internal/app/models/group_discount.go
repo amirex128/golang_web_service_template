@@ -35,3 +35,6 @@ func (c *GroupDiscount) Encode(iw io.Writer) error {
 func (c *GroupDiscount) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
+func initGroupDiscount(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&GroupDiscount{})
+}

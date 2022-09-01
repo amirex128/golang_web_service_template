@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -39,6 +40,13 @@ func (c *Guild) Encode(iw io.Writer) error {
 
 func (c *Guild) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
+}
+
+func initGuild(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Guild{})
+	manager.GetConn().AutoMigrate(&GuildProduct{})
+	guilds := helpers.ReadCsvFile("../../csv/guilds.csv")
+	manager.CreateAllGuilds(guilds)
 }
 
 func (m *MysqlManager) CreateAllGuilds(files [][]string) {

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -34,7 +35,11 @@ func (c *Event) Encode(iw io.Writer) error {
 func (c *Event) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
-
+func initEvent(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Event{})
+	events := helpers.ReadCsvFile("../../csv/events.csv")
+	manager.CreateAllEvents(events)
+}
 func (m *MysqlManager) CreateAllEvents(files [][]string) {
 	events := make([]Event, 0)
 	for i := range files {

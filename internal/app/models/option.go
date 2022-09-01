@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/helpers"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -47,4 +48,11 @@ func (m *MysqlManager) CreateAllOptions(files [][]string) {
 	if err != nil {
 		logrus.Error("seed options error: ", err)
 	}
+}
+func initOption(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Option{})
+	initOptionItem(manager)
+	options := helpers.ReadCsvFile("../../csv/options.csv")
+	manager.CreateAllOptions(options)
+
 }

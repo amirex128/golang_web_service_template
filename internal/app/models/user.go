@@ -50,9 +50,20 @@ func (c *User) Encode(iw io.Writer) error {
 func (c *User) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
-
-func (m *MysqlManager) CreateUser(user *User) error {
-	return m.GetConn().Create(user).Error
+func initUser(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&User{})
+}
+func (m *MysqlManager) CreateUser(user *User) string {
+	find := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, helpers.GeneratePasswordHash(user.Password)).Find(&User{}).RowsAffected
+	if find > 0 {
+		return "کاربری با این مشخصات قبلا ثبت شده است"
+	}
+	user.Password = helpers.GeneratePasswordHash(user.Password)
+	err := m.GetConn().Create(user).Error
+	if err != nil {
+		return "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید"
+	}
+	return ""
 }
 func (m *MysqlManager) FindUserByMobilePassword(user DTOs.Login) (*User, error) {
 	res := &User{}
