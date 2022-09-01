@@ -53,8 +53,8 @@ func (m *MysqlManager) CreateAllCities(files [][]string) {
 	for i := range files {
 		value := files[i]
 		cities = append(cities, City{
-			ID:          intConvert(value[0]),
-			ProvinceID:  intConvert(value[1]),
+			ID:          int32Convert(value[0]),
+			ProvinceID:  int32Convert(value[1]),
 			PersianName: value[2],
 			EnglishName: stringConvert(value[5]),
 			Code:        stringConvert(value[6]),

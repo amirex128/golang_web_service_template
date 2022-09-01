@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\csv\category_related.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\csv\cities.csv">
           <value>
             <Attribute>
@@ -67,6 +74,13 @@
           </value>
         </entry>
         <entry key="\csv\option_items.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\csv\options.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

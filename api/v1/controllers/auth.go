@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"backend/api/v1/validations"
 	"backend/internal/app/models"
-	"backend/internal/app/routers/v1/validations"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,5 +24,7 @@ func register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, login)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ثبت نام با موفقیت انجام شد",
+	})
 }

@@ -12,7 +12,7 @@ services:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: 'config.yml'
+      MYSQL_DATABASE: 'hamyarsale'
       MYSQL_ROOT_PASSWORD: 'a6766581'
     ports:
       - '3306:3306'

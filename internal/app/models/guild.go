@@ -54,8 +54,8 @@ func (m *MysqlManager) CreateAllGuilds(files [][]string) {
 	for i := range files {
 		value := files[i]
 		guilds = append(guilds, Guild{
-			ID:         intConvert(value[0]),
-			ParentID:   intConvert(value[1]),
+			ID:         int32Convert(value[0]),
+			ParentID:   int32Convert(value[1]),
 			Name:       value[2],
 			Icon:       stringConvert(value[3]),
 			Equivalent: stringConvert(value[4]),

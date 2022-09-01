@@ -47,8 +47,8 @@ func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureGroups = append(featureGroups, FeatureGroup{
-			ID:          intConvert(value[0]),
-			CategoryID:  intConvert(value[1]),
+			ID:          int32Convert(value[0]),
+			CategoryID:  int32Convert(value[1]),
 			Title:       value[2],
 			Icon:        stringConvert(value[3]),
 			Sort:        uintConvert(value[4]),

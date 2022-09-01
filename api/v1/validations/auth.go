@@ -22,7 +22,7 @@ func Register(c *gin.Context) (*DTOs.Register, error) {
 			"startswith": "شماره موبایل باید با 09 شروع شود",
 		},
 	}
-	err := c.BindJSON(&register)
+	err := c.Bind(&register)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
@@ -54,7 +54,7 @@ func Login(c *gin.Context) (DTOs.Login, error) {
 			"startswith": "شماره موبایل باید با 09 شروع شود",
 		},
 	}
-	err := c.BindJSON(&login)
+	err := c.Bind(&login)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",

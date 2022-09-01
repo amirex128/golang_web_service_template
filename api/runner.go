@@ -1,9 +1,9 @@
-package routers
+package api
 
 import (
+	"backend/api/v1/controllers"
+	"backend/api/v1/validations"
 	"backend/internal/app/models"
-	"backend/internal/app/routers/v1/controllers"
-	"backend/internal/app/routers/v1/validations"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"

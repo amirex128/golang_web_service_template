@@ -38,7 +38,7 @@ func (m *MysqlManager) CreateAllOptions(files [][]string) {
 	for i := range files {
 		value := files[i]
 		options = append(options, Option{
-			ID:          intConvert(value[0]),
+			ID:          int32Convert(value[0]),
 			Name:        value[1],
 			Description: value[2],
 			Type:        value[3],

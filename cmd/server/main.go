@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/internal/app/routers"
+	"backend/api"
 	"backend/internal/pkg/framework/bredis"
 	"backend/internal/pkg/framework/config"
 	"backend/internal/pkg/framework/container"
@@ -28,7 +28,7 @@ func main() {
 	mysql.Initialize(ctx)
 	//global_loaders.Initializer(ctx)
 
-	routers.Runner(viper.GetString("server_host"), viper.GetString("server_port"))
+	api.Runner(viper.GetString("server_host"), viper.GetString("server_port"))
 
 	sig := signal.WaitExitSignal()
 	fmt.Println(sig.String())

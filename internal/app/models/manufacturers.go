@@ -46,7 +46,7 @@ func (m *MysqlManager) CreateAllManufacturer(files [][]string) {
 	for i := range files {
 		value := files[i]
 		manufacturer = append(manufacturer, Manufacturer{
-			ID:               intConvert(value[0]),
+			ID:               int32Convert(value[0]),
 			CountryName:      stringConvert(value[2]),
 			ShortDescription: stringConvert(value[3]),
 			Logo:             stringConvert(value[4]),

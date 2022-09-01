@@ -4,6 +4,7 @@ import (
 	"backend/internal/pkg/framework/mysql"
 	"database/sql"
 	"strconv"
+	"time"
 )
 
 const (
@@ -71,7 +72,7 @@ func init() {
 	mysql.Register("mysql_main", &MysqlManager{})
 }
 
-func activeConvert(value string) byte {
+func activeConvert(value interface{}) byte {
 
 	if value == "0" || value == "deactivate" || value == "" || value == "NULL" {
 		return 0
@@ -86,15 +87,30 @@ func stringConvert(value string) sql.NullString {
 	}
 }
 
-func intConvert(value string) int {
-	return func() int {
-		val, _ := strconv.Atoi(value)
-		return val
-	}()
+func int32Convert(value string) int {
+	val, _ := strconv.Atoi(value)
+	return val
+}
+func float32Convert(value string) float32 {
+	val, _ := strconv.ParseFloat(value, 32)
+	return float32(val)
 }
 func uintConvert(value string) uint {
-	return func() uint {
-		val, _ := strconv.ParseUint(value, 10, 32)
-		return uint(val)
-	}()
+	val, _ := strconv.ParseUint(value, 10, 32)
+	return uint(val)
+}
+func dateTimeConvert(value string) string {
+	if value != "" {
+		l, _ := time.LoadLocation("Asia/Tehran")
+		res, err := time.ParseInLocation("2006-01-02 15:04:05", value, l)
+		if err == nil {
+			return res.String()
+		}
+		return ""
+	}
+	return ""
+}
+func nowTime() string {
+	l, _ := time.LoadLocation("Asia/Tehran")
+	return time.Now().In(l).Format("2006-01-02 15:04:05")
 }

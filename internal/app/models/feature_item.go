@@ -51,8 +51,8 @@ func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItems = append(featureItems, FeatureItem{
-			ID:            intConvert(value[0]),
-			FeatureItemID: intConvert(value[1]),
+			ID:            int32Convert(value[0]),
+			FeatureItemID: int32Convert(value[1]),
 			Title:         value[2],
 			Type:          value[3],
 			Actions:       value[4],

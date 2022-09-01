@@ -28,23 +28,24 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 			return errors.New("validation error")
 
 		}
-		var validationErrors []gin.H
+		var validationErrors = make(map[string]map[string]string)
 		for _, err := range err.(validator.ValidationErrors) {
 			for s, m := range items {
 				if err.StructField() == s {
 					for t, v := range m {
 						if err.Tag() == t {
-							validationErrors = append(validationErrors, gin.H{
-								"message": v,
-							})
+							validationErrors[s] = map[string]string{
+								t: v,
+							}
 						}
 					}
 				}
 			}
+		}
 
-			c.JSON(http.StatusBadRequest, validationErrors)
-			return errors.New("validation error")
-
+		c.JSON(http.StatusBadRequest, validationErrors)
+		if len(validationErrors) > 0 {
+			return err
 		}
 	}
 	return nil

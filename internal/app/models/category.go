@@ -88,8 +88,8 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categories = append(categories, Category{
-			ID:          intConvert(value[0]),
-			ParentID:    intConvert(value[0]),
+			ID:          int32Convert(value[0]),
+			ParentID:    int32Convert(value[0]),
 			Name:        value[2],
 			Sort:        uintConvert(value[3]),
 			Equivalent:  stringConvert(value[4]),
@@ -110,8 +110,8 @@ func (m *MysqlManager) CreateAllCategoryRelated(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categoryRelated = append(categoryRelated, CategoryRelated{
-			CategoryID:        intConvert(value[0]),
-			CategoryRelatedID: intConvert(value[1]),
+			CategoryID:        int32Convert(value[0]),
+			CategoryRelatedID: int32Convert(value[1]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(categoryRelated, 100).Error
