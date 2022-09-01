@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func register(c *gin.Context) {
+func requestCustomer(c *gin.Context) {
 	login, err := validations.Register(c)
 	if err != nil {
 		return
@@ -28,7 +28,28 @@ func register(c *gin.Context) {
 		"message": "ثبت نام با موفقیت انجام شد",
 	})
 }
-func forget(c *gin.Context) {
+func verifyCustomer(c *gin.Context) {
+	login, err := validations.Register(c)
+	if err != nil {
+		return
+	}
+	user := &models.User{
+		Mobile:   login.Mobile,
+		Password: login.Password,
+	}
+	errRes := models.NewMainManager().CreateUser(user)
+	if errRes != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": errRes,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ثبت نام با موفقیت انجام شد",
+	})
+}
+func updateCustomer(c *gin.Context) {
 	login, err := validations.Register(c)
 	if err != nil {
 		return

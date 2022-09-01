@@ -1,20 +1,27 @@
 package models
 
 import (
+	"backend/internal/app/DTOs"
+	"backend/internal/app/helpers"
 	"encoding/gob"
+	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
+	"strings"
 )
 
 type Discount struct {
-	ID        int64   `json:"id"`
-	Code      string  `json:"code"`
-	UserID    int64   `json:"user_id"`
-	StartedAt int64   `json:"started_at"`
-	EndedAt   int64   `json:"ended_at"`
-	Type      string  `json:"type"` // percent, amount
-	Value     float32 `json:"value"`
-	Percent   float32 `json:"percent"`
-	Status    byte    `json:"status"`
+	ID         uint64  `json:"id"`
+	Code       string  `json:"code"`
+	UserID     uint64  `json:"user_id"`
+	StartedAt  string  `json:"started_at"`
+	Count      uint32  `json:"count"`
+	EndedAt    string  `json:"ended_at"`
+	Type       string  `json:"type" sql:"type:ENUM('percent','amount')"` // ,
+	Amount     float32 `json:"value"`
+	Percent    float32 `json:"percent"`
+	ProductIDs string  `json:"product_ids"`
+	Status     byte    `json:"status"`
 }
 type DiscountArr []Discount
 
@@ -38,4 +45,73 @@ func (c *Discount) Decode(ir io.Reader) error {
 
 func initDiscount(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Discount{})
+}
+func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, userID uint64) error {
+
+	for _, pId := range strings.Split(dto.ProductIDs, ",") {
+		product, err := m.FindProductById(c, helpers.Uint64Convert(pId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
+			return err
+		}
+		if product.UserId != userID {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
+			return err
+		}
+	}
+
+	if m.GetConn().Where("code = ?", dto.Code).First(&Discount{}).RowsAffected > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف تکراری است"})
+		return nil
+	}
+
+	discount := Discount{
+		Code:       dto.Code,
+		UserID:     userID,
+		StartedAt:  helpers.DateTimeConvert(dto.StartedAt),
+		EndedAt:    helpers.DateTimeConvert(dto.EndedAt),
+		Count:      dto.Count,
+		Type:       dto.Type,
+		Amount:     dto.Amount,
+		Percent:    dto.Percent,
+		ProductIDs: dto.ProductIDs,
+		Status:     dto.Status,
+	}
+	err := m.GetConn().Create(discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در ایجاد کد تخفیف"})
+		return err
+	}
+	return nil
+}
+func (m *MysqlManager) UpdateDiscount(c *gin.Context, discountID uint64) (Discount, error) {
+
+	discount := Discount{}
+	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		return discount, err
+	}
+	return discount, nil
+}
+func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64) (Discount, error) {
+
+	discount := Discount{}
+	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		return discount, err
+	}
+	return discount, nil
+}
+
+func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Discount, error) {
+
+	discount := Discount{}
+	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		return discount, err
+	}
+	return discount, nil
 }

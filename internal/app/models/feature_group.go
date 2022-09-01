@@ -47,12 +47,12 @@ func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureGroups = append(featureGroups, FeatureGroup{
-			ID:          int32Convert(value[0]),
-			CategoryID:  int32Convert(value[1]),
+			ID:          helpers.Int32Convert(value[0]),
+			CategoryID:  helpers.Int32Convert(value[1]),
 			Title:       value[2],
-			Icon:        stringConvert(value[3]),
-			Sort:        uintConvert(value[4]),
-			Description: stringConvert(value[5]),
+			Icon:        helpers.StringConvert(value[3]),
+			Sort:        helpers.UintConvert(value[4]),
+			Description: helpers.StringConvert(value[5]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureGroups, 100).Error

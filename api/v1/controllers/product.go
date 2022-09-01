@@ -2,17 +2,11 @@ package controllers
 
 import (
 	"backend/api/v1/validations"
+	"backend/internal/app/helpers"
 	"backend/internal/app/models"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"log"
-	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
 )
 
 func indexProduct(c *gin.Context) {
@@ -37,15 +31,14 @@ func createProduct(c *gin.Context) {
 		return
 	}
 
-	images, err := uploadImage(c, dto.Images, userID)
+	images, err := helpers.UploadImages(c, dto.Images, userID)
 	if err != nil {
 		return
 	}
 
 	dto.ImagePath = images
-	err = models.NewMainManager().CreateProduct(dto, userID)
+	err = models.NewMainManager().CreateProduct(c, dto, userID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در ایجاد محصول"})
 		return
 	}
 
@@ -55,33 +48,68 @@ func createProduct(c *gin.Context) {
 	return
 }
 
-func uploadImage(c *gin.Context, images []*multipart.FileHeader, userID uint64) ([]string, error) {
-	abs, _ := filepath.Abs("../../assets")
-	var imagesPath []string
-	userDir := filepath.Join(abs, "user_"+strconv.FormatUint(userID, 10), "images")
-	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
-		log.Fatal(err)
-	}
-	for i := range images {
-		path := filepath.Join(userDir, uuid.NewString()+"."+strings.Split(images[i].Header["Content-Type"][0], "/")[1])
-		err := c.SaveUploadedFile(images[i], path)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در آپلود تصایر"})
-			return nil, err
-		}
-		imagesPath = append(imagesPath, path)
-	}
-	return imagesPath, nil
-}
-
 func updateProduct(c *gin.Context) {
+	userID := uint64(jwt.ExtractClaims(c)["id"].(float64))
 
+	dto, err := validations.UpdateProduct(c)
+	if err != nil {
+		return
+	}
+	manager := models.NewMainManager()
+
+	err = manager.CheckAccessProduct(c, dto.ID, userID)
+	if err != nil {
+		return
+	}
+
+	helpers.RemoveImages(dto.ImageRemove)
+
+	images, err := helpers.UploadImages(c, dto.Images, userID)
+	if err != nil {
+		return
+	}
+
+	dto.ImagePath = append(dto.ImagePath, images...)
+	err = manager.UpdateProduct(c, dto, userID)
+	if err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "محصول با موفقیت ویرایش شد",
+	})
+	return
 }
 
 func deleteProduct(c *gin.Context) {
+	userID := uint64(jwt.ExtractClaims(c)["id"].(float64))
+	id := helpers.Uint64Convert(c.Param("id"))
 
+	manager := models.NewMainManager()
+	err := manager.CheckAccessProduct(c, id, userID)
+	if err != nil {
+		return
+	}
+	err = manager.DeleteProduct(c, id)
+	if err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "محصول با موفقیت حذف شد",
+	})
+	return
 }
 
 func showProduct(c *gin.Context) {
+	id := helpers.Uint64Convert(c.Param("id"))
 
+	manager := models.NewMainManager()
+	product, err := manager.FindProductById(c, id)
+	if err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, product)
+	return
 }

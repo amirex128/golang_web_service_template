@@ -50,7 +50,7 @@ func (m *MysqlManager) CreateAllEvents(files [][]string) {
 				return val
 			}(),
 			Name:      value[1],
-			Active:    activeConvert(value[2]),
+			Active:    helpers.ActiveConvert(value[2]),
 			StartedAt: value[3],
 			EndedAt:   value[4],
 		})

@@ -28,6 +28,7 @@ type User struct {
 	ExpireAt    string `json:"expire_at"`
 	Status      string `json:"status"`
 	PostalCode  string `json:"postal_code"`
+	VerifyCode  uint16 `json:"verify_code"`
 	UpdatedAt   string `json:"updated_at"`
 	CreatedAt   string `json:"created_at"`
 }

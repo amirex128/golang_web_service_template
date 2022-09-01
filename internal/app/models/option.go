@@ -1,17 +1,16 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
 	"encoding/gob"
-	"github.com/sirupsen/logrus"
 	"io"
 )
 
 type Option struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Type        string `json:"type" sql:"type:ENUM('text','color')"`
+	ID       uint64  `json:"id"`
+	Variant  string  `json:"variant"`
+	Name     string  `json:"name"`
+	Price    float32 `json:"price"`
+	Quantity uint32  `json:"quantity"`
 }
 type OptionArr []Option
 
@@ -32,27 +31,6 @@ func (c *Option) Encode(iw io.Writer) error {
 func (c *Option) Decode(ir io.Reader) error {
 	return gob.NewDecoder(ir).Decode(c)
 }
-
-func (m *MysqlManager) CreateAllOptions(files [][]string) {
-	options := make([]Option, 0)
-	for i := range files {
-		value := files[i]
-		options = append(options, Option{
-			ID:          int32Convert(value[0]),
-			Name:        value[1],
-			Description: value[2],
-			Type:        value[3],
-		})
-	}
-	err := m.GetConn().CreateInBatches(options, 100).Error
-	if err != nil {
-		logrus.Error("seed options error: ", err)
-	}
-}
 func initOption(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Option{})
-	initOptionItem(manager)
-	options := helpers.ReadCsvFile("../../csv/options.csv")
-	manager.CreateAllOptions(options)
-
 }

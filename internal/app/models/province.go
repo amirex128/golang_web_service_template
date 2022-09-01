@@ -49,7 +49,7 @@ func (m *MysqlManager) CreateAllProvinces(files [][]string) {
 	for i := range files {
 		value := files[i]
 		province = append(province, Province{
-			ID:          int32Convert(value[0]),
+			ID:          helpers.Int32Convert(value[0]),
 			PersianName: value[1],
 			EnglishName: value[2],
 			Cod:         value[3],

@@ -54,13 +54,13 @@ func (m *MysqlManager) CreateAllGuilds(files [][]string) {
 	for i := range files {
 		value := files[i]
 		guilds = append(guilds, Guild{
-			ID:         int32Convert(value[0]),
-			ParentID:   int32Convert(value[1]),
+			ID:         helpers.Int32Convert(value[0]),
+			ParentID:   helpers.Int32Convert(value[1]),
 			Name:       value[2],
-			Icon:       stringConvert(value[3]),
-			Equivalent: stringConvert(value[4]),
-			Sort:       uintConvert(value[5]),
-			Active:     activeConvert(value[6]),
+			Icon:       helpers.StringConvert(value[3]),
+			Equivalent: helpers.StringConvert(value[4]),
+			Sort:       helpers.UintConvert(value[5]),
+			Active:     helpers.ActiveConvert(value[6]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(guilds, 100).Error

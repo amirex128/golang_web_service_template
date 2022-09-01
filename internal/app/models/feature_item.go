@@ -51,15 +51,15 @@ func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItems = append(featureItems, FeatureItem{
-			ID:            int32Convert(value[0]),
-			FeatureItemID: int32Convert(value[1]),
+			ID:            helpers.Int32Convert(value[0]),
+			FeatureItemID: helpers.Int32Convert(value[1]),
 			Title:         value[2],
 			Type:          value[3],
 			Actions:       value[4],
-			Active:        activeConvert(value[5]),
-			Icon:          stringConvert(value[6]),
+			Active:        helpers.ActiveConvert(value[5]),
+			Icon:          helpers.StringConvert(value[6]),
 			InputType:     value[7],
-			Sort:          uintConvert(value[8]),
+			Sort:          helpers.UintConvert(value[8]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureItems, 100).Error

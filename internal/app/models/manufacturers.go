@@ -46,10 +46,10 @@ func (m *MysqlManager) CreateAllManufacturer(files [][]string) {
 	for i := range files {
 		value := files[i]
 		manufacturer = append(manufacturer, Manufacturer{
-			ID:               int32Convert(value[0]),
-			CountryName:      stringConvert(value[2]),
-			ShortDescription: stringConvert(value[3]),
-			Logo:             stringConvert(value[4]),
+			ID:               helpers.Int32Convert(value[0]),
+			CountryName:      helpers.StringConvert(value[2]),
+			ShortDescription: helpers.StringConvert(value[3]),
+			Logo:             helpers.StringConvert(value[4]),
 			PersianName:      value[5],
 			EnglishName:      value[6],
 		})
