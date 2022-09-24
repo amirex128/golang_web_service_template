@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -42,7 +42,7 @@ func (c *FeatureItem) Decode(ir io.Reader) error {
 func initFeatureItem(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItem{})
 	initFeatureItemProduct(manager)
-	featureItems := helpers.ReadCsvFile("../../csv/feature_items.csv")
+	featureItems := utils.ReadCsvFile("../../csv/feature_items.csv")
 	manager.CreateAllFeatureItems(featureItems)
 }
 
@@ -51,15 +51,15 @@ func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItems = append(featureItems, FeatureItem{
-			ID:            helpers.Int32Convert(value[0]),
-			FeatureItemID: helpers.Int32Convert(value[1]),
+			ID:            utils.StringToInt(value[0]),
+			FeatureItemID: utils.StringToInt(value[1]),
 			Title:         value[2],
 			Type:          value[3],
 			Actions:       value[4],
-			Active:        helpers.ActiveConvert(value[5]),
-			Icon:          helpers.StringConvert(value[6]),
+			Active:        utils.ActiveConvert(value[5]),
+			Icon:          utils.StringConvert(value[6]),
 			InputType:     value[7],
-			Sort:          helpers.UintConvert(value[8]),
+			Sort:          utils.StringToUint(value[8]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureItems, 100).Error

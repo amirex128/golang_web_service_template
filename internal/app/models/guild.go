@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -45,7 +45,7 @@ func (c *Guild) Decode(ir io.Reader) error {
 func initGuild(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Guild{})
 	manager.GetConn().AutoMigrate(&GuildProduct{})
-	guilds := helpers.ReadCsvFile("../../csv/guilds.csv")
+	guilds := utils.ReadCsvFile("../../csv/guilds.csv")
 	manager.CreateAllGuilds(guilds)
 }
 
@@ -54,13 +54,13 @@ func (m *MysqlManager) CreateAllGuilds(files [][]string) {
 	for i := range files {
 		value := files[i]
 		guilds = append(guilds, Guild{
-			ID:         helpers.Int32Convert(value[0]),
-			ParentID:   helpers.Int32Convert(value[1]),
+			ID:         utils.StringToInt(value[0]),
+			ParentID:   utils.StringToInt(value[1]),
 			Name:       value[2],
-			Icon:       helpers.StringConvert(value[3]),
-			Equivalent: helpers.StringConvert(value[4]),
-			Sort:       helpers.UintConvert(value[5]),
-			Active:     helpers.ActiveConvert(value[6]),
+			Icon:       utils.StringConvert(value[3]),
+			Equivalent: utils.StringConvert(value[4]),
+			Sort:       utils.StringToUint(value[5]),
+			Active:     utils.ActiveConvert(value[6]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(guilds, 100).Error

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -37,7 +37,7 @@ func (c *Event) Decode(ir io.Reader) error {
 }
 func initEvent(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Event{})
-	events := helpers.ReadCsvFile("../../csv/events.csv")
+	events := utils.ReadCsvFile("../../csv/events.csv")
 	manager.CreateAllEvents(events)
 }
 func (m *MysqlManager) CreateAllEvents(files [][]string) {
@@ -50,7 +50,7 @@ func (m *MysqlManager) CreateAllEvents(files [][]string) {
 				return val
 			}(),
 			Name:      value[1],
-			Active:    helpers.ActiveConvert(value[2]),
+			Active:    utils.ActiveConvert(value[2]),
 			StartedAt: value[3],
 			EndedAt:   value[4],
 		})

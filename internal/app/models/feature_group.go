@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -39,7 +39,7 @@ func (c *FeatureGroup) Decode(ir io.Reader) error {
 
 func initFeatureGroup(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureGroup{})
-	featureGroups := helpers.ReadCsvFile("../../csv/feature_groups.csv")
+	featureGroups := utils.ReadCsvFile("../../csv/feature_groups.csv")
 	manager.CreateAllFeatureGroups(featureGroups)
 }
 func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
@@ -47,12 +47,12 @@ func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureGroups = append(featureGroups, FeatureGroup{
-			ID:          helpers.Int32Convert(value[0]),
-			CategoryID:  helpers.Int32Convert(value[1]),
+			ID:          utils.StringToInt(value[0]),
+			CategoryID:  utils.StringToInt(value[1]),
 			Title:       value[2],
-			Icon:        helpers.StringConvert(value[3]),
-			Sort:        helpers.UintConvert(value[4]),
-			Description: helpers.StringConvert(value[5]),
+			Icon:        utils.StringConvert(value[3]),
+			Sort:        utils.StringToUint(value[4]),
+			Description: utils.StringConvert(value[5]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureGroups, 100).Error

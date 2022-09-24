@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"backend/api/v1/validations"
-	"backend/internal/app/helpers"
 	"backend/internal/app/models"
-	jwt "github.com/appleboy/gin-jwt/v2"
+	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,14 +23,14 @@ func indexProduct(c *gin.Context) {
 }
 
 func createProduct(c *gin.Context) {
-	userID := uint64(jwt.ExtractClaims(c)["id"].(float64))
+	userID := utils.GetUser(c)
 
 	dto, err := validations.CreateProduct(c)
 	if err != nil {
 		return
 	}
 
-	images, err := helpers.UploadImages(c, dto.Images, userID)
+	images, err := utils.UploadImages(c, dto.Images, userID)
 	if err != nil {
 		return
 	}
@@ -49,7 +48,7 @@ func createProduct(c *gin.Context) {
 }
 
 func updateProduct(c *gin.Context) {
-	userID := uint64(jwt.ExtractClaims(c)["id"].(float64))
+	userID := utils.GetUser(c)
 
 	dto, err := validations.UpdateProduct(c)
 	if err != nil {
@@ -62,15 +61,15 @@ func updateProduct(c *gin.Context) {
 		return
 	}
 
-	helpers.RemoveImages(dto.ImageRemove)
+	utils.RemoveImages(dto.ImageRemove)
 
-	images, err := helpers.UploadImages(c, dto.Images, userID)
+	images, err := utils.UploadImages(c, dto.Images, userID)
 	if err != nil {
 		return
 	}
 
 	dto.ImagePath = append(dto.ImagePath, images...)
-	err = manager.UpdateProduct(c, dto, userID)
+	err = manager.UpdateProduct(c, dto)
 	if err != nil {
 		return
 	}
@@ -82,8 +81,8 @@ func updateProduct(c *gin.Context) {
 }
 
 func deleteProduct(c *gin.Context) {
-	userID := uint64(jwt.ExtractClaims(c)["id"].(float64))
-	id := helpers.Uint64Convert(c.Param("id"))
+	userID := utils.GetUser(c)
+	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()
 	err := manager.CheckAccessProduct(c, id, userID)
@@ -102,7 +101,7 @@ func deleteProduct(c *gin.Context) {
 }
 
 func showProduct(c *gin.Context) {
-	id := helpers.Uint64Convert(c.Param("id"))
+	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()
 	product, err := manager.FindProductById(c, id)

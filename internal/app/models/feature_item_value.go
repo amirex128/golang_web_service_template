@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -33,7 +33,7 @@ func (c *FeatureItemValue) Decode(ir io.Reader) error {
 }
 func initFeatureItemValue(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItemValue{})
-	featureItemValues := helpers.ReadCsvFile("../../csv/feature_item_values.csv")
+	featureItemValues := utils.ReadCsvFile("../../csv/feature_item_values.csv")
 	manager.CreateAllFeatureItemValues(featureItemValues)
 }
 func (m *MysqlManager) CreateAllFeatureItemValues(files [][]string) {
@@ -41,8 +41,8 @@ func (m *MysqlManager) CreateAllFeatureItemValues(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItemValue = append(featureItemValue, FeatureItemValue{
-			ID:            helpers.Int32Convert(value[0]),
-			FeatureItemID: helpers.Int32Convert(value[1]),
+			ID:            utils.StringToInt(value[0]),
+			FeatureItemID: utils.StringToInt(value[1]),
 			Value:         value[2],
 		})
 	}

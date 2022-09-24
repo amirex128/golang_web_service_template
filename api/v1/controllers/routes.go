@@ -35,7 +35,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			user.POST("/order/create", createOrder)
 			user.POST("/discount/check", checkDiscount)
-			user.POST("/customer/request", requestCustomer)
+			user.POST("/customer/request", requestCustomerInformation)
 			user.POST("/customer/verify", verifyCustomer)
 			user.POST("/customer/update", updateCustomer)
 		}

@@ -11,5 +11,5 @@ type CreateOrder struct {
 	OrderItems []OrderItem `json:"order_items" validate:"required,dive"`
 	CustomerID uint64      `json:"customer_id" validate:"required,numeric"`
 	DiscountID uint64      `json:"discount_id" validate:"numeric"`
-	VerifyCode uint16      `json:"verify_code" validate:"required,numeric,min=1000,max=9999"`
+	VerifyCode string      `json:"verify_code" validate:"required,numeric,min=2,max=20"`
 }

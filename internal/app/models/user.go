@@ -2,7 +2,7 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"encoding/gob"
 	"io"
 )
@@ -55,11 +55,11 @@ func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
 }
 func (m *MysqlManager) CreateUser(user *User) string {
-	find := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, helpers.GeneratePasswordHash(user.Password)).Find(&User{}).RowsAffected
+	find := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).Find(&User{}).RowsAffected
 	if find > 0 {
 		return "کاربری با این مشخصات قبلا ثبت شده است"
 	}
-	user.Password = helpers.GeneratePasswordHash(user.Password)
+	user.Password = utils.GeneratePasswordHash(user.Password)
 	err := m.GetConn().Create(user).Error
 	if err != nil {
 		return "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید"
@@ -68,7 +68,7 @@ func (m *MysqlManager) CreateUser(user *User) string {
 }
 func (m *MysqlManager) FindUserByMobilePassword(user DTOs.Login) (*User, error) {
 	res := &User{}
-	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, helpers.GeneratePasswordHash(user.Password)).First(res).Error
+	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).First(res).Error
 	if err != nil {
 		return nil, err
 	}

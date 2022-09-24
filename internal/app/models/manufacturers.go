@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -37,7 +37,7 @@ func (c *Manufacturer) Decode(ir io.Reader) error {
 }
 func initManufacturer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Manufacturer{})
-	manufacturer := helpers.ReadCsvFile("../../csv/manufacturers.csv")
+	manufacturer := utils.ReadCsvFile("../../csv/manufacturers.csv")
 	manager.CreateAllManufacturer(manufacturer)
 }
 
@@ -46,10 +46,10 @@ func (m *MysqlManager) CreateAllManufacturer(files [][]string) {
 	for i := range files {
 		value := files[i]
 		manufacturer = append(manufacturer, Manufacturer{
-			ID:               helpers.Int32Convert(value[0]),
-			CountryName:      helpers.StringConvert(value[2]),
-			ShortDescription: helpers.StringConvert(value[3]),
-			Logo:             helpers.StringConvert(value[4]),
+			ID:               utils.StringToInt(value[0]),
+			CountryName:      utils.StringConvert(value[2]),
+			ShortDescription: utils.StringConvert(value[3]),
+			Logo:             utils.StringConvert(value[4]),
 			PersianName:      value[5],
 			EnglishName:      value[6],
 		})

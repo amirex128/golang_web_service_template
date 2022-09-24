@@ -27,6 +27,7 @@ const (
 	OrderTable              = "orders"
 	OrderItemTable          = "order_items"
 	ProductTable            = "products"
+	ShopTable               = "shops"
 	ProvinceTable           = "provinces"
 	ProductProvinceTable    = "product_provinces"
 	UserTable               = "users"
@@ -62,6 +63,7 @@ func (r *MysqlManager) Initial() {
 	initProvince(manager)
 	initUser(manager)
 	initOption(manager)
+	initShop(manager)
 
 }
 

@@ -2,7 +2,7 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"errors"
@@ -88,7 +88,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 			return dto.Quantity
 		}(),
 		Price:    dto.Price,
-		FreeSend: helpers.ActiveConvert(dto.FreeSend),
+		FreeSend: utils.ActiveConvert(dto.FreeSend),
 		Weight: func() sql.NullInt32 {
 			if dto.Weight > 0 {
 				return sql.NullInt32{
@@ -127,8 +127,8 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		}(),
 		Active:    1,
 		Images:    strings.Join(dto.ImagePath, ","),
-		CreatedAt: helpers.NowTime(),
-		UpdatedAt: helpers.NowTime(),
+		CreatedAt: utils.NowTime(),
+		UpdatedAt: utils.NowTime(),
 		StartedAt: func() sql.NullString {
 			if dto.StartedAt == "" {
 				return sql.NullString{
@@ -137,7 +137,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 				}
 			}
 			return sql.NullString{
-				String: helpers.DateTimeConvert(dto.StartedAt),
+				String: utils.DateTimeConvert(dto.StartedAt),
 				Valid:  true,
 			}
 		}(),
@@ -149,7 +149,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 				}
 			}
 			return sql.NullString{
-				String: helpers.DateTimeConvert(dto.EndedAt),
+				String: utils.DateTimeConvert(dto.EndedAt),
 				Valid:  true,
 			}
 		}(),
@@ -164,7 +164,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 	return nil
 }
 
-func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct, userID uint64) error {
+func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) error {
 	product, err := m.FindProductById(c, dto.ID)
 	if err != nil {
 		return err
@@ -185,7 +185,7 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct, use
 		product.Price = dto.Price
 	}
 	if dto.FreeSend != "" {
-		product.FreeSend = helpers.ActiveConvert(dto.FreeSend)
+		product.FreeSend = utils.ActiveConvert(dto.FreeSend)
 	}
 	if dto.Weight > 0 {
 		product.Weight = sql.NullInt32{
@@ -206,21 +206,21 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct, use
 		}
 	}
 	if dto.Active != "" {
-		product.Active = helpers.ActiveConvert(dto.Active)
+		product.Active = utils.ActiveConvert(dto.Active)
 	}
 	if len(dto.ImagePath) > 0 {
 		product.Images = strings.Join(dto.ImagePath, ",")
 	}
-	product.UpdatedAt = helpers.NowTime()
+	product.UpdatedAt = utils.NowTime()
 	if dto.StartedAt != "" {
 		product.StartedAt = sql.NullString{
-			String: helpers.DateTimeConvert(dto.StartedAt),
+			String: utils.DateTimeConvert(dto.StartedAt),
 			Valid:  true,
 		}
 	}
 	if dto.EndedAt != "" {
 		product.EndedAt = sql.NullString{
-			String: helpers.DateTimeConvert(dto.EndedAt),
+			String: utils.DateTimeConvert(dto.EndedAt),
 			Valid:  true,
 		}
 	}
@@ -242,7 +242,7 @@ func (m *MysqlManager) DeleteProduct(c *gin.Context, id uint64) error {
 		return err
 	}
 
-	helpers.RemoveImages(strings.Split(product.Images, ","))
+	utils.RemoveImages(strings.Split(product.Images, ","))
 
 	err = m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
@@ -260,6 +260,15 @@ func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, erro
 		return product, err
 	}
 	return product, nil
+}
+func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product, error) {
+	var products []Product
+	err := m.GetConn().Where("id IN (?)", ids).First(&products).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت محصولات"})
+		return products, err
+	}
+	return products, nil
 }
 
 func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint64) error {

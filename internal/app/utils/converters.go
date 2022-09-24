@@ -1,4 +1,4 @@
-package helpers
+package utils
 
 import (
 	"database/sql"
@@ -21,19 +21,19 @@ func StringConvert(value string) sql.NullString {
 	}
 }
 
-func Int32Convert(value string) int {
+func StringToInt(value string) int {
 	val, _ := strconv.Atoi(value)
 	return val
 }
-func Float32Convert(value string) float32 {
+func StringToFloat32(value string) float32 {
 	val, _ := strconv.ParseFloat(value, 32)
 	return float32(val)
 }
-func UintConvert(value string) uint {
+func StringToUint(value string) uint {
 	val, _ := strconv.ParseUint(value, 10, 32)
 	return uint(val)
 }
-func Uint64Convert(value string) uint64 {
+func StringToUint64(value string) uint64 {
 	val, _ := strconv.ParseUint(value, 10, 32)
 	return val
 }

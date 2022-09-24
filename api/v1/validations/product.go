@@ -2,7 +2,7 @@ package validations
 
 import (
 	"backend/internal/app/DTOs"
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -108,7 +108,7 @@ func CreateProduct(c *gin.Context) (DTOs.CreateProduct, error) {
 }
 func UpdateProduct(c *gin.Context) (DTOs.UpdateProduct, error) {
 	var dto DTOs.UpdateProduct
-	dto.ID = helpers.Uint64Convert(c.Param("id"))
+	dto.ID = utils.StringToUint64(c.Param("id"))
 
 	tags := ValidationTags{
 		"ID": {

@@ -2,8 +2,9 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"encoding/gob"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -22,6 +23,8 @@ type Discount struct {
 	Percent    float32 `json:"percent"`
 	ProductIDs string  `json:"product_ids"`
 	Status     byte    `json:"status"`
+	CreatedAt  string  `json:"created_at"`
+	UpdatedAt  string  `json:"updated_at"`
 }
 type DiscountArr []Discount
 
@@ -48,8 +51,8 @@ func initDiscount(manager *MysqlManager) {
 }
 func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, userID uint64) error {
 
-	for _, pId := range strings.Split(dto.ProductIDs, ",") {
-		product, err := m.FindProductById(c, helpers.Uint64Convert(pId))
+	for _, pId := range dto.ProductIDs {
+		product, err := m.FindProductById(c, pId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
 			return err
@@ -68,14 +71,16 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 	discount := Discount{
 		Code:       dto.Code,
 		UserID:     userID,
-		StartedAt:  helpers.DateTimeConvert(dto.StartedAt),
-		EndedAt:    helpers.DateTimeConvert(dto.EndedAt),
+		StartedAt:  utils.DateTimeConvert(dto.StartedAt),
+		EndedAt:    utils.DateTimeConvert(dto.EndedAt),
 		Count:      dto.Count,
 		Type:       dto.Type,
 		Amount:     dto.Amount,
 		Percent:    dto.Percent,
-		ProductIDs: dto.ProductIDs,
+		ProductIDs: strings.Join(utils.Uint64ToStringArray(dto.ProductIDs), ","),
 		Status:     dto.Status,
+		CreatedAt:  utils.NowTime(),
+		UpdatedAt:  utils.NowTime(),
 	}
 	err := m.GetConn().Create(discount).Error
 	if err != nil {
@@ -84,31 +89,111 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateDiscount(c *gin.Context, discountID uint64) (Discount, error) {
+func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, userID uint64) error {
 
-	discount := Discount{}
-	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
-		return discount, err
+	for _, pId := range dto.ProductIDs {
+		product, err := m.FindProductById(c, pId)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
+			return err
+		}
+		if product.UserId != userID {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
+			return err
+		}
 	}
-	return discount, nil
+
+	discount := &Discount{}
+	err := m.GetConn().Where("id = ?", dto.DiscountID).First(discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
+		return nil
+	}
+
+	if discount.UserID != userID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ویرایش این تخفیف را ندارید"})
+		return errors.New("")
+	}
+
+	if dto.Code != "" {
+		discount.Code = dto.Code
+	}
+	if dto.StartedAt != "" {
+		discount.StartedAt = utils.DateTimeConvert(dto.StartedAt)
+	}
+	if dto.EndedAt != "" {
+		discount.EndedAt = utils.DateTimeConvert(dto.EndedAt)
+	}
+	if dto.Count != 0 {
+		discount.Count = dto.Count
+	}
+	if dto.Type != "" {
+		discount.Type = dto.Type
+	}
+	if dto.Amount != 0 {
+		discount.Amount = dto.Amount
+	}
+	if dto.Percent != 0 {
+		discount.Percent = dto.Percent
+	}
+	if dto.ProductIDs != nil {
+		discount.ProductIDs = strings.Join(utils.Uint64ToStringArray(dto.ProductIDs), ",")
+	}
+	if dto.Status != 0 {
+		discount.Status = dto.Status
+	}
+	discount.UpdatedAt = utils.NowTime()
+	err = m.GetConn().Save(discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در ویرایش تخفیف"})
+		return err
+	}
+	return nil
 }
-func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64) (Discount, error) {
-
+func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64, userID uint64) error {
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
-		return discount, err
+		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
+		return err
 	}
-	return discount, nil
+	if discount.UserID != userID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه حذف این تخفیف را ندارید"})
+		return errors.New("")
+	}
+
+	err = m.GetConn().Delete(&discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در حذف تخفیف"})
+		return err
+	}
+	return nil
+}
+func (m *MysqlManager) IndexDiscount(c *gin.Context, search string, userID uint64) ([]Discount, error) {
+	var discounts []Discount
+	err := m.GetConn().Where("user_id = ?", userID).Where("code LIKE ?", "%"+search+"%").Find(&discounts).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در دریافت تخفیف ها"})
+		return nil, err
+	}
+	return discounts, nil
 }
 
 func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Discount, error) {
 
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		return discount, err
+	}
+	return discount, nil
+}
+
+func (m *MysqlManager) FindDiscountByCodeAndShop(c *gin.Context, code string, shopID uint64) (Discount, error) {
+
+	discount := Discount{}
+	err := m.GetConn().Where("code = ?", code).Where("shop_id = ?", shopID).First(&discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
 		return discount, err

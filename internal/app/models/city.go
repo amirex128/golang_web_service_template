@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -45,7 +45,7 @@ func (c *City) Decode(ir io.Reader) error {
 func initCity(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&City{})
 	manager.GetConn().AutoMigrate(&CityProduct{})
-	cities := helpers.ReadCsvFile("../../csv/cities.csv")
+	cities := utils.ReadCsvFile("../../csv/cities.csv")
 	manager.CreateAllCities(cities)
 }
 func (m *MysqlManager) CreateAllCities(files [][]string) {
@@ -53,13 +53,13 @@ func (m *MysqlManager) CreateAllCities(files [][]string) {
 	for i := range files {
 		value := files[i]
 		cities = append(cities, City{
-			ID:          helpers.Int32Convert(value[0]),
-			ProvinceID:  helpers.Int32Convert(value[1]),
+			ID:          utils.StringToInt(value[0]),
+			ProvinceID:  utils.StringToInt(value[1]),
 			PersianName: value[2],
-			EnglishName: helpers.StringConvert(value[5]),
-			Code:        helpers.StringConvert(value[6]),
-			Lat:         helpers.StringConvert(value[7]),
-			Lng:         helpers.StringConvert(value[8]),
+			EnglishName: utils.StringConvert(value[5]),
+			Code:        utils.StringConvert(value[6]),
+			Lat:         utils.StringConvert(value[7]),
+			Lng:         utils.StringConvert(value[8]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(cities, 100).Error

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/helpers"
+	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
@@ -65,9 +65,9 @@ func initCategory(manager *MysqlManager) bool {
 		return false
 	}
 
-	categories := helpers.ReadCsvFile("../../csv/categories.csv")
+	categories := utils.ReadCsvFile("../../csv/categories.csv")
 	manager.CreateAllCategories(categories)
-	categoryRelated := helpers.ReadCsvFile("../../csv/category_related.csv")
+	categoryRelated := utils.ReadCsvFile("../../csv/category_related.csv")
 	manager.CreateAllCategoryRelated(categoryRelated)
 
 	return true
@@ -88,15 +88,15 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categories = append(categories, Category{
-			ID:          helpers.Int32Convert(value[0]),
-			ParentID:    helpers.Int32Convert(value[0]),
+			ID:          utils.StringToInt(value[0]),
+			ParentID:    utils.StringToInt(value[0]),
 			Name:        value[2],
-			Sort:        helpers.UintConvert(value[3]),
-			Equivalent:  helpers.StringConvert(value[4]),
-			GuildIds:    helpers.StringConvert(value[5]),
-			Description: helpers.StringConvert(value[7]),
-			Icon:        helpers.StringConvert(value[8]),
-			Depth:       helpers.UintConvert(value[9]),
+			Sort:        utils.StringToUint(value[3]),
+			Equivalent:  utils.StringConvert(value[4]),
+			GuildIds:    utils.StringConvert(value[5]),
+			Description: utils.StringConvert(value[7]),
+			Icon:        utils.StringConvert(value[8]),
+			Depth:       utils.StringToUint(value[9]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(categories, 100).Error
@@ -110,8 +110,8 @@ func (m *MysqlManager) CreateAllCategoryRelated(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categoryRelated = append(categoryRelated, CategoryRelated{
-			CategoryID:        helpers.Int32Convert(value[0]),
-			CategoryRelatedID: helpers.Int32Convert(value[1]),
+			CategoryID:        utils.StringToInt(value[0]),
+			CategoryRelatedID: utils.StringToInt(value[1]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(categoryRelated, 100).Error

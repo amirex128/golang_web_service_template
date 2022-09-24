@@ -10,7 +10,7 @@ import (
 func CreateOrder(c *gin.Context) (DTOs.CreateOrder, error) {
 	var dto DTOs.CreateOrder
 	tags := ValidationTags{
-		"OrderItem": {
+		"OrderItems": {
 			"required": "محصولات الزامی است",
 		},
 		"CustomerID": {
