@@ -113,3 +113,51 @@ func UpdateCustomer(c *gin.Context) (DTOs.UpdateCustomer, error) {
 	}
 	return dto, nil
 }
+
+func CreateCustomer(c *gin.Context) (DTOs.CreateCustomer, error) {
+	var dto DTOs.CreateCustomer
+	tags := ValidationTags{
+		"Mobile": {
+			"required":   "شماره موبایل الزامی است",
+			"min":        "شماره موبایل باید 11 رقم باشد",
+			"max":        "شماره موبایل باید 11 رقم باشد",
+			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+		"VerifyCode": {
+			"required": "کد تایید الزامی است",
+			"min":      "کد تایید باید 4 رقم باشد",
+			"max":      "کد تایید باید 20 رقم باشد",
+		},
+		"FullName": {
+			"required": "نام و نام خانوادگی الزامی است",
+		},
+		"ProvinceID": {
+			"required": "استان الزامی است",
+		},
+		"CityID": {
+			"required": "شهر الزامی است",
+		},
+		"Address": {
+			"required": "آدرس الزامی است",
+		},
+		"PostalCode": {
+			"required":  "کد پستی الزامی است",
+			"startwith": "کد پستی باید با ۹ شروع شود",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}

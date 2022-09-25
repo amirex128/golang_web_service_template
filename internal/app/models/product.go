@@ -34,6 +34,11 @@ type Product struct {
 	EndedAt          sql.NullString `json:"ended_at"`
 	DeliveryTime     uint           `json:"delivery_time"` // مدت زمان ارسال
 }
+
+func (c Product) GetID() uint64 {
+	return c.ID
+}
+
 type ProductArr []Product
 
 func (s ProductArr) Len() int {

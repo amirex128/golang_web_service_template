@@ -16,11 +16,8 @@ func register(c *gin.Context) {
 		Mobile:   login.Mobile,
 		Password: login.Password,
 	}
-	errRes := models.NewMainManager().CreateUser(user)
-	if errRes != "" {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": errRes,
-		})
+	err = models.NewMainManager().CreateUser(c, user)
+	if err != nil {
 		return
 	}
 
@@ -37,11 +34,8 @@ func forget(c *gin.Context) {
 		Mobile:   login.Mobile,
 		Password: login.Password,
 	}
-	errRes := models.NewMainManager().CreateUser(user)
-	if errRes != "" {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": errRes,
-		})
+	err = models.NewMainManager().CreateUser(c, user)
+	if err != nil {
 		return
 	}
 

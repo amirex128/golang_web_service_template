@@ -4,7 +4,10 @@ import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
 	"encoding/gob"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
 )
 
 type User struct {
@@ -14,9 +17,9 @@ type User struct {
 	Lastname    string `json:"lastname"`
 	Email       string `json:"email"`
 	ShopName    string `json:"shop_name"`
-	GuildID     string `json:"guild_id"`
-	ProvinceID  string `json:"province_id"`
-	CityID      string `json:"city_id"`
+	GuildID     uint32 `json:"guild_id"`
+	ProvinceID  uint32 `json:"province_id"`
+	CityID      uint32 `json:"city_id"`
 	Lat         string `json:"lat"`
 	Long        string `json:"long"`
 	Logo        string `json:"logo"`
@@ -54,22 +57,39 @@ func (c *User) Decode(ir io.Reader) error {
 func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
 }
-func (m *MysqlManager) CreateUser(user *User) string {
+func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
 	find := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).Find(&User{}).RowsAffected
 	if find > 0 {
-		return "کاربری با این مشخصات قبلا ثبت شده است"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "کاربری با این مشخصات قبلا ثبت شده است",
+		})
+		return errors.New("")
 	}
 	user.Password = utils.GeneratePasswordHash(user.Password)
 	err := m.GetConn().Create(user).Error
 	if err != nil {
-		return "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید",
+		})
+		return err
 	}
-	return ""
+	return nil
 }
 func (m *MysqlManager) FindUserByMobilePassword(user DTOs.Login) (*User, error) {
 	res := &User{}
 	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).First(res).Error
 	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error) {
+	res := &User{}
+	err := m.GetConn().Where("id = ?", userID).First(res).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "فروشگاه یافت نشد",
+		})
 		return nil, err
 	}
 	return res, nil

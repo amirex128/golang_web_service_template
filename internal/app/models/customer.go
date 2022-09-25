@@ -16,7 +16,7 @@ type Customer struct {
 	ProvinceID uint32 `json:"province_id"`
 	CityID     uint32 `json:"city_id"`
 	Address    string `json:"address"`
-	PostalCode string `json:"postal_code"`
+	PostalCode uint64 `json:"postal_code"`
 	VerifyCode string `json:"verify_code"`
 	CreatedAt  string `json:"created_at"`
 	UpdatedAt  string `json:"updated_at"`
@@ -72,7 +72,24 @@ func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(mobile, verifyCode stri
 	}
 	return customer, nil
 }
-
+func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateCustomer) error {
+	encryptPassword := utils.GeneratePasswordHash(dto.VerifyCode)
+	customer := Customer{
+		FullName:   dto.FullName,
+		Mobile:     dto.Mobile,
+		ProvinceID: dto.ProvinceID,
+		CityID:     dto.CityID,
+		Address:    dto.Address,
+		PostalCode: dto.PostalCode,
+		VerifyCode: encryptPassword,
+	}
+	err := m.GetConn().Create(&customer).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "مشکلی در ثبت نام شما پیش آمده است"})
+		return err
+	}
+	return nil
+}
 func (m *MysqlManager) UpdateCustomer(dto DTOs.UpdateCustomer) error {
 
 	customer := &Customer{

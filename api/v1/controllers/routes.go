@@ -28,14 +28,22 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 				product.POST("/update/:id", updateProduct)
 				product.POST("/delete/:id", deleteProduct)
 			}
-
+			discount := admin.Group("discounts")
+			{
+				discount.GET("/", indexDiscount)
+				discount.GET("/show/:id", showDiscount)
+				discount.POST("/create", createDiscount)
+				discount.POST("/update/:id", updateDiscount)
+				discount.POST("/delete/:id", deleteDiscount)
+			}
 		}
 
 		user := v1.Group("user")
 		{
 			user.POST("/order/create", createOrder)
 			user.POST("/discount/check", checkDiscount)
-			user.POST("/customer/request", requestCustomerInformation)
+			user.POST("/customer/create", createCustomer)
+			user.POST("/customer/login", loginCustomer)
 			user.POST("/customer/verify", verifyCustomer)
 			user.POST("/customer/update", updateCustomer)
 		}

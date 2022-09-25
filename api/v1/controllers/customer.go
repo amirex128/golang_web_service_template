@@ -7,6 +7,22 @@ import (
 	"net/http"
 )
 
+// createCustomer ثبت نام مشتری
+func createCustomer(c *gin.Context) {
+	dto, err := validations.CreateCustomer(c)
+	if err != nil {
+		return
+	}
+	err = models.NewMainManager().CreateCustomer(c, dto)
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "اطلاعات شما با موفقیت ثبت شد",
+	})
+	return
+}
+
 // loginCustomer ارسال شماره موبایل برای ورود و در صورت عدم وجود شماره موبایل پیامک ارسال خواهد شد
 func loginCustomer(c *gin.Context) {
 	dto, err := validations.LoginCustomer(c)

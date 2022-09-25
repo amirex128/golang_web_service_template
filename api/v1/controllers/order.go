@@ -16,13 +16,19 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
+	user, err := models.NewMainManager().FindUserByID(c, dto.UserID)
+	if err != nil {
+		return
+	}
+
 	customer, err := models.NewMainManager().FindCustomerById(c, dto.CustomerID)
 	if err != nil {
 		return
 	}
 
-	if customer.VerifyCode != dto.VerifyCode {
+	if customer.VerifyCode != utils.GeneratePasswordHash(dto.VerifyCode) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تایید صحیح نمی باشد"})
+		return
 	}
 
 	discount, err := models.NewMainManager().FindDiscountById(c, dto.DiscountID)
@@ -40,10 +46,35 @@ func createOrder(c *gin.Context) {
 	}
 
 	productDiscounts := strings.Split(discount.ProductIDs, ",")
-	applyDiscount := utils.ApplyDiscount(productDiscounts, discount, productIDs)
-	utils.CalculateDiscountProduct(applyDiscount, products, discount)
+	applyDiscount := utils.ApplyDiscount(productDiscounts, utils.DiscountPriceType{
+		Percent: discount.Percent,
+		Amount:  discount.Amount,
+		Type:    discount.Type,
+	}, productIDs)
+	var productCalculate []utils.ProductDiscountCalculatorType
+	for i := range products {
+		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
+			ProductID: products[i].ID,
+			Price:     products[i].Price,
+		})
+	}
+	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productCalculate, utils.DiscountPriceType{
+		Percent: discount.Percent,
+		Amount:  discount.Amount,
+		Type:    discount.Type,
+	})
 
-	err = models.NewMainManager().CreateOrder(c, dto)
+	var order models.Order
+	for _, dis := range calculateDiscountProduct {
+		order.TotalProductPrice += dis.RawPrice
+		order.TotalDiscountPrice += dis.OffPrice
+		order.TotalTaxPrice += dis.NewPrice * 0.09
+		order.TotalProductDiscountPrice += dis.NewPrice
+	}
+	order.SendPrice = utils.CalculateSendPrice(user.ProvinceID, user.CityID, customer.ProvinceID, customer.CityID)
+	order.TotalFinalPrice = order.TotalProductDiscountPrice + order.TotalTaxPrice
+
+	err = models.NewMainManager().CreateOrder(c, order)
 	if err != nil {
 		return
 	}

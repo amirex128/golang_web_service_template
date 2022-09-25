@@ -190,10 +190,10 @@ func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Disc
 	return discount, nil
 }
 
-func (m *MysqlManager) FindDiscountByCodeAndShop(c *gin.Context, code string, shopID uint64) (Discount, error) {
+func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, code string, userID uint64) (Discount, error) {
 
 	discount := Discount{}
-	err := m.GetConn().Where("code = ?", code).Where("shop_id = ?", shopID).First(&discount).Error
+	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
 		return discount, err

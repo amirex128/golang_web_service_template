@@ -17,7 +17,7 @@ func checkDiscount(c *gin.Context) {
 	}
 	productIDs := dto.ProductIDs
 
-	discount, err := models.NewMainManager().FindDiscountByCodeAndShop(c, dto.Code, dto.UserID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, dto.Code, dto.UserID)
 	if err != nil {
 		return
 	}
@@ -28,8 +28,23 @@ func checkDiscount(c *gin.Context) {
 
 	productDiscounts := strings.Split(discount.ProductIDs, ",")
 
-	applyDiscount := utils.ApplyDiscount(productDiscounts, discount, productIDs)
-	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, products, discount)
+	applyDiscount := utils.ApplyDiscount(productDiscounts, utils.DiscountPriceType{
+		Percent: discount.Percent,
+		Amount:  discount.Amount,
+		Type:    discount.Type,
+	}, productIDs)
+	var productCalculate []utils.ProductDiscountCalculatorType
+	for i := range products {
+		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
+			ProductID: products[i].ID,
+			Price:     products[i].Price,
+		})
+	}
+	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productCalculate, utils.DiscountPriceType{
+		Percent: discount.Percent,
+		Amount:  discount.Amount,
+		Type:    discount.Type,
+	})
 
 	c.JSON(http.StatusOK, gin.H{
 		"result": calculateDiscountProduct,
@@ -95,6 +110,25 @@ func deleteDiscount(c *gin.Context) {
 	err := models.NewMainManager().DeleteDiscount(c, id, userID)
 	if err != nil {
 		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "تخفیف با موفقیت حذف شد",
+	})
+}
+
+// showDiscount نمایش تخفیف
+func showDiscount(c *gin.Context) {
+	id := utils.StringToUint64(c.Param("id"))
+	userID := utils.GetUser(c)
+
+	discount, err := models.NewMainManager().FindDiscountById(c, id)
+	if err != nil {
+		return
+	}
+	if discount.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "شما اجازه مشاهده این تخفیف را ندارید",
+		})
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تخفیف با موفقیت حذف شد",
