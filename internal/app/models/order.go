@@ -4,13 +4,14 @@ import (
 	"encoding/gob"
 	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
 )
 
 type Order struct {
-	ID                        int64   `json:"id"`
-	UserID                    int64   `json:"user_id"`
-	CustomerID                int64   `json:"customer_id"`
-	DiscountID                int64   `json:"discount_id"`
+	ID                        uint64  `json:"id"`
+	UserID                    uint64  `json:"user_id"`
+	CustomerID                uint64  `json:"customer_id"`
+	DiscountID                uint64  `json:"discount_id"`
 	IP                        string  `json:"ip"`
 	TotalProductPrice         float32 `json:"total_product_price"`
 	TotalDiscountPrice        float32 `json:"total_discount_price"`
@@ -18,7 +19,8 @@ type Order struct {
 	TotalProductDiscountPrice float32 `json:"total_product_discount_price"`
 	TotalFinalPrice           float32 `json:"total_final_price"`
 	SendPrice                 float32 `json:"send_price"`
-	Status                    string  `json:"status"`    // suspend ready wrong_ready seller_not_to_attend personal_sent service_sent virtual_sent posted unacceptable waited not_distribution pre_distribution distributed confirmed accept return return_final cancel khesarat gheramati amadesazi merge inprocessing ready_schedule logistic_sent pre_return_logistic ready_logistic
+	Status                    string  `json:"status"`
+	PaymentStatus             string  `json:"payment_status"`
 	SendType                  string  `json:"send_type"` // tipax post post-poshtaz
 	LastUpdateStatusAt        string  `json:"last_update_status_at"`
 	CreatedAt                 string  `json:"created_at"`
@@ -47,7 +49,13 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(c *gin.Context, dto Order) error {
-
+func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) error {
+	err := m.GetConn().Create(&order).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در ثبت سفارش",
+		})
+		return err
+	}
 	return nil
 }

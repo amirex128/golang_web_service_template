@@ -19,8 +19,8 @@ type Product struct {
 	Name             string         `json:"name"`
 	ShortDescription string         `json:"short_description"`
 	TotalSales       uint32         `json:"total_sales"`
-	BlockStatus      string         `json:"block_status"` // ok filter black_list disable_ok disable_filter disable_black_list
-	Quantity         int            `json:"quantity"`
+	Status           string         `json:"block_status" sql:"type:ENUM('block','ok')"`
+	Quantity         uint64         `json:"quantity"`
 	Price            float32        `json:"price"`
 	FreeSend         byte           `json:"free_send"`
 	Weight           sql.NullInt32  `json:"weight"`

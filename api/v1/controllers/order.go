@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"backend/api/v1/validations"
+	"backend/internal/app/DTOs"
+	"backend/internal/app/constants"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
@@ -36,13 +38,39 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	var productIDs []uint64
-	for i := range dto.OrderItems {
-		productIDs = append(productIDs, dto.OrderItems[i].ProductID)
-	}
-	products, err := models.NewMainManager().FindProductByIds(c, productIDs)
+	rawProducts, err := models.NewMainManager().FindProductByIds(c, extractProductIDs(dto))
 	if err != nil {
 		return
+	}
+	var products []models.Product
+	for i := range rawProducts {
+		var count uint64
+		for j := range dto.OrderItems {
+			if rawProducts[i].ID == dto.OrderItems[j].ProductID {
+				count = dto.OrderItems[j].Count
+			}
+		}
+		if rawProducts[i].Active == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message":    "محصول " + rawProducts[i].Name + " غیر فعال است",
+				"product_id": rawProducts[i].ID,
+			})
+			return
+		}
+		if rawProducts[i].Quantity < count {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message":    "موجودی محصول " + rawProducts[i].Name + " کافی نمی باشد",
+				"product_id": rawProducts[i].ID,
+			})
+			return
+		}
+		if rawProducts[i].Status == constants.BlockProductStatus {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message":    "محصول " + rawProducts[i].Name + " مسدود شده است",
+				"product_id": rawProducts[i].ID,
+			})
+			return
+		}
 	}
 
 	productDiscounts := strings.Split(discount.ProductIDs, ",")
@@ -50,7 +78,7 @@ func createOrder(c *gin.Context) {
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
-	}, productIDs)
+	}, extractProductIDs(dto))
 	var productCalculate []utils.ProductDiscountCalculatorType
 	for i := range products {
 		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
@@ -71,8 +99,30 @@ func createOrder(c *gin.Context) {
 		order.TotalTaxPrice += dis.NewPrice * 0.09
 		order.TotalProductDiscountPrice += dis.NewPrice
 	}
-	order.SendPrice = utils.CalculateSendPrice(user.ProvinceID, user.CityID, customer.ProvinceID, customer.CityID)
-	order.TotalFinalPrice = order.TotalProductDiscountPrice + order.TotalTaxPrice
+
+	freeSend := true
+	for i := range products {
+		if products[i].FreeSend == 0 {
+			freeSend = false
+		}
+	}
+	if freeSend {
+		order.SendPrice = 0
+	} else {
+		order.SendPrice = utils.CalculateSendPrice(user.ProvinceID, user.CityID, customer.ProvinceID, customer.CityID)
+	}
+
+	order.TotalFinalPrice = order.TotalProductDiscountPrice + order.TotalTaxPrice + order.SendPrice
+
+	order.UserID = user.ID
+	order.CustomerID = customer.ID
+	order.DiscountID = discount.ID
+	order.IP = c.ClientIP()
+	order.Status = constants.PendingPaymentOrderStatus
+	order.PaymentStatus = constants.PendingPaymentOrderPaymentStatus
+	order.SendType = dto.SendType
+	order.LastUpdateStatusAt = utils.NowTime()
+	order.CreatedAt = utils.NowTime()
 
 	err = models.NewMainManager().CreateOrder(c, order)
 	if err != nil {
@@ -83,4 +133,16 @@ func createOrder(c *gin.Context) {
 		"message": "محصول با موفقیت ایجاد شد",
 	})
 	return
+}
+
+func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
+	var productIDs []uint64
+	for i := range dto.OrderItems {
+		productIDs = append(productIDs, dto.OrderItems[i].ProductID)
+	}
+	return productIDs
+}
+
+func updateOrder() {
+
 }
