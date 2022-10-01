@@ -8,7 +8,7 @@ import (
 )
 
 type Province struct {
-	ID          int    `json:"id"`
+	ID          int    `gorm:"primary_key;auto_increment" json:"id"`
 	PersianName string `json:"persian_name"`
 	EnglishName string `json:"english_name"`
 	Cod         string `json:"COD"` // کد سیستم پست

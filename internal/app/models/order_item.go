@@ -6,7 +6,7 @@ import (
 )
 
 type OrderItem struct {
-	ID        int64 `json:"id"`
+	ID        int64 `gorm:"primary_key;auto_increment" json:"id"`
 	ProductID int64 `json:"product_id"`
 	Count     uint  `json:"count"`
 }

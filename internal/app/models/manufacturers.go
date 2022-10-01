@@ -9,7 +9,7 @@ import (
 )
 
 type Manufacturer struct {
-	ID               int            `json:"id"`
+	ID               int            `gorm:"primary_key;auto_increment" json:"id"`
 	CountryName      sql.NullString `json:"country_name"`
 	ShortDescription sql.NullString `json:"short_description"`
 	Logo             sql.NullString `json:"logo"`

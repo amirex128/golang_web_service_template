@@ -14,7 +14,7 @@ import (
 import "github.com/spf13/viper"
 
 const (
-	appName = "hamyarsale"
+	appName = "selloora"
 )
 
 func main() {

@@ -9,7 +9,7 @@ import (
 )
 
 type Guild struct {
-	ID         int            `json:"id"`
+	ID         int            `gorm:"primary_key;auto_increment" json:"id"`
 	ParentID   int            `json:"parent_id"`
 	Name       string         `json:"name"`
 	Icon       sql.NullString `json:"icon"`

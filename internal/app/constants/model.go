@@ -5,38 +5,30 @@ type IModel interface {
 }
 
 const (
-	PendingPaymentOrderStatus        = "pending_payment"
-	PendingPaymentOrderPaymentStatus = "pending_payment"
+	PendingPaymentOrderStatus   = "pending_payment"
+	SucceededPaymentOrderStatus = "succeeded_payment"
+	FailedPaymentOrderStatus    = "failed_payment"
+
+	CanceledOrderStatus = "canceled"
+
+	PendingAcceptOrderStatus = "pending_accept"
+	AcceptedOrderStatus      = "accepted"
+
+	PendingReceivePostOrderStatus = "pending_receive_post"
+	ReceivedPostOrderStatus       = "received_post"
+	ReceivedCustomerOrderStatus   = "received_customer"
+
+	PendingReturnOrderStatus  = "pending_return"
+	AcceptedReturnOrderStatus = "accepted_return"
+	RejectedReturnOrderStatus = "rejected_return"
+
+	PendingReceivePostReturnOrderStatus = "pending_receive_return"
+	ReceivedPostReturnOrderStatus       = "received_post_return"
+	ReceivedOwnerOrderStatus            = "received_owner"
+
+	FinishedOrderStatus = "finished"
 
 	OKProductStatus      = "ok"
 	PendingProductStatus = "pending"
 	BlockProductStatus   = "block"
-
-	Suspend           = "suspend"
-	Ready             = "ready"
-	WrongReady        = "wrong_ready"
-	SellerNotToAttend = "seller_not_to_attend"
-	PersonalSent      = "personal_sent"
-	ServiceSent       = "service_sent"
-	VirtualSent       = "virtual_sent"
-	Posted            = "posted"
-	Unacceptable      = "unacceptable"
-	Waited            = "waited"
-	NotDistribution   = "not_distribution"
-	PreDistribution   = "pre_distribution"
-	Distributed       = "distributed"
-	Confirmed         = "confirmed"
-	Accept            = "accept"
-	ReturnOrder       = "return_order"
-	ReturnFinal       = "return_final"
-	Cancel            = "cancel"
-	Khesarat          = "khesarat"
-	Gheramati         = "gheramati"
-	Amadesazi         = "amadesazi"
-	Merge             = "merge"
-	Inprocessing      = "inprocessing"
-	ReadySchedule     = "ready_schedule"
-	LogisticSent      = "logistic_sent"
-	PreReturnLogistic = "pre_return_logistic"
-	ReadyLogistic     = "ready_logistic"
 )

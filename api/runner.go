@@ -6,6 +6,7 @@ import (
 	"backend/internal/app/models"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -38,7 +39,7 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &models.User{
-				ID:        int64(claims["id"].(float64)),
+				ID:        uint64(claims["id"].(float64)),
 				Email:     claims["email"].(string),
 				Mobile:    claims["mobile"].(string),
 				Status:    claims["status"].(string),
@@ -108,7 +109,7 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 
 func Runner(host string, port string) {
 	r := gin.Default()
-
+	r.Use(Pongo2())
 	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
 			c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s", err))
@@ -123,4 +124,43 @@ func Runner(host string, port string) {
 		panic(err)
 	}
 
+}
+func Pongo2() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+
+		name := stringFromContext(c, "template")
+		data, _ := c.Get("data")
+
+		if name == "" {
+			return
+		}
+
+		template := pongo2.Must(pongo2.FromFile(fmt.Sprintf("%s/%s", "../../templates", name)))
+		err := template.ExecuteWriter(convertContext(data), c.Writer)
+		if err != nil {
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func stringFromContext(c *gin.Context, input string) string {
+	raw, ok := c.Get(input)
+	if ok {
+		strVal, ok := raw.(string)
+		if ok {
+			return strVal
+		}
+	}
+	return ""
+}
+
+func convertContext(thing interface{}) pongo2.Context {
+	if thing != nil {
+		context, isMap := thing.(map[string]interface{})
+		if isMap {
+			return context
+		}
+	}
+	return nil
 }

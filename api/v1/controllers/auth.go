@@ -26,20 +26,5 @@ func register(c *gin.Context) {
 	})
 }
 func forget(c *gin.Context) {
-	login, err := validations.Register(c)
-	if err != nil {
-		return
-	}
-	user := &models.User{
-		Mobile:   login.Mobile,
-		Password: login.Password,
-	}
-	err = models.NewMainManager().CreateUser(c, user)
-	if err != nil {
-		return
-	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ثبت نام با موفقیت انجام شد",
-	})
 }

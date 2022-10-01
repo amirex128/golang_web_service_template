@@ -9,7 +9,7 @@ import (
 )
 
 type FeatureItem struct {
-	ID            int            `json:"id"`
+	ID            int            `gorm:"primary_key;auto_increment" json:"id"`
 	FeatureItemID int            `json:"feature_group_id"`
 	Title         string         `json:"title"`
 	Type          string         `json:"type" sql:"type:ENUM('label','color','boolean','other')"`              //      => تعیین نوع مجاز پاسخ برای این خصوصیت : پاسخ متنی ساده - پاسخ از نوع رنگ - پاسخ بله یا خیر - پاسخ چند جوابه

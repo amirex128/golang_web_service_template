@@ -13,8 +13,9 @@ import (
 )
 
 type Product struct {
-	ID               uint64         `json:"id"`
-	UserId           uint64         `json:"user_id"`
+	ID               uint64         `gorm:"primary_key;auto_increment" json:"id"`
+	UserID           uint64         `json:"user_id"`
+	ShopID           uint64         `json:"shop_id"`
 	Description      string         `json:"description"`
 	Name             string         `json:"name"`
 	ShortDescription string         `json:"short_description"`
@@ -22,7 +23,6 @@ type Product struct {
 	Status           string         `json:"block_status" sql:"type:ENUM('block','ok')"`
 	Quantity         uint64         `json:"quantity"`
 	Price            float32        `json:"price"`
-	FreeSend         byte           `json:"free_send"`
 	Weight           sql.NullInt32  `json:"weight"`
 	Height           sql.NullInt32  `json:"height"`
 	Width            sql.NullInt32  `json:"width"`
@@ -62,7 +62,7 @@ func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 }
 
-func (m *MysqlManager) IndexProduct(dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
 	conn := m.GetConn()
 	var products []Product
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -82,18 +82,18 @@ func (m *MysqlManager) IndexProduct(dto DTOs.IndexProduct) (*DTOs.Pagination, er
 func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, userID uint64) error {
 
 	var product = Product{
-		UserId:           userID,
+		UserID:           userID,
+		ShopID:           dto.ShopID,
 		Description:      dto.Description,
 		Name:             dto.Name,
 		ShortDescription: dto.ShortDescription,
-		Quantity: func() int {
+		Quantity: func() uint64 {
 			if dto.Quantity == 0 {
-				return -1
+				return 0
 			}
 			return dto.Quantity
 		}(),
-		Price:    dto.Price,
-		FreeSend: utils.ActiveConvert(dto.FreeSend),
+		Price: dto.Price,
 		Weight: func() sql.NullInt32 {
 			if dto.Weight > 0 {
 				return sql.NullInt32{
@@ -174,6 +174,9 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	if err != nil {
 		return err
 	}
+	if dto.ShopID > 0 {
+		product.ShopID = dto.ShopID
+	}
 	if dto.Description != "" {
 		product.Description = dto.Description
 	}
@@ -183,14 +186,11 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	if dto.ShortDescription != "" {
 		product.ShortDescription = dto.ShortDescription
 	}
-	if dto.Quantity > 0 || dto.Quantity == -1 {
+	if dto.Quantity > 0 {
 		product.Quantity = dto.Quantity
 	}
 	if dto.Price > 0 {
 		product.Price = dto.Price
-	}
-	if dto.FreeSend != "" {
-		product.FreeSend = utils.ActiveConvert(dto.FreeSend)
 	}
 	if dto.Weight > 0 {
 		product.Weight = sql.NullInt32{
@@ -281,7 +281,7 @@ func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint
 	if err != nil {
 		return err
 	}
-	if product.UserId != userID {
+	if product.UserID != userID {
 		err = errors.New("access denied")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error(), "message": "شما دسترسی کافی برای ویرایش این محصول را ندارید"})
 		return err

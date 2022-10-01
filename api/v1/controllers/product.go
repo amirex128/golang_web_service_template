@@ -14,7 +14,7 @@ func indexProduct(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	products, err := models.NewMainManager().IndexProduct(dto)
+	products, err := models.NewMainManager().GetAllProductWithPagination(dto)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت اطلاعات"})
 	}
@@ -30,7 +30,7 @@ func createProduct(c *gin.Context) {
 		return
 	}
 
-	images, err := utils.UploadImages(c, dto.Images, userID)
+	images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
 	if err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func updateProduct(c *gin.Context) {
 
 	utils.RemoveImages(dto.ImageRemove)
 
-	images, err := utils.UploadImages(c, dto.Images, userID)
+	images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
 	if err != nil {
 		return
 	}

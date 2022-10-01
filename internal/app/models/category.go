@@ -9,7 +9,7 @@ import (
 )
 
 type Category struct {
-	ID          int            `json:"id"`
+	ID          int            `gorm:"primary_key;auto_increment" json:"id"`
 	ParentID    int            `json:"parent_id"`
 	Name        string         `json:"name"`
 	Sort        uint           `json:"sort"`

@@ -6,7 +6,7 @@ import (
 )
 
 type Option struct {
-	ID       uint64  `json:"id"`
+	ID       uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Variant  string  `json:"variant"`
 	Name     string  `json:"name"`
 	Price    float32 `json:"price"`

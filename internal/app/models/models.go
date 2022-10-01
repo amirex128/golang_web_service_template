@@ -31,6 +31,8 @@ const (
 	ProvinceTable           = "provinces"
 	ProductProvinceTable    = "product_provinces"
 	UserTable               = "users"
+	PostTable               = "posts"
+	FinancialTable          = "financials"
 )
 
 type MysqlManager struct {
@@ -64,6 +66,7 @@ func (r *MysqlManager) Initial() {
 	initUser(manager)
 	initOption(manager)
 	initShop(manager)
+	InitPost(manager)
 
 }
 

@@ -12,11 +12,11 @@ import (
 func Initialize(prefix string) {
 	viper.SetEnvPrefix(prefix)
 	viper.AutomaticEnv()
-	viper.SetConfigName("config") // name of config file (without extension)
-	viper.SetConfigType("yml")    // REQUIRED if the config file does not have the extension in the name
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
 	viper.AddConfigPath("../../configs")
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
+	err := viper.ReadInConfig()
+	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 	viper.OnConfigChange(func(e fsnotify.Event) {

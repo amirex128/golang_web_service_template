@@ -8,7 +8,7 @@ import (
 )
 
 type Order struct {
-	ID                        uint64  `json:"id"`
+	ID                        uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	UserID                    uint64  `json:"user_id"`
 	CustomerID                uint64  `json:"customer_id"`
 	DiscountID                uint64  `json:"discount_id"`
@@ -20,7 +20,6 @@ type Order struct {
 	TotalFinalPrice           float32 `json:"total_final_price"`
 	SendPrice                 float32 `json:"send_price"`
 	Status                    string  `json:"status"`
-	PaymentStatus             string  `json:"payment_status"`
 	SendType                  string  `json:"send_type"` // tipax post post-poshtaz
 	LastUpdateStatusAt        string  `json:"last_update_status_at"`
 	CreatedAt                 string  `json:"created_at"`
@@ -49,13 +48,50 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) error {
-	err := m.GetConn().Create(&order).Error
+func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (err error) {
+	err = m.GetConn().Create(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت سفارش",
 		})
-		return err
+		return
 	}
-	return nil
+	return
+}
+
+func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []string) (orders []Order, err error) {
+	err = m.GetConn().Where("user_id = ? AND status IN (?)", userID, orderStatus).Find(&orders).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در دریافت سفارشات",
+		})
+		return
+	}
+	return
+}
+func (m *MysqlManager) FindOrderByID(c *gin.Context, orderID uint64, userID uint64) (order Order, err error) {
+	err = m.GetConn().Where("id = ?", orderID).First(&order).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در دریافت سفارش",
+		})
+		return
+	}
+	if order.UserID != userID {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "شما اجازه دسترسی به این سفارش را ندارید",
+		})
+		return
+	}
+	return
+}
+func (m *MysqlManager) UpdateOrder(c *gin.Context, order Order) (err error) {
+	err = m.GetConn().Save(&order).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در ثبت سفارش",
+		})
+		return
+	}
+	return
 }

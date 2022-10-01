@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -48,7 +49,7 @@ func DateTimeConvert(value string) string {
 	}
 	return ""
 }
-func NowTime() string {
-	l, _ := time.LoadLocation("Asia/Tehran")
-	return time.Now().In(l).Format("2006-01-02 15:04:05")
+
+func Uint64ToString(value uint64) string {
+	return fmt.Sprintf("%d", value)
 }

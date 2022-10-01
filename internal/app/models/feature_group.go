@@ -9,7 +9,7 @@ import (
 )
 
 type FeatureGroup struct {
-	ID          int            `json:"id"`
+	ID          int            `gorm:"primary_key;auto_increment" json:"id"`
 	CategoryID  int            `json:"category_id"`
 	Title       string         `json:"title"`
 	Icon        sql.NullString `json:"icon"`

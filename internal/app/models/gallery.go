@@ -6,7 +6,7 @@ import (
 )
 
 type Gallery struct {
-	ID        int    `json:"id"`
+	ID        int    `gorm:"primary_key;auto_increment" json:"id"`
 	ProductID int64  `json:"product_id"`
 	Path      string `json:"path"`
 	Caption   string `json:"caption"`

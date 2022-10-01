@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -28,10 +27,10 @@ func ReadCsvFile(filePath string) [][]string {
 
 	return records
 }
-func UploadImages(c *gin.Context, images []*multipart.FileHeader, userID uint64) ([]string, error) {
+func UploadMultiImage(c *gin.Context, images []*multipart.FileHeader, dest string) ([]string, error) {
 	abs, _ := filepath.Abs("../../assets")
 	var imagesPath []string
-	userDir := filepath.Join(abs, "user_"+strconv.FormatUint(userID, 10), "images")
+	userDir := filepath.Join(abs, dest, "images")
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
@@ -45,6 +44,21 @@ func UploadImages(c *gin.Context, images []*multipart.FileHeader, userID uint64)
 		imagesPath = append(imagesPath, path)
 	}
 	return imagesPath, nil
+}
+func UploadImage(c *gin.Context, image *multipart.FileHeader, dest string) (string, error) {
+	abs, _ := filepath.Abs("../../assets")
+	userDir := filepath.Join(abs, dest, "images")
+	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+	path := filepath.Join(userDir, uuid.NewString()+"."+strings.Split(image.Header["Content-Type"][0], "/")[1])
+	err := c.SaveUploadedFile(image, path)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در آپلود تصایر"})
+		return "", err
+	}
+
+	return path, nil
 }
 func RemoveImages(images []string) {
 	for i := range images {

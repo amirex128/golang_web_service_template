@@ -9,7 +9,7 @@ import (
 )
 
 type Event struct {
-	ID        int    `json:"id"`
+	ID        int    `gorm:"primary_key;auto_increment" json:"id"`
 	Name      string `json:"name"`
 	Active    byte   `json:"active"`
 	StartedAt string `json:"started_at"`

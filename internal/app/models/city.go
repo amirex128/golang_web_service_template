@@ -9,7 +9,7 @@ import (
 )
 
 type City struct {
-	ID          int            `json:"id"`
+	ID          int            `gorm:"primary_key;auto_increment" json:"id"`
 	ProvinceID  int            `json:"province_id"`
 	PersianName string         `json:"persian_name"`
 	EnglishName sql.NullString `json:"english_name"`

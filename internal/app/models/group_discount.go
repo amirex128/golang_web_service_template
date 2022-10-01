@@ -6,7 +6,7 @@ import (
 )
 
 type GroupDiscount struct {
-	ID        int64   `json:"id"`
+	ID        int64   `gorm:"primary_key;auto_increment" json:"id"`
 	ProductID int64   `json:"product_id"`
 	Quantity  int     `json:"quantity"`
 	Value     float32 `json:"value"`

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+<!-- start error area -->
+<div class="error-area ptb-100">
+    <div class="container">
+        <div class="error-content">
+            <img src="assets/images/404.svg" alt="image" />
+            <h3>صفحه ای که دنبالشی پیدا نشد !</h3>
+            <p>
+                صفحه ای که دنبالش هستی ممکنه در صورت تغییر نام حذف شده باشه یا به طور موقت در دسترس نباشه .
+            </p>
+            <a href="index" class="btn primary-btn primary-btn-5">برو به صفحه اصلی</a>
+        </div>
+    </div>
+</div>
+<!-- end error area -->
+{% endblock %}

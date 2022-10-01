@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="1d0012b5-24b2-4881-bb4b-3b2b54703c5e" name="selloora.com" url="http://188.121.106.169">
+        <fileTransfer rootFolder="/home/sell/backend" host="188.121.106.169" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

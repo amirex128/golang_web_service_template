@@ -6,7 +6,7 @@ import (
 )
 
 type FeatureItemProduct struct {
-	ID                 int    `json:"id"`
+	ID                 int    `gorm:"primary_key;auto_increment" json:"id"`
 	ProductID          int    `json:"product_id"`
 	FeatureItemID      int    `json:"feature_item_id"`
 	FeatureItemValueID int    `json:"feature_item_value_id"`

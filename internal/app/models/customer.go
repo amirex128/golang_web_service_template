@@ -10,7 +10,7 @@ import (
 )
 
 type Customer struct {
-	ID         uint64 `json:"id"`
+	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	FullName   string `json:"full_name"`
 	Mobile     string `json:"mobile"`
 	ProvinceID uint32 `json:"province_id"`

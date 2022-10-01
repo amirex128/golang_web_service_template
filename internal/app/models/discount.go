@@ -12,7 +12,7 @@ import (
 )
 
 type Discount struct {
-	ID         uint64  `json:"id"`
+	ID         uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Code       string  `json:"code"`
 	UserID     uint64  `json:"user_id"`
 	StartedAt  string  `json:"started_at"`
@@ -57,7 +57,7 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
 			return err
 		}
-		if product.UserId != userID {
+		if product.UserID != userID {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
 			return err
 		}
@@ -97,7 +97,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
 			return err
 		}
-		if product.UserId != userID {
+		if product.UserID != userID {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
 			return err
 		}

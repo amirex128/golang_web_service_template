@@ -6,26 +6,26 @@ import (
 )
 
 type Pagination struct {
-	PageSize   int         `json:"page_size"`
-	Page       int         `json:"page"`
+	PageSize   uint32      `json:"page_size"`
+	Page       uint32      `json:"page"`
 	Sort       string      `json:"sort,omitempty;query:sort"`
-	TotalRows  int64       `json:"total_rows"`
-	TotalPages int         `json:"total_pages"`
+	TotalRows  uint64      `json:"total_rows"`
+	TotalPages uint32      `json:"total_pages"`
 	Data       interface{} `json:"data"`
 }
 
-func (p *Pagination) GetOffset() int {
+func (p *Pagination) GetOffset() uint32 {
 	return (p.GetPage() - 1) * p.GetPageSize()
 }
 
-func (p *Pagination) GetPageSize() int {
+func (p *Pagination) GetPageSize() uint32 {
 	if p.PageSize == 0 {
 		p.PageSize = 10
 	}
 	return p.PageSize
 }
 
-func (p *Pagination) GetPage() int {
+func (p *Pagination) GetPage() uint32 {
 	if p.Page == 0 {
 		p.Page = 1
 	}
@@ -45,11 +45,11 @@ func Paginate(table string, pagination *Pagination, db *gorm.DB) func(db *gorm.D
 	var totalRows int64
 
 	db.Table(table).Count(&totalRows)
-	pagination.TotalRows = totalRows
+	pagination.TotalRows = uint64(totalRows)
 	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.PageSize)))
-	pagination.TotalPages = totalPages
+	pagination.TotalPages = uint32(totalPages)
 
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Offset(offset).Limit(size).Order(sort)
+		return db.Offset(int(offset)).Limit(int(size)).Order(sort)
 	}
 }
