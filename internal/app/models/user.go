@@ -11,27 +11,28 @@ import (
 )
 
 type User struct {
-	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
-	Gender     string `json:"gender"`
-	Firstname  string `json:"firstname"`
-	Lastname   string `json:"lastname"`
-	Email      string `json:"email"`
-	ProvinceID uint32 `json:"province_id"`
-	CityID     uint32 `json:"city_id"`
-	Lat        string `json:"lat"`
-	Long       string `json:"long"`
-	Address    string `json:"address"`
-	Mobile     string `json:"mobile"`
-	Password   string `json:"password"`
-	ExpireAt   string `json:"expire_at"`
-	Status     string `json:"status"`
-	PostalCode string `json:"postal_code"`
-	VerifyCode uint16 `json:"verify_code"`
-	CartNumber string `json:"cart_number"`
-	Shaba      string `json:"shaba"`
-	IsAdmin    byte   `json:"is_admin"`
-	UpdatedAt  string `json:"updated_at"`
-	CreatedAt  string `json:"created_at"`
+	ID         uint64      `gorm:"primary_key;auto_increment" json:"id"`
+	Gender     string      `json:"gender"`
+	Firstname  string      `json:"firstname"`
+	Lastname   string      `json:"lastname"`
+	Email      string      `json:"email"`
+	ProvinceID uint32      `json:"province_id"`
+	CityID     uint32      `json:"city_id"`
+	Lat        string      `json:"lat"`
+	Long       string      `json:"long"`
+	Address    string      `json:"address"`
+	Mobile     string      `json:"mobile"`
+	Password   string      `json:"password"`
+	ExpireAt   string      `json:"expire_at"`
+	Status     string      `json:"status"`
+	PostalCode string      `json:"postal_code"`
+	VerifyCode uint16      `json:"verify_code"`
+	CartNumber string      `json:"cart_number"`
+	Shaba      string      `json:"shaba"`
+	IsAdmin    byte        `json:"is_admin"`
+	Financial  []Financial `gorm:"foreignKey:user_id" json:"financial"`
+	UpdatedAt  string      `json:"updated_at"`
+	CreatedAt  string      `json:"created_at"`
 }
 type UserArr []User
 

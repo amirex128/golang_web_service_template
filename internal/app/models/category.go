@@ -18,16 +18,8 @@ type Category struct {
 	Description sql.NullString `json:"description"`
 	Icon        sql.NullString `json:"icon"`
 	Depth       uint           `json:"depth"`
-}
-
-type CategoryOption struct {
-	CategoryID int `json:"category_id"`
-	OptionID   int `json:"option_id"`
-}
-
-type CategoryProduct struct {
-	CategoryID int   `json:"category_id"`
-	ProductID  int64 `json:"product_id"`
+	Products    []Product      `gorm:"many2many:product_category;"`
+	Options     []Option       `gorm:"many2many:category_options;"`
 }
 
 type CategoryRelated struct {
@@ -57,8 +49,6 @@ func (c *Category) Decode(ir io.Reader) error {
 
 func initCategory(manager *MysqlManager) bool {
 	manager.GetConn().AutoMigrate(&Category{})
-	manager.GetConn().AutoMigrate(&CategoryOption{})
-	manager.GetConn().AutoMigrate(&CategoryProduct{})
 	manager.GetConn().AutoMigrate(&CategoryRelated{})
 
 	if manager.GetConn().First(&Category{}).Error == nil {

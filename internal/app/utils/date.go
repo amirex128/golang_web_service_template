@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	ptime "github.com/yaa110/go-persian-calendar"
 	"time"
 )
@@ -17,6 +18,6 @@ func DateToJalaali(date string) string {
 		return ""
 	}
 	pt := ptime.New(parse)
-	return pt.Format("YYYY/MM/DD HH:mm:ss")
+	return fmt.Sprintf("%d %s %d   %d:%d", pt.Day(), pt.Month(), pt.Year(), pt.Hour(), pt.Minute())
 
 }

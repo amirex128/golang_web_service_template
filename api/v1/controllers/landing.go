@@ -30,12 +30,16 @@ func blogLanding(c *gin.Context) {
 	postArray := posts.Data.([]models.Post)
 	for i := range postArray {
 		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
 	c.Set("template", "blog.html")
 	c.Set("data", map[string]interface{}{
-		"title": "بلاگ" + siteName,
-		"posts": posts,
+		"title":      "بلاگ" + siteName,
+		"posts":      posts,
+		"last_posts": "",
+		"categories": "",
+		"tags":       "",
 	})
 }
 
@@ -46,10 +50,18 @@ func detailsLanding(c *gin.Context) {
 		return
 	}
 
+	post.CreatedAt = utils.DateToJalaali(post.CreatedAt)
+	post.UpdatedAt = utils.DateToJalaali(post.UpdatedAt)
+
 	c.Set("template", "blog-details.html")
 	c.Set("data", map[string]interface{}{
-		"title": post.Title + siteName,
-		"post":  post,
+		"title":        post.Title + siteName,
+		"post":         post,
+		"last_posts":   "",
+		"random_posts": "",
+		"categories":   "",
+		"comments":     "",
+		"tags":         "",
 	})
 }
 

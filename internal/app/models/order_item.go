@@ -6,9 +6,12 @@ import (
 )
 
 type OrderItem struct {
-	ID        int64 `gorm:"primary_key;auto_increment" json:"id"`
-	ProductID int64 `json:"product_id"`
-	Count     uint  `json:"count"`
+	ID        int64   `gorm:"primary_key;auto_increment" json:"id"`
+	OrderID   int64   `json:"order_id"`
+	Order     Order   `gorm:"foreignKey:order_id" json:"order"`
+	ProductID int64   `json:"product_id"`
+	Product   Product `gorm:"foreignKey:product_id" json:"product"`
+	Count     uint    `json:"count"`
 }
 type OrderItemArr []OrderItem
 

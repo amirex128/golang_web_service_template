@@ -8,26 +8,27 @@ import (
 )
 
 type Shop struct {
-	ID          uint64  `gorm:"primary_key;auto_increment" json:"id"`
-	UserID      uint64  `json:"user_id"`
-	Name        string  `json:"name"`
-	Logo        string  `json:"logo"`
-	Type        string  `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
-	AccountID   string  `json:"account_id"`
-	Verify      bool    `json:"verify"`
-	SendPrice   float32 `json:"send_price"`
-	CategoryID  uint64  `json:"category_id"`
-	GuildID     uint32  `json:"guild_id"`
-	Description string  `json:"description"`
-	Phone       string  `json:"phone"`
-	Mobile      string  `json:"mobile"`
-	TelegramID  string  `json:"telegram_id"`
-	InstagramID string  `json:"instagram_id"`
-	WhatsappID  string  `json:"whatsapp_id"`
-	Email       string  `json:"email"`
-	Website     string  `json:"website"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
+	ID          uint64    `gorm:"primary_key;auto_increment" json:"id"`
+	UserID      uint64    `json:"user_id"`
+	Name        string    `json:"name"`
+	Logo        string    `json:"logo"`
+	Type        string    `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
+	Verify      bool      `json:"verify"`
+	SendPrice   float32   `json:"send_price"`
+	CategoryID  uint64    `json:"category_id"`
+	GuildID     uint32    `json:"guild_id"`
+	Description string    `json:"description"`
+	Phone       string    `json:"phone"`
+	Mobile      string    `json:"mobile"`
+	TelegramID  string    `json:"telegram_id"`
+	InstagramID string    `json:"instagram_id"`
+	WhatsappID  string    `json:"whatsapp_id"`
+	Email       string    `json:"email"`
+	Website     string    `json:"website"`
+	Products    []Product `gorm:"foreignkey:shop_id" json:"products"`
+	User        User      `gorm:"foreignkey:user_id" json:"user"`
+	CreatedAt   string    `json:"created_at"`
+	UpdatedAt   string    `json:"updated_at"`
 }
 type ShopArr []Shop
 

@@ -32,16 +32,19 @@ func UploadMultiImage(c *gin.Context, images []*multipart.FileHeader, dest strin
 	var imagesPath []string
 	userDir := filepath.Join(abs, dest, "images")
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": "خطا در آپلود تصویر"})
+		return nil, err
 	}
 	for i := range images {
-		path := filepath.Join(userDir, uuid.NewString()+"."+strings.Split(images[i].Header["Content-Type"][0], "/")[1])
+		relativePath := uuid.NewString() + "." + strings.Split(images[i].Header["Content-Type"][0], "/")[1]
+		path := filepath.Join(userDir, relativePath)
+		relativePath = filepath.Join("/assets", dest, "images", relativePath)
 		err := c.SaveUploadedFile(images[i], path)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در آپلود تصایر"})
 			return nil, err
 		}
-		imagesPath = append(imagesPath, path)
+		imagesPath = append(imagesPath, relativePath)
 	}
 	return imagesPath, nil
 }
@@ -49,16 +52,19 @@ func UploadImage(c *gin.Context, image *multipart.FileHeader, dest string) (stri
 	abs, _ := filepath.Abs("../../assets")
 	userDir := filepath.Join(abs, dest, "images")
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": "خطا در آپلود تصویر"})
+		return "", err
 	}
-	path := filepath.Join(userDir, uuid.NewString()+"."+strings.Split(image.Header["Content-Type"][0], "/")[1])
+	relativePath := uuid.NewString() + "." + strings.Split(image.Header["Content-Type"][0], "/")[1]
+	path := filepath.Join(userDir, relativePath)
+	relativePath = filepath.Join("/assets", dest, "images", relativePath)
 	err := c.SaveUploadedFile(image, path)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در آپلود تصایر"})
 		return "", err
 	}
 
-	return path, nil
+	return relativePath, nil
 }
 func RemoveImages(images []string) {
 	for i := range images {

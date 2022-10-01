@@ -63,12 +63,15 @@ func updateProduct(c *gin.Context) {
 
 	utils.RemoveImages(dto.ImageRemove)
 
-	images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
-	if err != nil {
-		return
+	if dto.Images != nil {
+		images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
+		if err != nil {
+			return
+		}
+
+		dto.ImagePath = append(dto.ImagePath, images...)
 	}
 
-	dto.ImagePath = append(dto.ImagePath, images...)
 	err = manager.UpdateProduct(c, dto)
 	if err != nil {
 		return

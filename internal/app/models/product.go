@@ -15,7 +15,9 @@ import (
 type Product struct {
 	ID               uint64         `gorm:"primary_key;auto_increment" json:"id"`
 	UserID           uint64         `json:"user_id"`
+	User             User           `gorm:"foreignKey:user_id" json:"user"`
 	ShopID           uint64         `json:"shop_id"`
+	Shop             Shop           `gorm:"foreignKey:shop_id" json:"shop"`
 	Description      string         `json:"description"`
 	Name             string         `json:"name"`
 	ShortDescription string         `json:"short_description"`
@@ -32,6 +34,9 @@ type Product struct {
 	UpdatedAt        string         `json:"updated_at"`
 	StartedAt        sql.NullString `json:"started_at"`
 	EndedAt          sql.NullString `json:"ended_at"`
+	CategoryID       uint64         `json:"category_id"`
+	Category         Category       `gorm:"foreignKey:category_id" json:"category"`
+	Galleries        []Gallery      `gorm:"foreignKey:product_id" json:"galleries"`
 	DeliveryTime     uint           `json:"delivery_time"` // مدت زمان ارسال
 }
 

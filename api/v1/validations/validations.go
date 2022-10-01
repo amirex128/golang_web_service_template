@@ -43,8 +43,11 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 			}
 		}
 
-		c.JSON(http.StatusBadRequest, validationErrors)
 		if len(validationErrors) > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "مقادیر ارسال شده نا درست میباشد",
+				"errors":  validationErrors,
+			})
 			return err
 		}
 	}

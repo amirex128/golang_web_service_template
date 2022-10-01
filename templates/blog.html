@@ -26,64 +26,36 @@
     <div class="container">
         <div class="row justify-content-center gx-xl-5">
             <div class="col-lg-8">
-                {% for blog in blogs %}
+                {% for post in posts.Data %}
                 <article class="item-single mb-30">
                     <div class="image">
-                        <a href="blog-details" class="lazy-container aspect-ratio">
-                            <img class="lazyload lazy-image" src="assets/images/placeholder.png"
-                                 data-src="assets/images/blog/blog-4.jpg" alt="تصویر وبلاگ">
+                        <a href="/blog/{{post.Slug}}" class="lazy-container aspect-ratio">
+                            <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
+                                 data-src="{{post.Thumbnail}}" alt="تصویر وبلاگ">
                         </a>
-                        <a href="404-error" class="btn primary-btn primary-btn-2"><i class="fas fa-share-alt"></i>اشتراک
+                        <a href="/404-error" class="btn primary-btn primary-btn-2"><i class="fas fa-share-alt"></i>اشتراک
                             گذاری</a>
                     </div>
                     <div class="content">
                         <ul class="info-list">
                             <li><i class="far fa-calendar-alt"></i>{{post.UpdatedAt}}</li>
-                            <li><i class="fas fa-user"></i>ادمین</li>
-                            <li><i class="fas fa-tag"></i>آژانس طراحی</li>
+                            <li><i class="fas fa-user"></i>{{post.User.Firstname}} {{post.User.Lastname}}</li>
+                            <li><i class="fas fa-tag"></i>{{post.Category.Name}}</li>
                         </ul>
                         <h3 class="title">
                             <a href="blog-details">
-                                بهترین راه برای ایجاد یک گفتگوی موفقیت آمیز
+                                {{post.Title}}
                             </a>
                         </h3>
                         <p>
-                            آیا در برقراری ارتباط موثر کلامی یا نوشتاری با دیگران خیلی تلاش می‌کنید؟ کلمات به راحتی بر
-                            زبانتان جاری می‌َشوند اما نتایج واقعی که از آن کلمات حاصل می‌شود با قصد و نیت شما فاصله
-                            دارد؟ شاید با به کارگیری چند تکنیک موثر مشکلتان حل شود.
+                            {{post.Body}}
                         </p>
-                        <a href="blog-details" class="btn primary-btn primary-btn-5">ادامه مطلب</a>
+                        <a href="/blog/{{post.Slug}}" class="btn primary-btn primary-btn-5">ادامه مطلب</a>
                     </div>
                 </article>
+                {% empty %}
+                <p>مطلبی یافت نشد</p>
                 {% endfor %}
-                <article class="item-single mb-30">
-                    <div class="image">
-                        <a href="blog-details" class="lazy-container aspect-ratio">
-                            <img class="lazyload lazy-image" src="assets/images/placeholder.png"
-                                 data-src="assets/images/blog/blog-4.jpg" alt="تصویر وبلاگ">
-                        </a>
-                        <a href="404-error" class="btn primary-btn primary-btn-2"><i class="fas fa-share-alt"></i>اشتراک
-                            گذاری</a>
-                    </div>
-                    <div class="content">
-                        <ul class="info-list">
-                            <li><i class="far fa-calendar-alt"></i>8 مهر 1401</li>
-                            <li><i class="fas fa-user"></i>ادمین</li>
-                            <li><i class="fas fa-tag"></i>آژانس طراحی</li>
-                        </ul>
-                        <h3 class="title">
-                            <a href="blog-details">
-                                بهترین راه برای ایجاد یک گفتگوی موفقیت آمیز
-                            </a>
-                        </h3>
-                        <p>
-                            آیا در برقراری ارتباط موثر کلامی یا نوشتاری با دیگران خیلی تلاش می‌کنید؟ کلمات به راحتی بر
-                            زبانتان جاری می‌َشوند اما نتایج واقعی که از آن کلمات حاصل می‌شود با قصد و نیت شما فاصله
-                            دارد؟ شاید با به کارگیری چند تکنیک موثر مشکلتان حل شود.
-                        </p>
-                        <a href="blog-details" class="btn primary-btn primary-btn-5">ادامه مطلب</a>
-                    </div>
-                </article>
                 <div class="pagination mb-30">
                     <a href="#" class="page-numbers"><i class="fas fa-angle-right"></i></a>
                     <span class="page-numbers current" aria-current="page">1</span>
@@ -128,8 +100,8 @@
                         <article class="article-item mb-30">
                             <div class="image">
                                 <a href="blog-details" class="lazy-container aspect-ratio">
-                                    <img class="lazyload lazy-image" src="assets/images/placeholder.png"
-                                         data-src="assets/images/blog/blog-1.jpg" alt="تصویر وبلاگ">
+                                    <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
+                                         data-src="/assets/images/blog/blog-1.jpg" alt="تصویر وبلاگ">
                                 </a>
                             </div>
                             <div class="content">
@@ -144,8 +116,8 @@
                         <article class="article-item mb-30">
                             <div class="image">
                                 <a href="blog-details" class="lazy-container aspect-ratio">
-                                    <img class="lazyload lazy-image" src="assets/images/placeholder.png"
-                                         data-src="assets/images/blog/blog-2.jpg" alt="تصویر وبلاگ">
+                                    <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
+                                         data-src="/assets/images/blog/blog-2.jpg" alt="تصویر وبلاگ">
                                 </a>
                             </div>
                             <div class="content">
@@ -160,8 +132,8 @@
                         <article class="article-item">
                             <div class="image">
                                 <a href="blog-details" class="lazy-container aspect-ratio">
-                                    <img class="lazyload lazy-image" src="assets/images/placeholder.png"
-                                         data-src="assets/images/blog/blog-6.jpg" alt="تصویر وبلاگ">
+                                    <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
+                                         data-src="/assets/images/blog/blog-6.jpg" alt="تصویر وبلاگ">
                                 </a>
                             </div>
                             <div class="content">

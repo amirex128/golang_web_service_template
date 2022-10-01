@@ -1,4 +1,4 @@
-package admin
+package controllers
 
 import (
 	"backend/api/v1/validations"
@@ -9,13 +9,18 @@ import (
 	"net/http"
 )
 
-func CreatePost(c *gin.Context) {
+func createPost(c *gin.Context) {
 	dto, err := validations.CreatePost(c)
 	if err != nil {
 		return
 	}
 	userID := utils.GetUser(c)
 	dto.Slug = slug.MakeLang(dto.Slug, "en")
+	err = models.NewMainManager().CheckSlug(c, dto.Slug)
+	if err != nil {
+		return
+	}
+
 	image, err := utils.UploadImage(c, dto.Thumbnail, "post")
 	if err != nil {
 		return
@@ -30,23 +35,36 @@ func CreatePost(c *gin.Context) {
 	})
 }
 
-func UpdatePost(c *gin.Context) {
+func updatePost(c *gin.Context) {
 	dto, err := validations.UpdatePost(c)
 	if err != nil {
 		return
 	}
 	postID := c.Param("id")
-	dto.Slug = slug.MakeLang(dto.Slug, "en")
-	image, err := utils.UploadImage(c, dto.Thumbnail, "post")
-	if err != nil {
-		return
+	if dto.Slug != "" {
+		dto.Slug = slug.MakeLang(dto.Slug, "en")
+		err = models.NewMainManager().CheckSlug(c, dto.Slug)
+		if err != nil {
+			return
+		}
 	}
-	dto.ThumbnailPath = image
+
+	if dto.Thumbnail != nil {
+		image, err := utils.UploadImage(c, dto.Thumbnail, "post")
+		if err != nil {
+			return
+		}
+		dto.ThumbnailPath = image
+	}
+
 	utils.RemoveImages([]string{dto.ThumbnailRemove})
 	err = models.NewMainManager().UpdatePost(c, dto, utils.StringToUint64(postID))
+	c.JSON(http.StatusOK, gin.H{
+		"message": "مقاله با موفقیت ویرایش شد",
+	})
 }
 
-func ShowPost(c *gin.Context) {
+func showPost(c *gin.Context) {
 	postID := c.Param("id")
 	post, err := models.NewMainManager().FindPostByID(c, utils.StringToUint64(postID))
 	if err != nil {
@@ -57,7 +75,7 @@ func ShowPost(c *gin.Context) {
 	})
 }
 
-func IndexPost(c *gin.Context) {
+func indexPost(c *gin.Context) {
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
@@ -72,7 +90,7 @@ func IndexPost(c *gin.Context) {
 
 }
 
-func DeletePost(c *gin.Context) {
+func deletePost(c *gin.Context) {
 	postID := c.Param("id")
 	err := models.NewMainManager().DeletePost(c, utils.StringToUint64(postID))
 	if err != nil {

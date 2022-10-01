@@ -32,6 +32,8 @@ const (
 	ProductProvinceTable    = "product_provinces"
 	UserTable               = "users"
 	PostTable               = "posts"
+	CommentTable            = "comments"
+	TagTable                = "tags"
 	FinancialTable          = "financials"
 )
 
@@ -67,6 +69,8 @@ func (r *MysqlManager) Initial() {
 	initOption(manager)
 	initShop(manager)
 	InitPost(manager)
+	initComment(manager)
+	initTag(manager)
 
 }
 

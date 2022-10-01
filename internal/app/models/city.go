@@ -18,11 +18,6 @@ type City struct {
 	Lng         sql.NullString `json:"lng"`
 }
 
-type CityProduct struct {
-	ProductID int64 `json:"product_id"`
-	CityID    int   `json:"city_id"`
-}
-
 type CityArr []City
 
 func (s CityArr) Len() int {
@@ -44,7 +39,6 @@ func (c *City) Decode(ir io.Reader) error {
 }
 func initCity(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&City{})
-	manager.GetConn().AutoMigrate(&CityProduct{})
 	cities := utils.ReadCsvFile("../../csv/cities.csv")
 	manager.CreateAllCities(cities)
 }

@@ -4,21 +4,26 @@ import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
 	"encoding/gob"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 )
 
 type Post struct {
-	ID         uint64 `gorm:"primary_key;auto_increment" json:"id"`
-	Title      string `json:"title"`
-	Body       string `json:"body"`
-	Thumbnail  string `json:"thumbnail"`
-	Slug       string `json:"slug"`
-	UserID     uint64 `json:"user_id"`
-	CategoryID uint64 `json:"category_id"`
-	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at"`
+	ID         uint64    `gorm:"primary_key;auto_increment" json:"id"`
+	Title      string    `json:"title"`
+	Body       string    `json:"body"`
+	Thumbnail  string    `json:"thumbnail"`
+	Slug       string    `json:"slug"`
+	UserID     uint64    `json:"user_id"`
+	User       User      `gorm:"foreignKey:user_id" json:"user"`
+	CategoryID uint64    `json:"category_id"`
+	Category   Category  `gorm:"foreignKey:category_id" json:"category"`
+	Tags       []Tag     `gorm:"many2many:post_tags;" json:"tags"`
+	Comments   []Comment `gorm:"foreignKey:post_id" json:"comments"`
+	CreatedAt  string    `json:"created_at"`
+	UpdatedAt  string    `json:"updated_at"`
 }
 type PostArr []Post
 
@@ -42,6 +47,16 @@ func (c *Post) Decode(ir io.Reader) error {
 func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
 }
+func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
+	rowsAffected := m.GetConn().Where("slug = ?", slug).First(&Post{}).RowsAffected
+	if rowsAffected > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "این نامک قبلا استفاده شده است",
+		})
+		return errors.New("slug not valid")
+	}
+	return
+}
 
 func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID uint64) (err error) {
 	post := Post{
@@ -59,7 +74,7 @@ func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ایجاد پست پیش آمده است",
 		})
-		return
+		return err
 	}
 	return
 }
@@ -70,7 +85,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
 		})
-		return
+		return err
 	}
 	if dto.Title != "" {
 		post.Title = dto.Title
@@ -93,7 +108,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
 		})
-		return
+		return err
 	}
 	return
 }
@@ -110,7 +125,7 @@ func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
 }
 
 func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, err error) {
-	err = m.GetConn().Where("id = ?", postID).First(&post).Error
+	err = m.GetConn().Where("id = ?", postID).Preload("User").Preload("Category").First(&post).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
@@ -120,7 +135,7 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, e
 	return
 }
 func (m *MysqlManager) FindPostBySlug(c *gin.Context, slug string) (post Post, err error) {
-	err = m.GetConn().Where("slug = ?", slug).First(&post).Error
+	err = m.GetConn().Where("slug = ?", slug).Preload("User").Preload("Category").First(&post).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
@@ -135,9 +150,9 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	var posts []Post
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(PostTable, pagination, conn))
+	conn = conn.Scopes(DTOs.Paginate(PostTable, pagination, conn)).Preload("User").Preload("Category")
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
 	err = conn.Find(&posts).Error
 	if err != nil {

@@ -8,21 +8,25 @@ import (
 )
 
 type Order struct {
-	ID                        uint64  `gorm:"primary_key;auto_increment" json:"id"`
-	UserID                    uint64  `json:"user_id"`
-	CustomerID                uint64  `json:"customer_id"`
-	DiscountID                uint64  `json:"discount_id"`
-	IP                        string  `json:"ip"`
-	TotalProductPrice         float32 `json:"total_product_price"`
-	TotalDiscountPrice        float32 `json:"total_discount_price"`
-	TotalTaxPrice             float32 `json:"total_tax_price"`
-	TotalProductDiscountPrice float32 `json:"total_product_discount_price"`
-	TotalFinalPrice           float32 `json:"total_final_price"`
-	SendPrice                 float32 `json:"send_price"`
-	Status                    string  `json:"status"`
-	SendType                  string  `json:"send_type"` // tipax post post-poshtaz
-	LastUpdateStatusAt        string  `json:"last_update_status_at"`
-	CreatedAt                 string  `json:"created_at"`
+	ID                        uint64      `gorm:"primary_key;auto_increment" json:"id"`
+	UserID                    uint64      `json:"user_id"`
+	User                      User        `gorm:"foreignKey:user_id" json:"user"`
+	CustomerID                uint64      `json:"customer_id"`
+	Customer                  Customer    `gorm:"foreignKey:customer_id" json:"customer"`
+	DiscountID                uint64      `json:"discount_id"`
+	Discount                  Discount    `gorm:"foreignKey:discount_id" json:"discount"`
+	OrderItems                []OrderItem `gorm:"foreignKey:order_id" json:"order_items"`
+	IP                        string      `json:"ip"`
+	TotalProductPrice         float32     `json:"total_product_price"`
+	TotalDiscountPrice        float32     `json:"total_discount_price"`
+	TotalTaxPrice             float32     `json:"total_tax_price"`
+	TotalProductDiscountPrice float32     `json:"total_product_discount_price"`
+	TotalFinalPrice           float32     `json:"total_final_price"`
+	SendPrice                 float32     `json:"send_price"`
+	Status                    string      `json:"status"`
+	SendType                  string      `json:"send_type"` // tipax post post-poshtaz
+	LastUpdateStatusAt        string      `json:"last_update_status_at"`
+	CreatedAt                 string      `json:"created_at"`
 }
 
 type OrderArr []Order

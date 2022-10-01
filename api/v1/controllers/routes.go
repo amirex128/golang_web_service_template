@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"backend/api/v1/controllers/admin"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +29,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
 	v1 := r.Group("api/v1")
 	{
-		ad := v1.Group("ad")
+		ad := v1.Group("admin")
 		ad.Use(authMiddleware.MiddlewareFunc())
 		{
 			product := ad.Group("products")
@@ -49,13 +48,13 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 				discount.POST("/update/:id", updateDiscount)
 				discount.POST("/delete/:id", deleteDiscount)
 			}
-			blog := ad.Group("blog")
+			blog := ad.Group("post")
 			{
-				blog.GET("/", admin.IndexPost)
-				blog.GET("/show/:id", admin.ShowPost)
-				blog.POST("/create", admin.CreatePost)
-				blog.POST("/update/:id", admin.UpdatePost)
-				blog.POST("/delete/:id", admin.DeletePost)
+				blog.GET("/", indexPost)
+				blog.GET("/show/:id", showPost)
+				blog.POST("/create", createPost)
+				blog.POST("/update/:id", updatePost)
+				blog.POST("/delete/:id", deletePost)
 			}
 		}
 

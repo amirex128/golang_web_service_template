@@ -6,13 +6,14 @@ import (
 )
 
 type Gallery struct {
-	ID        int    `gorm:"primary_key;auto_increment" json:"id"`
-	ProductID int64  `json:"product_id"`
-	Path      string `json:"path"`
-	Caption   string `json:"caption"`
-	Type      string `json:"type"` // image video cover
-	Sort      uint   `json:"sort"`
-	IsMain    byte   `json:"is_main"`
+	ID        int     `gorm:"primary_key;auto_increment" json:"id"`
+	ProductID int64   `json:"product_id"`
+	Path      string  `json:"path"`
+	Caption   string  `json:"caption"`
+	Type      string  `json:"type"` // image video cover
+	Sort      uint    `json:"sort"`
+	IsMain    byte    `json:"is_main"`
+	Product   Product `gorm:"foreignKey:product_id" json:"product"`
 }
 type GalleryArr []Gallery
 

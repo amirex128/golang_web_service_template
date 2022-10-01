@@ -15,6 +15,7 @@ type Discount struct {
 	ID         uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Code       string  `json:"code"`
 	UserID     uint64  `json:"user_id"`
+	User       User    `gorm:"foreignKey:user_id" json:"user"`
 	StartedAt  string  `json:"started_at"`
 	Count      uint32  `json:"count"`
 	EndedAt    string  `json:"ended_at"`
