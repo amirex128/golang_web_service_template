@@ -30,7 +30,7 @@ func createProduct(c *gin.Context) {
 		return
 	}
 
-	images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
+	images, err := utils.UploadMultiImage(c, dto.Images, "product/user_"+utils.Uint64ToString(userID))
 	if err != nil {
 		return
 	}
@@ -64,7 +64,7 @@ func updateProduct(c *gin.Context) {
 	utils.RemoveImages(dto.ImageRemove)
 
 	if dto.Images != nil {
-		images, err := utils.UploadMultiImage(c, dto.Images, "user_"+utils.Uint64ToString(userID))
+		images, err := utils.UploadMultiImage(c, dto.Images, "product/user_"+utils.Uint64ToString(userID))
 		if err != nil {
 			return
 		}

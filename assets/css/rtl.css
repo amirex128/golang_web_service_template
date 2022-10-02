@@ -1,0 +1,347 @@
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Heavy.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Heavy.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Heavy.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Regular.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Regular.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/lineawesome/YekanBakhFaNum-Light.eot');
+  src: url('../fonts/fontawesome/lineawesome/YekanBakhFaNum-Light.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/lineawesome/YekanBakhFaNum-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/fontawesome/YekanBakhFaNum-Thin.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Thin.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Medium.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Medium.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Bold.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Bold.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Fat.eot');
+  src: url('../fonts/fontawesome/YekanBakhFaNum-Fat.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/fontawesome/YekanBakhFaNum-Fat.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "yekan";
+  direction: rtl;
+  text-align: right;
+}
+
+.ml-auto {
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
+.ms-auto {
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
+.list-unstyled {
+  -webkit-padding-start: 0;
+          padding-inline-start: 0;
+}
+
+.section-title .icon {
+  margin-left: auto;
+  margin-right: 0;
+  border-radius: 50% 50% 50% 0;
+}
+
+.mfp-iframe-holder .mfp-close {
+  text-align: left;
+}
+
+.header-area .main-navbar-area .main-nav .navbar .navbar-nav .nav-item .dropdown-menu {
+  text-align: right;
+  left: unset;
+  right: 0;
+}
+
+.header-area .main-navbar-area .main-nav .navbar .navbar-nav .nav-item .dropdown-menu::before {
+  left: unset;
+  right: 25px;
+}
+
+.home-banner-area .banner-content .tag .icon {
+  left: unset;
+  right: 0;
+  -webkit-transform: translate(20px, -50%);
+          transform: translate(20px, -50%);
+}
+/* .home-banner-area.banner-bg {
+  background-image: url(../images/banner/banner-bg-11.png);
+} */
+
+.home-banner-area.banner-2 .bg-shape.bg-shape-1 {
+  right: unset;
+  left: 0;
+  -webkit-transform: rotateZ(180deg) rotateX(180deg);
+          transform: rotateZ(180deg) rotateX(180deg);
+}
+
+.home-banner-area.banner-8 .bg-shape {
+  bottom: 0;
+  left: 0;
+  -webkit-transform: rotatey(180deg);
+          transform: rotatey(180deg);
+}
+.home-banner-area.banner-9 .bg-shape {
+  bottom: 0;
+  left: 0;
+  -webkit-transform: rotatey(180deg);
+          transform: rotatey(180deg);
+}
+
+.home-banner-area.banner-2 .bg-shape.bg-shape-2 {
+  right: unset;
+  left: 9%;
+}
+
+.sponsor .bg-shape {
+  left: unset;
+  right: 0;
+  -webkit-transform: rotateZ(180deg) rotateX(180deg) translateY(-28%);
+          transform: rotateZ(180deg) rotateX(180deg) translateY(-28%);
+}
+
+.blog-area.blog-with-shape::after{
+  -webkit-transform: rotatey(180deg);
+          transform: rotatey(180deg);
+}
+
+.features-area.features-3 .section-title {
+  text-align: right;
+}
+.features-area .section-gap::after {
+  -webkit-transform: rotateY(180deg);
+          transform: rotateY(180deg);
+}
+
+
+.main-features-area .section-title .icon {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.choose-area .section-title {
+  text-align: right;
+}
+
+.integration-area.integration-2 .section-title {
+  text-align: right;
+}
+
+.integration-area.integration-3 .section-title {
+  text-align: right;
+}
+
+.integration-area.integration-4 .section-title {
+  text-align: right;
+}
+
+/* .integration-area.integration-5 .image {
+  -webkit-transform: rotateZ(180deg) rotateX(180deg);
+          transform: rotateZ(180deg) rotateX(180deg);
+} */
+
+.about-area .section-title {
+  text-align: right;
+}
+
+/* .about-area .image {
+  -webkit-transform: rotateZ(180deg) rotateX(180deg);
+          transform: rotateZ(180deg) rotateX(180deg);
+} */
+
+.overview-area .section-title {
+  text-align: right;
+}
+
+.testimonial-area.testimonial-4 .bg-image img {
+  -webkit-margin-start: 0;
+          margin-inline-start: 0;
+}
+
+.feedback-area .slider-item .slider-item-inner .quote {
+  right: unset;
+  left: 40px;
+}
+
+.feedback-area .section-top .section-title {
+  text-align: right;
+}
+
+.pricing-plan-area .section-title .icon {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pricing-plan-area .section-top .section-title{
+  text-align: right;
+}
+
+.services-area .section-title {
+  text-align: right;
+}
+
+.faq-area .section-title {
+  text-align: right;
+}
+
+.faq-area .accordion-item .accordion-header .accordion-button {
+  text-align: right;
+}
+
+.faq-area .accordion-item .accordion-header .accordion-button::after {
+  text-align: left;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.sidebar-widget-area .widget.widget-search .search-form .search-input {
+  border-radius: 0 5px 5px 0;
+  padding-right: 15px;
+}
+
+.sidebar-widget-area .widget.widget-search .search-form .btn-search {
+  border-radius: 5px 0 0 5px;
+}
+
+.go-top.active {
+  right: unset;
+  left: 3%;
+}
+
+.footer-area .footer-widget .footer-links li i {
+  left: unset;
+  right: -20px;
+}
+
+.footer-area .footer-widget .footer-links li:hover i {
+  left: unset;
+  right: 0;
+}
+
+.footer-area .footer-widget .footer-links li a:hover {
+  padding-left: unset;
+  padding-right: 10px;
+}
+
+/* -----------------------------------------
+  	Responsive CSS
+----------------------------------------- */
+@media (min-width: 1200px) {
+  .home-banner-area.banner-8 .left-content,
+  .integration-area.integration-2 .left-content,
+  .integration-area.integration-5 .left-content,
+  .about-area.about-2 .left-content {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  .integration-area.integration-3 .right-content {
+    margin-left: auto;
+    margin-right: 0;
+  }
+  .overview-area .content {
+    padding-left: unset;
+    padding-right: 20px;
+  }
+}
+
+@media only screen and (max-width: 1199px) {
+  .header-area .main-responsive-nav .logo {
+    left: unset;
+    right: 0;
+  }
+  .header-area .mean-container .mean-nav ul li a.mean-expand {
+    text-align: left !important;
+    right: auto;
+    left: 0;
+  }
+  .header-area .mean-container .mean-nav ul li.mean-last a {
+    float: right;
+  }
+  .header-area .main-responsive-nav.mean-container a.meanmenu-reveal {
+    right: unset !important;
+    left: 0 !important;
+  }
+  .header-area .mean-nav a {
+    text-align: right !important;
+  }
+  .header-area .dropdown-menu a {
+    text-align: right !important;
+  }
+  .main-navbar-area .main-responsive-nav .mean-container a.meanmenu-reveal {
+    right: auto !important;
+    left: 0 !important;
+    padding-left: unset;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991.98px) {
+  .overview-area .section-title,
+  .features-area.features-3 .section-title {
+    text-align: center;
+  }
+}
+
+@media only screen and (max-width: 767.98px) {
+  .choose-area .section-title,
+  .overview-area .section-title,
+  .feedback-area .section-top .section-title,
+  .features-area.features-3 .section-title {
+    text-align: center;
+  }
+  .feedback-area .slider-item .slider-item-inner .quote {
+    left: 20px;
+  }
+}
+/*# sourceMappingURL=rtl.css.map */
