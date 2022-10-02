@@ -48,7 +48,7 @@ func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
 	manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
 		Title:         "آموزش برنامه نویس گولنگ",
-		Body:          "تست آموزش تست آموزش تست آموزش",
+		Body:          "این یک پست آموزشی برنامه نویسی گولنگ است",
 		ThumbnailPath: "",
 		Slug:          "learn-golang",
 		CategoryID:    1,
@@ -82,6 +82,7 @@ func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID ui
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ایجاد پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -93,6 +94,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -116,6 +118,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -127,6 +130,7 @@ func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در حذف پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -138,6 +142,7 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, e
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -148,6 +153,7 @@ func (m *MysqlManager) FindPostBySlug(c *gin.Context, slug string) (post Post, e
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -167,6 +173,7 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -179,6 +186,7 @@ func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -189,6 +197,7 @@ func (m *MysqlManager) GetLastPost(c *gin.Context, count int) (posts []Post, err
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}

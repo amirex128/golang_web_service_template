@@ -49,13 +49,23 @@ func (c *Discount) Decode(ir io.Reader) error {
 
 func initDiscount(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Discount{})
+	manager.CreateDiscount(&gin.Context{}, DTOs.CreateDiscount{
+		Code:       "test",
+		StartedAt:  "2021-01-01 00:00:00",
+		EndedAt:    "2024-01-01 00:00:00",
+		Count:      10,
+		Type:       "percent",
+		Amount:     0,
+		Percent:    20,
+		ProductIDs: []uint64{1, 2, 3},
+		Status:     1,
+	}, 1)
 }
 func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, userID uint64) error {
 
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(c, pId)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
 			return err
 		}
 		if product.UserID != userID {
@@ -85,7 +95,10 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 	}
 	err := m.GetConn().Create(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در ایجاد کد تخفیف"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در ایجاد کد تخفیف",
+			"error":   err.Error(),
+		})
 		return err
 	}
 	return nil
@@ -95,11 +108,17 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(c, pId)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "محصول یافت نشد"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "محصول یافت نشد",
+				"error":   err.Error(),
+			})
 			return err
 		}
 		if product.UserID != userID {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید",
+				"error":   err.Error(),
+			})
 			return err
 		}
 	}
@@ -107,12 +126,18 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	discount := &Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "تخفیف یافت نشد",
+			"error":   err.Error(),
+		})
 		return err
 	}
 
 	if discount.UserID != userID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ویرایش این تخفیف را ندارید"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "شما اجازه ویرایش این تخفیف را ندارید",
+			"error":   err.Error(),
+		})
 		return errors.New("")
 	}
 
@@ -146,7 +171,8 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	discount.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در ویرایش تخفیف"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در ویرایش تخفیف"})
 		return err
 	}
 	return nil
@@ -155,17 +181,26 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64, userID 
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "تخفیف یافت نشد",
+			"error":   err.Error(),
+		})
 		return err
 	}
 	if discount.UserID != userID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه حذف این تخفیف را ندارید"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "شما اجازه حذف این تخفیف را ندارید",
+			"error":   err.Error(),
+		})
 		return errors.New("")
 	}
 
 	err = m.GetConn().Delete(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در حذف تخفیف"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در حذف تخفیف",
+			"error":   err.Error(),
+		})
 		return err
 	}
 	return nil
@@ -181,7 +216,10 @@ func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, dto DTOs.Ind
 	}
 	err := conn.Find(&discounts).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "خطا در دریافت تخفیف ها"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت تخفیف ها",
+			"error":   err.Error(),
+		})
 		return pagination, err
 	}
 	pagination.Data = discounts
@@ -193,7 +231,10 @@ func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Disc
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "کد تخفیف یافت نشد",
+			"error":   err.Error(),
+		})
 		return discount, err
 	}
 	return discount, nil
@@ -204,7 +245,10 @@ func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, code string, 
 	discount := Discount{}
 	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف یافت نشد"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "کد تخفیف یافت نشد",
+			"error":   err.Error(),
+		})
 		return discount, err
 	}
 	return discount, nil

@@ -18,32 +18,32 @@ type DiscountPriceType struct {
 type ProductDiscountCalculatorType struct {
 	ProductID uint64
 	Price     float32
+	Count     uint32
 }
 
 func (p ProductDiscountCalculatorType) GetID() uint64 {
 	return p.ProductID
 }
 
-// CalculateDiscountProduct  محاسبه میزان تخفیف برای محصولات
 func CalculateDiscountProduct(applyDiscount map[string][]uint64, products []ProductDiscountCalculatorType, discount DiscountPriceType) map[uint64]ApplyDiscountType {
-	var finalProductPrice map[uint64]ApplyDiscountType
+	var finalProductPrice = make(map[uint64]ApplyDiscountType)
 	for pType, pIds := range applyDiscount {
 		if pType == "percent" {
 			for _, pId := range pIds {
 				product := FindId(products, pId)
 				finalProductPrice[pId] = ApplyDiscountType{
-					RawPrice: product.Price,
-					OffPrice: product.Price * (discount.Percent / 100),
-					NewPrice: product.Price - (product.Price * (discount.Percent / 100)),
+					RawPrice: product.Price * float32(product.Count),
+					OffPrice: (product.Price * float32(product.Count)) * (discount.Percent / 100),
+					NewPrice: (product.Price * float32(product.Count)) - ((product.Price * float32(product.Count)) * (discount.Percent / 100)),
 				}
 			}
 		} else {
 			for _, pId := range pIds {
 				product := FindId(products, pId)
 				finalProductPrice[pId] = ApplyDiscountType{
-					RawPrice: product.Price,
+					RawPrice: product.Price * float32(product.Count),
 					OffPrice: discount.Amount,
-					NewPrice: product.Price - discount.Amount,
+					NewPrice: (product.Price * float32(product.Count)) - discount.Amount,
 				}
 			}
 		}
@@ -62,17 +62,17 @@ func FindId[T constants.IModel](products []T, pId uint64) T {
 	return product
 }
 
-// ApplyDiscount اعمال تخفیف روی محصول
 func ApplyDiscount(productDiscounts []string, discount DiscountPriceType, productIDs []uint64) map[string][]uint64 {
-	var applyDiscount map[string][]uint64
-
+	var applyDiscount = make(map[string][]uint64)
 	if len(productDiscounts) > 0 {
 		// در صورتی که تخفیف درصدی بود
 		if discount.Type == "percent" {
 			for i := range productDiscounts {
+			loop:
 				for i2 := range productIDs {
 					if StringToUint64(productDiscounts[i]) == productIDs[i2] {
 						applyDiscount["percent"] = append(applyDiscount["percent"], productIDs[i2])
+						break loop
 					}
 				}
 			}

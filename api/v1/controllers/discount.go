@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"backend/api/v1/validations"
+	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
@@ -9,19 +10,28 @@ import (
 	"strings"
 )
 
-// checkDiscount بررسی درستی تخفیف
 func checkDiscount(c *gin.Context) {
 	dto, err := validations.CheckDiscount(c)
 	if err != nil {
 		return
 	}
-	productIDs := dto.ProductIDs
 
 	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, dto.Code, dto.UserID)
 	if err != nil {
 		return
 	}
-	products, err := models.NewMainManager().FindProductByIds(c, productIDs)
+
+	if utils.DifferentWithNow(discount.StartedAt) < 0 || utils.DifferentWithNow(discount.EndedAt) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف منقضی شده است"})
+		return
+	}
+
+	var pIDs []uint64
+	for i := range dto.ProductIDs {
+		pIDs = append(pIDs, dto.ProductIDs[i].ProductID)
+	}
+
+	products, err := models.NewMainManager().FindProductByIds(c, pIDs)
 	if err != nil {
 		return
 	}
@@ -32,15 +42,23 @@ func checkDiscount(c *gin.Context) {
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
-	}, productIDs)
-	var productCalculate []utils.ProductDiscountCalculatorType
+	}, pIDs)
+	var productsCalculate []utils.ProductDiscountCalculatorType
 	for i := range products {
-		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
+		productsCalculate = append(productsCalculate, utils.ProductDiscountCalculatorType{
 			ProductID: products[i].ID,
 			Price:     products[i].Price,
+			Count: func() *DTOs.ProductListDiscount {
+				for j := range dto.ProductIDs {
+					if dto.ProductIDs[j].ProductID == products[i].ID {
+						return &dto.ProductIDs[j]
+					}
+				}
+				return nil
+			}().Count,
 		})
 	}
-	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productCalculate, utils.DiscountPriceType{
+	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productsCalculate, utils.DiscountPriceType{
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
@@ -51,7 +69,6 @@ func checkDiscount(c *gin.Context) {
 	})
 }
 
-// createDiscount ایجاد تخفیف
 func createDiscount(c *gin.Context) {
 	dto, err := validations.CreateDiscount(c)
 	if err != nil {
@@ -68,7 +85,6 @@ func createDiscount(c *gin.Context) {
 
 }
 
-// updateDiscount بروزرسانی تخفیف
 func updateDiscount(c *gin.Context) {
 	dto, err := validations.UpdateDiscount(c)
 	if err != nil {
@@ -86,7 +102,6 @@ func updateDiscount(c *gin.Context) {
 	})
 }
 
-// indexDiscount لیست تخفیفات
 func indexDiscount(c *gin.Context) {
 	dto, err := validations.IndexDiscount(c)
 	if err != nil {
@@ -103,7 +118,6 @@ func indexDiscount(c *gin.Context) {
 	})
 }
 
-// deleteDiscount حذف تخفیف
 func deleteDiscount(c *gin.Context) {
 	id := utils.StringToUint64(c.Param("id"))
 	userID := utils.GetUser(c)
@@ -117,7 +131,6 @@ func deleteDiscount(c *gin.Context) {
 	})
 }
 
-// showDiscount نمایش تخفیف
 func showDiscount(c *gin.Context) {
 	id := utils.StringToUint64(c.Param("id"))
 	userID := utils.GetUser(c)
@@ -132,6 +145,6 @@ func showDiscount(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "تخفیف با موفقیت حذف شد",
+		"discount": discount,
 	})
 }

@@ -46,6 +46,7 @@ func (m *MysqlManager) CreateTag(c *gin.Context, dto DTOs.CreateTag) (err error)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در ایجاد تگ",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -65,6 +66,7 @@ func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTa
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -77,6 +79,7 @@ func (m *MysqlManager) DeleteTag(c *gin.Context, id uint64) (err error) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در حذف تگ",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -88,6 +91,7 @@ func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در افزودن تگ",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -99,6 +103,7 @@ func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []Tag, err er
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در یافتن تگ ها",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}

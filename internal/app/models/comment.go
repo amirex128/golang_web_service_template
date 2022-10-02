@@ -54,6 +54,7 @@ func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (er
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در ایجاد دیدگاه",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -73,6 +74,7 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -84,6 +86,7 @@ func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []Comment, err e
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در یافتن دیدگاه ها",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -96,6 +99,7 @@ func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در حذف دیدگاه",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -108,6 +112,7 @@ func (m *MysqlManager) ApproveComment(c *gin.Context, id uint64) (err error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در تایید دیدگاه",
+			"error":   err.Error(),
 		})
 		return err
 	}

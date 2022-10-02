@@ -93,6 +93,7 @@ func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید",
+			"error":   err.Error(),
 		})
 		return err
 	}
@@ -112,6 +113,7 @@ func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}

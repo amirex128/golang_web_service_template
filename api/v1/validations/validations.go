@@ -26,7 +26,6 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 				"error":   err.Error(),
 			})
 			return errors.New("validation error")
-
 		}
 		var validationErrors = make(map[string]map[string]string)
 		for _, err := range err.(validator.ValidationErrors) {

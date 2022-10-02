@@ -1,9 +1,13 @@
 package DTOs
 
+type ProductListDiscount struct {
+	ProductID uint64 `json:"product_id"`
+	Count     uint32 `json:"count"`
+}
 type CheckDiscount struct {
-	UserID     uint64   `form:"user_id" json:"user_id" validate:"required,numeric"`
-	Code       string   `form:"code" json:"code" binding:"required"`
-	ProductIDs []uint64 `form:"product_ids" json:"product_ids" binding:"required,dive"`
+	UserID     uint64                `form:"user_id" json:"user_id" validate:"required,numeric"`
+	Code       string                `form:"code" json:"code" validate:"required"`
+	ProductIDs []ProductListDiscount `form:"product_ids[]" json:"product_ids" validate:"required"`
 }
 
 type CreateDiscount struct {
@@ -14,7 +18,7 @@ type CreateDiscount struct {
 	Type       string   `form:"type" json:"type" validate:"required,oneof=percent amount"`
 	Amount     float32  `form:"amount" json:"amount" validate:"omitempty,numeric"`
 	Percent    float32  `form:"percent" json:"percent" validate:"omitempty,numeric"`
-	ProductIDs []uint64 `form:"product_ids" json:"product_ids" validate:"omitempty,dive,numeric"`
+	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
 	Status     byte     `form:"status" json:"status" validate:"required,numeric"`
 }
 
@@ -26,7 +30,7 @@ type UpdateDiscount struct {
 	Type       string   `form:"type" json:"type" validate:"required,oneof=percent amount"`
 	Amount     float32  `form:"amount" json:"amount" validate:"omitempty,numeric"`
 	Percent    float32  `form:"percent" json:"percent" validate:"omitempty,numeric"`
-	ProductIDs []uint64 `form:"product_ids" json:"product_ids" validate:"omitempty,dive,numeric"`
+	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
 	Status     byte     `form:"status" json:"status" validate:"required,numeric"`
 }
 type IndexDiscount struct {

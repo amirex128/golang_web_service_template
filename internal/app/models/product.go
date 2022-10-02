@@ -3,9 +3,9 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"database/sql"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -13,31 +13,31 @@ import (
 )
 
 type Product struct {
-	ID               uint64         `gorm:"primary_key;auto_increment" json:"id"`
-	UserID           uint64         `json:"user_id"`
-	User             User           `gorm:"foreignKey:user_id" json:"user"`
-	ShopID           uint64         `json:"shop_id"`
-	Shop             Shop           `gorm:"foreignKey:shop_id" json:"shop"`
-	Description      string         `json:"description"`
-	Name             string         `json:"name"`
-	ShortDescription string         `json:"short_description"`
-	TotalSales       uint32         `json:"total_sales"`
-	Status           string         `json:"block_status" sql:"type:ENUM('block','ok')"`
-	Quantity         uint64         `json:"quantity"`
-	Price            float32        `json:"price"`
-	Weight           sql.NullInt32  `json:"weight"`
-	Height           sql.NullInt32  `json:"height"`
-	Width            sql.NullInt32  `json:"width"`
-	Active           byte           `json:"active"`
-	Images           string         `json:"images"`
-	CreatedAt        string         `json:"created_at"`
-	UpdatedAt        string         `json:"updated_at"`
-	StartedAt        sql.NullString `json:"started_at"`
-	EndedAt          sql.NullString `json:"ended_at"`
-	CategoryID       uint64         `json:"category_id"`
-	Category         Category       `gorm:"foreignKey:category_id" json:"category"`
-	Galleries        []Gallery      `gorm:"foreignKey:product_id" json:"galleries"`
-	DeliveryTime     uint           `json:"delivery_time"` // مدت زمان ارسال
+	ID               uint64    `gorm:"primary_key;auto_increment" json:"id"`
+	UserID           uint64    `json:"user_id"`
+	User             User      `gorm:"foreignKey:user_id" json:"user"`
+	ShopID           uint64    `json:"shop_id"`
+	Shop             Shop      `gorm:"foreignKey:shop_id" json:"shop"`
+	Description      string    `json:"description"`
+	Name             string    `json:"name"`
+	ShortDescription string    `json:"short_description"`
+	TotalSales       uint32    `json:"total_sales"`
+	Status           string    `json:"block_status" sql:"type:ENUM('block','ok')"`
+	Quantity         uint32    `json:"quantity"`
+	Price            float32   `json:"price"`
+	Weight           uint32    `json:"weight"`
+	Height           uint32    `json:"height"`
+	Width            uint32    `json:"width"`
+	Active           byte      `json:"active"`
+	Images           string    `json:"images"`
+	CreatedAt        string    `json:"created_at"`
+	UpdatedAt        string    `json:"updated_at"`
+	StartedAt        string    `json:"started_at"`
+	EndedAt          string    `json:"ended_at"`
+	CategoryID       uint64    `json:"category_id"`
+	Category         Category  `gorm:"foreignKey:category_id" json:"category"`
+	Galleries        []Gallery `gorm:"foreignKey:product_id" json:"galleries"`
+	DeliveryTime     uint32    `json:"delivery_time"` // مدت زمان ارسال
 }
 
 func (c Product) GetID() uint64 {
@@ -65,6 +65,28 @@ func (c *Product) Decode(ir io.Reader) error {
 }
 func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
+	for i := 0; i < 100; i++ {
+		manager.CreateProduct(&gin.Context{}, DTOs.CreateProduct{
+			ShopID:           1,
+			ManufacturerId:   1,
+			Description:      fmt.Sprintf("توضیحات محصول %d", i),
+			Name:             fmt.Sprintf("محصول %d", i),
+			ShortDescription: fmt.Sprintf("توضیحات کوتاه محصول %d", i),
+			Quantity:         10,
+			Price:            10000,
+			Weight:           100,
+			Height:           100,
+			Width:            100,
+			StartedAt:        "2020-01-01 00:00:00",
+			EndedAt:          "2024-01-01 00:00:00",
+			DeliveryTime:     1,
+			OptionId:         1,
+			OptionItemID:     1,
+			Images:           nil,
+			ImagePath:        nil,
+			CategoryID:       1,
+		}, 1)
+	}
 }
 
 func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
@@ -78,7 +100,10 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 	}
 	err := conn.Find(&products).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "خطا در دریافت محصولات"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت محصولات",
+			"error":   err.Error(),
+		})
 		return pagination, err
 	}
 	pagination.Data = products
@@ -93,83 +118,27 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		Description:      dto.Description,
 		Name:             dto.Name,
 		ShortDescription: dto.ShortDescription,
-		Quantity: func() uint64 {
-			if dto.Quantity == 0 {
-				return 0
-			}
-			return dto.Quantity
-		}(),
-		Price: dto.Price,
-		Weight: func() sql.NullInt32 {
-			if dto.Weight > 0 {
-				return sql.NullInt32{
-					Int32: int32(dto.Weight),
-					Valid: true,
-				}
-			}
-			return sql.NullInt32{
-				Int32: 0,
-				Valid: false,
-			}
-		}(),
-		Height: func() sql.NullInt32 {
-			if dto.Height > 0 {
-				return sql.NullInt32{
-					Int32: int32(dto.Height),
-					Valid: true,
-				}
-			}
-			return sql.NullInt32{
-				Int32: 0,
-				Valid: false,
-			}
-		}(),
-		Width: func() sql.NullInt32 {
-			if dto.Width > 0 {
-				return sql.NullInt32{
-					Int32: int32(dto.Width),
-					Valid: true,
-				}
-			}
-			return sql.NullInt32{
-				Int32: 0,
-				Valid: false,
-			}
-		}(),
-		Active:    1,
-		Images:    strings.Join(dto.ImagePath, ","),
-		CreatedAt: utils.NowTime(),
-		UpdatedAt: utils.NowTime(),
-		StartedAt: func() sql.NullString {
-			if dto.StartedAt == "" {
-				return sql.NullString{
-					String: "",
-					Valid:  false,
-				}
-			}
-			return sql.NullString{
-				String: utils.DateTimeConvert(dto.StartedAt),
-				Valid:  true,
-			}
-		}(),
-		EndedAt: func() sql.NullString {
-			if dto.EndedAt == "" {
-				return sql.NullString{
-					String: "",
-					Valid:  false,
-				}
-			}
-			return sql.NullString{
-				String: utils.DateTimeConvert(dto.EndedAt),
-				Valid:  true,
-			}
-		}(),
-		DeliveryTime: dto.DeliveryTime,
+		Quantity:         dto.Quantity,
+		Price:            dto.Price,
+		Weight:           dto.Weight,
+		Height:           dto.Height,
+		Width:            dto.Width,
+		Active:           1,
+		CategoryID:       dto.CategoryID,
+		Images:           strings.Join(dto.ImagePath, ","),
+		CreatedAt:        utils.NowTime(),
+		UpdatedAt:        utils.NowTime(),
+		StartedAt:        utils.DateTimeConvert(dto.StartedAt),
+		EndedAt:          utils.DateTimeConvert(dto.EndedAt),
+		DeliveryTime:     dto.DeliveryTime,
 	}
 
 	err := m.GetConn().Create(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در ایجاد محصول"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در ایجاد محصول",
+		})
 		return err
 	}
 	return nil
@@ -199,22 +168,13 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 		product.Price = dto.Price
 	}
 	if dto.Weight > 0 {
-		product.Weight = sql.NullInt32{
-			Int32: int32(dto.Weight),
-			Valid: true,
-		}
+		product.Weight = dto.Weight
 	}
 	if dto.Height > 0 {
-		product.Height = sql.NullInt32{
-			Int32: int32(dto.Height),
-			Valid: true,
-		}
+		product.Height = dto.Height
 	}
 	if dto.Width > 0 {
-		product.Width = sql.NullInt32{
-			Int32: int32(dto.Width),
-			Valid: true,
-		}
+		product.Width = dto.Width
 	}
 	if dto.Active != "" {
 		product.Active = utils.ActiveConvert(dto.Active)
@@ -224,16 +184,10 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	}
 	product.UpdatedAt = utils.NowTime()
 	if dto.StartedAt != "" {
-		product.StartedAt = sql.NullString{
-			String: utils.DateTimeConvert(dto.StartedAt),
-			Valid:  true,
-		}
+		product.StartedAt = utils.DateTimeConvert(dto.StartedAt)
 	}
 	if dto.EndedAt != "" {
-		product.EndedAt = sql.NullString{
-			String: utils.DateTimeConvert(dto.EndedAt),
-			Valid:  true,
-		}
+		product.EndedAt = utils.DateTimeConvert(dto.EndedAt)
 	}
 	if dto.DeliveryTime > 0 {
 		product.DeliveryTime = dto.DeliveryTime
@@ -241,7 +195,10 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 
 	err = m.GetConn().Save(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در بروزرسانی محصول"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در بروزرسانی محصول",
+		})
 		return err
 	}
 	return nil
@@ -257,7 +214,10 @@ func (m *MysqlManager) DeleteProduct(c *gin.Context, id uint64) error {
 
 	err = m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در حذف محصول"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در حذف محصول",
+		})
 		return err
 	}
 	return nil
@@ -267,16 +227,22 @@ func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, erro
 	var product Product
 	err := m.GetConn().Where("id = ?", id).First(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت محصول"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در دریافت محصول",
+		})
 		return product, err
 	}
 	return product, nil
 }
 func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product, error) {
 	var products []Product
-	err := m.GetConn().Where("id IN (?)", ids).First(&products).Error
+	err := m.GetConn().Where("id IN (?)", ids).Find(&products).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت محصولات"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در دریافت محصولات",
+		})
 		return products, err
 	}
 	return products, nil
@@ -289,7 +255,10 @@ func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint
 	}
 	if product.UserID != userID {
 		err = errors.New("access denied")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error(), "message": "شما دسترسی کافی برای ویرایش این محصول را ندارید"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   err.Error(),
+			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
+		})
 		return err
 	}
 

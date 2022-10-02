@@ -44,13 +44,27 @@ func (c *Customer) Decode(ir io.Reader) error {
 }
 func initCustomer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Customer{})
+	manager.CreateCustomer(&gin.Context{}, DTOs.CreateUpdateCustomer{
+		ShopID:        1,
+		Mobile:        "09123456789",
+		VerifyCode:    "1234",
+		FullName:      "محمد محمدی",
+		ProvinceID:    1,
+		CityID:        1,
+		Address:       "تهران",
+		PostalCode:    1234567890,
+		LastSendSMSAt: "2020-01-01 00:00:00",
+	})
 }
 func (m *MysqlManager) FindCustomerById(c *gin.Context, customerID uint64) (Customer, error) {
 
 	customer := Customer{}
 	err := m.GetConn().Where("id = ?", customerID).First(&customer).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "مشتری یافت نشد"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "مشتری یافت نشد",
+			"error":   err.Error(),
+		})
 		return customer, err
 	}
 	return customer, nil
@@ -61,6 +75,7 @@ func (m *MysqlManager) FindCustomerByMobile(c *gin.Context, mobile string) (Cust
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "شماره موبایل تکراری یا اشتباه میباشد",
+			"error":   err.Error(),
 		})
 		return customer, err
 	}
@@ -74,14 +89,13 @@ func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(c *gin.Context, mobile,
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "رمز عبور یا کد تایید اشتباه است",
-			"status":  false,
+			"error":   err.Error(),
 		})
 		return customer, err
 	}
 	return customer, nil
 }
 func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCustomer) error {
-	encryptPassword := utils.GeneratePasswordHash(dto.VerifyCode)
 	customer := Customer{
 		FullName:   dto.FullName,
 		Mobile:     dto.Mobile,
@@ -89,11 +103,14 @@ func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 		CityID:     dto.CityID,
 		Address:    dto.Address,
 		PostalCode: dto.PostalCode,
-		VerifyCode: encryptPassword,
+		VerifyCode: dto.VerifyCode,
 	}
 	err := m.GetConn().Create(&customer).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "مشکلی در ثبت نام شما پیش آمده است"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "مشکلی در ثبت نام شما پیش آمده است",
+			"error":   err.Error(),
+		})
 		return err
 	}
 	return nil
@@ -101,7 +118,9 @@ func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, dto DTOs.RequestCreateLoginCustomer, encryptPassword string) error {
 	rowsAffected := m.GetConn().Where("mobile = ?", dto.Mobile).First(&Customer{}).RowsAffected
 	if rowsAffected > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "شماره موبایل قبلا ثبت شده است"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "شماره موبایل قبلا ثبت شده است",
+		})
 		return errors.New("mobile failed")
 	}
 
@@ -112,7 +131,10 @@ func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, dto DTOs.RequestCreate
 	}
 	err := m.GetConn().Create(&customer).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "مشکلی در ثبت نام شما پیش آمده است"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "مشکلی در ثبت نام شما پیش آمده است",
+			"error":   err.Error(),
+		})
 		return err
 	}
 	return nil
@@ -143,7 +165,10 @@ func (m *MysqlManager) UpdateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 	}
 	err = m.GetConn().Save(&customer).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "مشکلی در ویرایش اطلاعات شما پیش آمده است"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "مشکلی در ویرایش اطلاعات شما پیش آمده است",
+			"error":   err.Error(),
+		})
 		return customer, err
 	}
 	return customer, nil

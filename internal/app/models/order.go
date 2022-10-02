@@ -24,6 +24,7 @@ type Order struct {
 	TotalFinalPrice           float32     `json:"total_final_price"`
 	SendPrice                 float32     `json:"send_price"`
 	Status                    string      `json:"status"`
+	Description               string      `json:"description"`
 	SendType                  string      `json:"send_type"` // tipax post post-poshtaz
 	LastUpdateStatusAt        string      `json:"last_update_status_at"`
 	CreatedAt                 string      `json:"created_at"`
@@ -52,14 +53,16 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (err error) {
+func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (orderID uint64, err error) {
 	err = m.GetConn().Create(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت سفارش",
+			"error":   err.Error(),
 		})
 		return
 	}
+	orderID = order.ID
 	return
 }
 
@@ -68,6 +71,7 @@ func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []st
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارشات",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -78,12 +82,14 @@ func (m *MysqlManager) FindOrderByID(c *gin.Context, orderID uint64, userID uint
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارش",
+			"error":   err.Error(),
 		})
 		return
 	}
 	if order.UserID != userID {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه دسترسی به این سفارش را ندارید",
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -94,6 +100,7 @@ func (m *MysqlManager) UpdateOrder(c *gin.Context, order Order) (err error) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت سفارش",
+			"error":   err.Error(),
 		})
 		return
 	}

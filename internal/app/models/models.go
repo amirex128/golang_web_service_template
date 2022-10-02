@@ -50,27 +50,27 @@ func (r *MysqlManager) Initial() {
 	if !initCategory(manager) {
 		return
 	}
+	initProvince(manager)
 	initCity(manager)
+	initUser(manager)
+	initShop(manager)
 	initCustomer(manager)
+	InitProduct(manager)
 	initDiscount(manager)
+	InitPost(manager)
+	initComment(manager)
+	initTag(manager)
+
 	initEvent(manager)
 	initFeatureGroup(manager)
 	initFeatureItem(manager)
 	initFeatureItemValue(manager)
 	initGallery(manager)
-	initGroupDiscount(manager)
 	initGuild(manager)
 	initManufacturer(manager)
 	initOrder(manager)
 	initOrderItem(manager)
-	InitProduct(manager)
-	initProvince(manager)
-	initUser(manager)
 	initOption(manager)
-	initShop(manager)
-	InitPost(manager)
-	initComment(manager)
-	initTag(manager)
 
 }
 

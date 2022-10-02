@@ -7,6 +7,8 @@ import (
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/flosch/pongo2"
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -116,11 +118,23 @@ func Runner(host string, port string) {
 		}
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
+	r.Use(sentrygin.New(sentrygin.Options{
+		Repanic:         true,
+		WaitForDelivery: false,
+		Timeout:         5 * time.Second,
+	}))
+	r.Use(func(ctx *gin.Context) {
+		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+			hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
+		}
+		ctx.Next()
+	})
 
 	controllers.Routes(r, GetAuthMiddleware())
 
 	err := r.Run(host + ":" + port)
 	if err != nil {
+		sentry.CaptureException(err)
 		panic(err)
 	}
 
@@ -139,6 +153,7 @@ func Pongo2() gin.HandlerFunc {
 		template := pongo2.Must(pongo2.FromFile(fmt.Sprintf("%s/%s", "../../templates", name)))
 		err := template.ExecuteWriter(convertContext(data), c.Writer)
 		if err != nil {
+			sentry.CaptureException(err)
 			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		}
 	}

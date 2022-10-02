@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
-	"time"
 )
 
 func ActiveConvert(value interface{}) byte {
@@ -37,17 +36,6 @@ func StringToUint(value string) uint {
 func StringToUint64(value string) uint64 {
 	val, _ := strconv.ParseUint(value, 10, 32)
 	return val
-}
-func DateTimeConvert(value string) string {
-	if value != "" {
-		l, _ := time.LoadLocation("Asia/Tehran")
-		res, err := time.ParseInLocation("2006-01-02 15:04:05", value, l)
-		if err == nil {
-			return res.String()
-		}
-		return ""
-	}
-	return ""
 }
 
 func Uint64ToString(value uint64) string {

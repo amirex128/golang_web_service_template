@@ -33,13 +33,18 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	if customer.VerifyCode != utils.GeneratePasswordHash(dto.VerifyCode) {
+	if customer.VerifyCode != dto.VerifyCode {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تایید صحیح نمی باشد"})
 		return
 	}
 
-	discount, err := models.NewMainManager().FindDiscountById(c, dto.DiscountID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, dto.DiscountCode, dto.UserID)
 	if err != nil {
+		return
+	}
+
+	if utils.DifferentWithNow(discount.StartedAt) < 0 || utils.DifferentWithNow(discount.EndedAt) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف منقضی شده است"})
 		return
 	}
 
@@ -47,9 +52,8 @@ func createOrder(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	var products []models.Product
 	for i := range rawProducts {
-		var count uint64
+		var count uint32
 		for j := range dto.OrderItems {
 			if rawProducts[i].ID == dto.OrderItems[j].ProductID {
 				count = dto.OrderItems[j].Count
@@ -85,10 +89,18 @@ func createOrder(c *gin.Context) {
 		Type:    discount.Type,
 	}, extractProductIDs(dto))
 	var productCalculate []utils.ProductDiscountCalculatorType
-	for i := range products {
+	for i := range rawProducts {
 		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
-			ProductID: products[i].ID,
-			Price:     products[i].Price,
+			ProductID: rawProducts[i].ID,
+			Price:     rawProducts[i].Price,
+			Count: func() *DTOs.OrderItem {
+				for j := range dto.OrderItems {
+					if dto.OrderItems[j].ProductID == rawProducts[i].ID {
+						return &dto.OrderItems[j]
+					}
+				}
+				return nil
+			}().Count,
 		})
 	}
 	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productCalculate, utils.DiscountPriceType{
@@ -114,18 +126,29 @@ func createOrder(c *gin.Context) {
 	order.IP = c.ClientIP()
 	order.Status = constants.PendingPaymentOrderStatus
 	order.SendType = dto.SendType
+	order.Description = dto.Description
 	order.LastUpdateStatusAt = utils.NowTime()
 	order.CreatedAt = utils.NowTime()
 
-	err = models.NewMainManager().CreateOrder(c, order)
+	orderID, err := models.NewMainManager().CreateOrder(c, order)
 	if err != nil {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "محصول با موفقیت ایجاد شد",
-	})
-	return
+	err = models.NewMainManager().CreateOrderItem(c, dto.OrderItems, orderID)
+	if err != nil {
+		return
+	}
+
+	err = utils.SadadPayRequest(c, 10000000, 10000.0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطایی در ارتباط با درگاه پرداخت رخ داده است",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 }
 
 func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
@@ -186,6 +209,22 @@ func acceptOrder(c *gin.Context) {
 }
 func sendOrder(c *gin.Context) {
 	// TODO دریافت اطلاعات وزن بسته و ارسال به این وبسرویس برای محاسبه هزینه ارسال سیستم های پستی مختلف
+}
+func sadadPaymentVerify(c *gin.Context) {
+	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطایی در ارتباط با درگاه پرداخت رخ داده است و مبلغ پرداختی شما تا 72 ساعت آینده به حساب شما برگشت داده میشود لطفا مجدد پرداخت خود را انجام دهید",
+			"error":   err.Error(),
+		})
+		return
+	}
+	//TODO ارسال پیامک خریدار کسر کردن موجودی محصول و کسر کردن موجودی کد تحفیف و ارسال پیامک ثبت سفارش برای فروشنده
+	//text := fmt.Sprintf("سفارش شما با کد %d با موفقیت ثبت شد و در انتظار تایید فروشگاه میباشد", order.ID)
+	//err = utils.SendSMS(c, customer.Mobile, text, true)
+	//if err != nil {
+	//	return
+	//}
 }
 
 func chooseSenderOrder(c *gin.Context) {

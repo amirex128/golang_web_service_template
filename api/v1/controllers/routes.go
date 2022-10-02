@@ -81,7 +81,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			r.POST("/login", authMiddleware.LoginHandler)
 			r.POST("/register", register)
 			r.POST("/forget", forget)
-			r.GET("/sadad/pay", sadadPaymentRequest)
 			r.POST("/sadad/verify", sadadPaymentVerify)
 
 			user.POST("/order/create", createOrder)

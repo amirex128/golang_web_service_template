@@ -73,6 +73,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در ایجاد فروشگاه رخ داده است",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
@@ -85,6 +86,7 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
+			"error":   err.Error(),
 		})
 		return nil, err
 	}
