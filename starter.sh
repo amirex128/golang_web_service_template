@@ -4,5 +4,5 @@ cd /home/sell/backend;
 /usr/local/go/bin/go mod vendor;
 cd /home/sell/backend/cmd/server;
 /usr/local/go/bin/go build main.go;
-./server;
+./main;
 

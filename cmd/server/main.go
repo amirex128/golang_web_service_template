@@ -10,6 +10,9 @@ import (
 	"backend/internal/pkg/framework/xlog"
 	"context"
 	"fmt"
+	"github.com/getsentry/sentry-go"
+	"log"
+	"time"
 )
 import "github.com/spf13/viper"
 
@@ -18,6 +21,20 @@ const (
 )
 
 func main() {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: "https://6fa4045bd9ae4e459a87550f63997177@o257983.ingest.sentry.io/4503915107909632",
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
+
+	sentry.CaptureMessage("It works!")
 
 	config.Initialize(appName)
 	xlog.Initialize(appName)

@@ -108,7 +108,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	err := m.GetConn().Where("id = ?", discountID).First(discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
-		return nil
+		return err
 	}
 
 	if discount.UserID != userID {
