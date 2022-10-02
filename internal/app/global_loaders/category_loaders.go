@@ -24,7 +24,7 @@ func initCategoryLoader() {
 
 func categoryTypeMapPool() func(ctx context.Context) (map[string]kv.Serializable, error) {
 	return func(ctx context.Context) (map[string]kv.Serializable, error) {
-		categories, err := models.NewMainManager().GetAllCategories()
+		categories, err := models.NewMainManager().GetLevel1Categories()
 		b := make(map[string]kv.Serializable)
 		if err != nil {
 			return b, err

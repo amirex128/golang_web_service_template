@@ -23,6 +23,10 @@ func CreateComment(c *gin.Context) (DTOs.CreateComment, error) {
 			"required": "متن نظر الزامی میباشد",
 			"min":      "متن نظر باید حداقل 3 کاراکتر باشد",
 		},
+		"Email": {
+			"required": "ایمیل الزامی میباشد",
+			"email":    "ایمیل نا درست میباشد",
+		},
 	}
 	err := c.Bind(&dto)
 	if err != nil {

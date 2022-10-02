@@ -170,14 +170,22 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64, userID 
 	}
 	return nil
 }
-func (m *MysqlManager) IndexDiscount(c *gin.Context, search string, userID uint64) ([]Discount, error) {
+func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, dto DTOs.IndexDiscount, userID uint64) (*DTOs.Pagination, error) {
+	conn := m.GetConn()
 	var discounts []Discount
-	err := m.GetConn().Where("user_id = ?", userID).Where("code LIKE ?", "%"+search+"%").Find(&discounts).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در دریافت تخفیف ها"})
-		return nil, err
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate(DiscountTable, pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
 	}
-	return discounts, nil
+	err := conn.Find(&discounts).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "خطا در دریافت تخفیف ها"})
+		return pagination, err
+	}
+	pagination.Data = discounts
+	return pagination, nil
 }
 
 func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Discount, error) {

@@ -48,13 +48,31 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 				discount.POST("/update/:id", updateDiscount)
 				discount.POST("/delete/:id", deleteDiscount)
 			}
-			blog := ad.Group("post")
+			post := ad.Group("post")
 			{
-				blog.GET("/", indexPost)
-				blog.GET("/show/:id", showPost)
-				blog.POST("/create", createPost)
-				blog.POST("/update/:id", updatePost)
-				blog.POST("/delete/:id", deletePost)
+				post.GET("/", indexPost)
+				post.GET("/show/:id", showPost)
+				post.POST("/create", createPost)
+				post.POST("/update/:id", updatePost)
+				post.POST("/delete/:id", deletePost)
+			}
+			category := ad.Group("category")
+			{
+				category.GET("/", indexCategory)
+			}
+			comment := ad.Group("comment")
+			{
+				comment.GET("/", indexComment)
+				comment.POST("/create", createComment)
+				comment.POST("/delete/:id", deleteComment)
+				comment.POST("/approve/:id", approveComment)
+			}
+			tag := ad.Group("tag")
+			{
+				tag.GET("/", indexTag)
+				tag.POST("/create", createTag)
+				tag.POST("/delete/:id", deleteTag)
+				tag.POST("/add", addTag)
 			}
 		}
 
@@ -68,10 +86,12 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
 			user.POST("/order/create", createOrder)
 			user.POST("/discount/check", checkDiscount)
-			user.POST("/customer/create", createCustomer)
-			user.POST("/customer/login", loginCustomer)
-			user.POST("/customer/verify", verifyCustomer)
-			user.POST("/customer/update", updateCustomer)
+
+			customer := user.Group("customer")
+			customer.POST("/customer/create", createCustomer)
+			customer.POST("/customer/login", loginCustomer)
+			customer.POST("/customer/verify", verifyCustomer)
+			customer.POST("/customer/update", updateCustomer)
 		}
 
 	}

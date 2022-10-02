@@ -67,17 +67,18 @@ func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 }
 
-func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
 	conn := m.GetConn()
 	var products []Product
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
 	conn = conn.Scopes(DTOs.Paginate(ProductTable, pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
 	err := conn.Find(&products).Error
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "خطا در دریافت محصولات"})
 		return pagination, err
 	}
 	pagination.Data = products

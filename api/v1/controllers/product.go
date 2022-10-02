@@ -14,7 +14,7 @@ func indexProduct(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	products, err := models.NewMainManager().GetAllProductWithPagination(dto)
+	products, err := models.NewMainManager().GetAllProductWithPagination(c, dto)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت اطلاعات"})
 	}

@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	ID         uint64      `gorm:"primary_key;auto_increment" json:"id"`
-	Gender     string      `json:"gender"`
+	Gender     string      `json:"gender" sql:"type:ENUM('man','woman')"`
 	Firstname  string      `json:"firstname"`
 	Lastname   string      `json:"lastname"`
 	Email      string      `json:"email"`
@@ -55,6 +55,30 @@ func (c *User) Decode(ir io.Reader) error {
 }
 func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
+	manager.CreateUser(&gin.Context{}, &User{
+		ID:         1,
+		Gender:     "man",
+		Firstname:  "امیر",
+		Lastname:   "شیردلی",
+		Email:      "amirex128@gmail.com",
+		ProvinceID: 1,
+		CityID:     2,
+		Lat:        "35",
+		Long:       "35",
+		Address:    "",
+		Mobile:     "",
+		Password:   "",
+		ExpireAt:   "",
+		Status:     "",
+		PostalCode: "",
+		VerifyCode: 0,
+		CartNumber: "",
+		Shaba:      "",
+		IsAdmin:    1,
+		Financial:  nil,
+		UpdatedAt:  utils.NowTime(),
+		CreatedAt:  utils.NowTime(),
+	})
 }
 func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
 	find := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).Find(&User{}).RowsAffected

@@ -46,6 +46,15 @@ func (c *Post) Decode(ir io.Reader) error {
 }
 func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
+	manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
+		Title:         "آموزش برنامه نویس گولنگ",
+		Body:          "تست آموزش تست آموزش تست آموزش",
+		ThumbnailPath: "",
+		Slug:          "learn-golang",
+		CategoryID:    1,
+		CreatedAt:     utils.NowTime(),
+		UpdatedAt:     utils.NowTime(),
+	}, 1)
 }
 func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
 	rowsAffected := m.GetConn().Where("slug = ?", slug).First(&Post{}).RowsAffected
@@ -150,7 +159,7 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	var posts []Post
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(PostTable, pagination, conn)).Preload("User").Preload("Category")
+	conn = conn.Scopes(DTOs.Paginate(PostTable, pagination, conn)).Preload("User").Preload("Category").Order("id DESC")
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
@@ -163,4 +172,25 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	}
 	pagination.Data = posts
 	return pagination, nil
+}
+
+func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err error) {
+	err = m.GetConn().Order("RAND()").Limit(count).Find(&posts).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "مشکلی در یافتن پست ها پیش آمده است",
+		})
+		return nil, err
+	}
+	return posts, nil
+}
+func (m *MysqlManager) GetLastPost(c *gin.Context, count int) (posts []Post, err error) {
+	err = m.GetConn().Order("id DESC").Limit(count).Find(&posts).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "مشکلی در یافتن پست ها پیش آمده است",
+		})
+		return nil, err
+	}
+	return posts, nil
 }

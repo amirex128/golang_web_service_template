@@ -93,7 +93,7 @@ func indexDiscount(c *gin.Context) {
 	}
 	userID := utils.GetUser(c)
 
-	discounts, err := models.NewMainManager().IndexDiscount(c, dto.Search, userID)
+	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, dto, userID)
 	if err != nil {
 		return
 	}

@@ -59,7 +59,7 @@ func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTa
 
 	conn = conn.Scopes(DTOs.Paginate(TagTable, pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
 	err = conn.Find(&tags).Error
 	if err != nil {
@@ -84,7 +84,7 @@ func (m *MysqlManager) DeleteTag(c *gin.Context, id uint64) (err error) {
 }
 
 func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
-	err = m.GetConn().Model(&Post{}).Where("id = ?", dto.PostID).Association("Tags").Append(&Tag{ID: dto.TagID})
+	err = m.GetConn().Model(&Post{ID: dto.PostID}).Association("Tags").Append(&Tag{ID: dto.TagID})
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در افزودن تگ",
@@ -92,4 +92,15 @@ func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
 		return err
 	}
 	return
+}
+
+func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []Tag, err error) {
+	err = m.GetConn().Order("RAND()").Limit(count).Find(&tags).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "خطا در یافتن تگ ها",
+		})
+		return nil, err
+	}
+	return tags, nil
 }

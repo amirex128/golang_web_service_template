@@ -22,9 +22,9 @@ func createComment(c *gin.Context) {
 	})
 }
 
-func acceptComment(c *gin.Context) {
+func approveComment(c *gin.Context) {
 	id := c.Param("id")
-	err := models.NewMainManager().AcceptComment(c, utils.StringToUint64(id))
+	err := models.NewMainManager().ApproveComment(c, utils.StringToUint64(id))
 	if err != nil {
 		return
 	}

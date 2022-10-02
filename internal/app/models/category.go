@@ -1,16 +1,20 @@
 package models
 
 import (
+	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
 	"database/sql"
 	"encoding/gob"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"io"
+	"net/http"
 )
 
 type Category struct {
 	ID          int            `gorm:"primary_key;auto_increment" json:"id"`
 	ParentID    int            `json:"parent_id"`
+	Type        string         `json:"type" sql:"type:ENUM('post','product')"`
 	Name        string         `json:"name"`
 	Sort        uint           `json:"sort"`
 	Equivalent  sql.NullString `json:"equivalent"`
@@ -64,10 +68,13 @@ func initCategory(manager *MysqlManager) bool {
 
 }
 
-func (m *MysqlManager) GetAllCategories() ([]*Category, error) {
+func (m *MysqlManager) GetLevel1Categories(c *gin.Context) ([]*Category, error) {
 	categories := make([]*Category, 0)
-	err := m.GetConn().Find(&categories).Error
+	err := m.GetConn().Where("type = ? and parent_id = ?", "post", 0).Find(&categories).Error
 	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "در دریافت دسته بندی ها مشکلی به وجود آمده است",
+		})
 		return nil, err
 	}
 	return categories, nil
@@ -79,8 +86,9 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 		value := files[i]
 		categories = append(categories, Category{
 			ID:          utils.StringToInt(value[0]),
-			ParentID:    utils.StringToInt(value[0]),
+			ParentID:    utils.StringToInt(value[1]),
 			Name:        value[2],
+			Type:        "product",
 			Sort:        utils.StringToUint(value[3]),
 			Equivalent:  utils.StringConvert(value[4]),
 			GuildIds:    utils.StringConvert(value[5]),
@@ -108,4 +116,24 @@ func (m *MysqlManager) CreateAllCategoryRelated(files [][]string) {
 	if err != nil {
 		logrus.Error("seed categoryRelated error: ", err)
 	}
+}
+
+func (m *MysqlManager) GetAllCategoryWithPagination(c *gin.Context, dto DTOs.IndexCategory) (pagination *DTOs.Pagination, err error) {
+	conn := m.GetConn()
+	var categories []Category
+	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate(CategoryTable, pagination, conn)).Order("id DESC")
+	if dto.Search != "" {
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
+	}
+	err = conn.Find(&categories).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مشکلی در یافتن پست ها پیش آمده است",
+		})
+		return nil, err
+	}
+	pagination.Data = categories
+	return pagination, nil
 }
