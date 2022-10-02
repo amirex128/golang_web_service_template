@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/DTOs"
 	"encoding/gob"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -9,13 +10,12 @@ import (
 
 type Shop struct {
 	ID          uint64    `gorm:"primary_key;auto_increment" json:"id"`
-	UserID      uint64    `json:"user_id"`
 	Name        string    `json:"name"`
 	Logo        string    `json:"logo"`
 	Type        string    `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
+	Social      string    `json:"social"`
 	Verify      bool      `json:"verify"`
 	SendPrice   float32   `json:"send_price"`
-	CategoryID  uint64    `json:"category_id"`
 	GuildID     uint32    `json:"guild_id"`
 	Description string    `json:"description"`
 	Phone       string    `json:"phone"`
@@ -25,8 +25,11 @@ type Shop struct {
 	WhatsappID  string    `json:"whatsapp_id"`
 	Email       string    `json:"email"`
 	Website     string    `json:"website"`
-	Products    []Product `gorm:"foreignkey:shop_id" json:"products"`
-	User        User      `gorm:"foreignkey:user_id" json:"user"`
+	Products    []Product `gorm:"foreignKey:shop_id" json:"products"`
+	UserID      uint64    `json:"user_id"`
+	User        User      `gorm:"foreignKey:user_id" json:"user"`
+	CategoryID  uint64    `json:"category_id"`
+	Category    Category  `gorm:"foreignKey:category_id" json:"category"`
 	CreatedAt   string    `json:"created_at"`
 	UpdatedAt   string    `json:"updated_at"`
 }
@@ -51,7 +54,31 @@ func (c *Shop) Decode(ir io.Reader) error {
 }
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
+	manager.CreateShop(&gin.Context{}, DTOs.CreateShop{
+		Name:       "فروشگاه امیر",
+		Type:       "instagram",
+		Social:     "amirex_dev",
+		CategoryID: 1,
+	}, 1)
 }
+func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID uint64) (*Shop, error) {
+	shop := &Shop{
+		Name:       dto.Name,
+		Type:       dto.Type,
+		Social:     dto.Social,
+		CategoryID: dto.CategoryID,
+		UserID:     userID,
+	}
+	err := m.GetConn().Create(shop).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطایی در ایجاد فروشگاه رخ داده است",
+		})
+		return nil, err
+	}
+	return shop, nil
+}
+
 func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error) {
 	res := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).First(res).Error

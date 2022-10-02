@@ -32,7 +32,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		ad := v1.Group("admin")
 		ad.Use(authMiddleware.MiddlewareFunc())
 		{
-			product := ad.Group("products")
+			product := ad.Group("product")
 			{
 				product.GET("/", indexProduct)
 				product.GET("/show/:id", showProduct)
@@ -40,7 +40,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 				product.POST("/update/:id", updateProduct)
 				product.POST("/delete/:id", deleteProduct)
 			}
-			discount := ad.Group("discounts")
+			discount := ad.Group("discount")
 			{
 				discount.GET("/", indexDiscount)
 				discount.GET("/show/:id", showDiscount)
@@ -88,10 +88,11 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			user.POST("/discount/check", checkDiscount)
 
 			customer := user.Group("customer")
-			customer.POST("/customer/create", createCustomer)
-			customer.POST("/customer/login", loginCustomer)
-			customer.POST("/customer/verify", verifyCustomer)
-			customer.POST("/customer/update", updateCustomer)
+			{
+				customer.POST("create/login/request", requestCreateLoginCustomer)
+				customer.POST("create/login/verify", verifyCreateLoginCustomer)
+			}
+
 		}
 
 	}

@@ -2,81 +2,86 @@ package controllers
 
 import (
 	"backend/api/v1/validations"
+	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
+	"backend/internal/app/utils"
+	"fmt"
+	"github.com/Squwid/go-randomizer"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-// createCustomer ثبت نام مشتری
-func createCustomer(c *gin.Context) {
-	dto, err := validations.CreateCustomer(c)
+func requestCreateLoginCustomer(c *gin.Context) {
+	dto, err := validations.RequestCreateLoginCustomer(c)
 	if err != nil {
 		return
 	}
-	err = models.NewMainManager().CreateCustomer(c, dto)
+	customer, err := models.NewMainManager().FindCustomerByMobile(c, dto.Mobile)
 	if err != nil {
 		return
 	}
+	dif := utils.DifferentWithNow(customer.LastSendSMSAt)
+	var randCode string
+	if dif < 7200 && dif > 0 {
+		randCode = customer.VerifyCode
+	} else {
+		randCode = fmt.Sprintf("%d", randomizer.Number(1000, 9999))
+	}
+	if customer.ID > 0 {
+		_, err = models.NewMainManager().UpdateCustomer(c, DTOs.CreateUpdateCustomer{
+			Mobile:        dto.Mobile,
+			VerifyCode:    randCode,
+			LastSendSMSAt: utils.NowTime(),
+		})
+		if err != nil {
+			return
+		}
+	} else {
+		err = models.NewMainManager().CreateCodeCustomer(c, dto, randCode)
+		if err != nil {
+			return
+		}
+	}
+	shop, err := models.NewMainManager().FindShopByID(c, dto.ShopID)
+	if err != nil {
+		return
+	}
+	text := fmt.Sprintf("%s %s : %s", "کد تایید", shop.Name, randCode)
+	err = utils.SendSMS(c, dto.Mobile, text, true)
+	if err != nil {
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "اطلاعات شما با موفقیت ثبت شد",
+		"message": "کد تایید برای شما ارسال گردید",
 	})
 	return
 }
 
-// loginCustomer ارسال شماره موبایل برای ورود و در صورت عدم وجود شماره موبایل پیامک ارسال خواهد شد
-func loginCustomer(c *gin.Context) {
-	dto, err := validations.LoginCustomer(c)
+func verifyCreateLoginCustomer(c *gin.Context) {
+	dto, err := validations.CreateUpdateCustomer(c)
 	if err != nil {
 		return
 	}
-	_, err = models.NewMainManager().FindCustomerByMobile(dto.Mobile)
-	if err != nil {
-		//TODO ارسال پیامک به مشتری
-		c.JSON(http.StatusOK, gin.H{
-			"message":   "شماره موبایل یا رمز عبور اشتباه است",
-			"is_exists": false,
-		})
-	}
 
+	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, dto.Mobile, dto.VerifyCode)
+	if err != nil {
+		return
+	}
+	updateDto := DTOs.CreateUpdateCustomer{
+		Mobile:     customer.Mobile,
+		FullName:   dto.FullName,
+		ProvinceID: dto.ProvinceID,
+		CityID:     dto.CityID,
+		Address:    dto.Address,
+		PostalCode: dto.PostalCode,
+	}
+	customerNew, err := models.NewMainManager().UpdateCustomer(c, updateDto)
+	if err != nil {
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "کد تایید یا پسورد خود را وارد نمایید",
-		"is_exists": true,
+		"message":  "اطلاعات شما با موفقیت ثبت شد",
+		"customer": customerNew,
 	})
-}
-
-// verifyCustomer ارسال پسورد یا کد تایید برای ورود به حساب
-func verifyCustomer(c *gin.Context) {
-	dto, err := validations.VerifyCustomer(c)
-	if err != nil {
-		return
-	}
-	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(dto.Mobile, dto.VerifyCode)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "رمز عبور یا کد تایید اشتباه است",
-			"status":  false,
-		})
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "شما با موفقیت وارد شدید",
-		"status":   true,
-		"customer": customer,
-	})
-
-}
-
-// updateCustomer ویرایش اطلاعات مشتری
-func updateCustomer(c *gin.Context) {
-	dto, err := validations.UpdateCustomer(c)
-	if err != nil {
-		return
-	}
-	err = models.NewMainManager().UpdateCustomer(dto)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "اطلاعات شما با موفقیت بروز شد",
-		})
-		return
-	}
 }

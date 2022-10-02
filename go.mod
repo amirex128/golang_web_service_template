@@ -3,6 +3,7 @@ module backend
 go 1.19
 
 require (
+	github.com/Squwid/go-randomizer v0.1.2
 	github.com/appleboy/gin-jwt/v2 v2.8.0
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3
 	github.com/fsnotify/fsnotify v1.5.4

@@ -19,5 +19,13 @@ func DateToJalaali(date string) string {
 	}
 	pt := ptime.New(parse)
 	return fmt.Sprintf("%d %s %d   %d:%d", pt.Day(), pt.Month(), pt.Year(), pt.Hour(), pt.Minute())
+}
 
+func DifferentWithNow(date string) int64 {
+	l, _ := time.LoadLocation("Asia/Tehran")
+	parse, err := time.ParseInLocation("2006-01-02 15:04:05", date, l)
+	if err != nil {
+		return 0
+	}
+	return time.Now().In(l).Unix() - parse.Unix()
 }

@@ -75,8 +75,9 @@ func updateDiscount(c *gin.Context) {
 		return
 	}
 	userID := utils.GetUser(c)
+	discountID := c.Param("id")
 
-	err = models.NewMainManager().UpdateDiscount(c, dto, userID)
+	err = models.NewMainManager().UpdateDiscount(c, dto, userID, discountID)
 	if err != nil {
 		return
 	}
@@ -98,7 +99,7 @@ func indexDiscount(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"result": discounts,
+		"discounts": discounts,
 	})
 }
 

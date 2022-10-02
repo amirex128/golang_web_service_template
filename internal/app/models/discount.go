@@ -83,14 +83,14 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 		CreatedAt:  utils.NowTime(),
 		UpdatedAt:  utils.NowTime(),
 	}
-	err := m.GetConn().Create(discount).Error
+	err := m.GetConn().Create(&discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "خطا در ایجاد کد تخفیف"})
 		return err
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, userID uint64) error {
+func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, userID uint64, discountID string) error {
 
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(c, pId)
@@ -105,7 +105,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	}
 
 	discount := &Discount{}
-	err := m.GetConn().Where("id = ?", dto.DiscountID).First(discount).Error
+	err := m.GetConn().Where("id = ?", discountID).First(discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "تخفیف یافت نشد"})
 		return nil

@@ -31,4 +31,8 @@ const (
 	OKProductStatus      = "ok"
 	PendingProductStatus = "pending"
 	BlockProductStatus   = "block"
+
+	username = ""
+	password = ""
+	from     = ""
 )
