@@ -20,7 +20,7 @@ func (p *Pagination) GetOffset() uint32 {
 
 func (p *Pagination) GetPageSize() uint32 {
 	if p.PageSize == 0 {
-		p.PageSize = 10
+		p.PageSize = 3
 	}
 	return p.PageSize
 }

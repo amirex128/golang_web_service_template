@@ -40,3 +40,12 @@ func DateTimeConvert(value string) string {
 	}
 	return ""
 }
+
+func DateAgo(date string) int {
+	l, _ := time.LoadLocation("Asia/Tehran")
+	parse, err := time.ParseInLocation("2006-01-02 15:04:05", date, l)
+	if err != nil {
+		return 0
+	}
+	return int(time.Now().In(l).Sub(parse).Hours() / 24)
+}

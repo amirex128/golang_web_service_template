@@ -16,6 +16,8 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	{
 		root.GET("/", indexLanding)
 		root.GET("blog", blogLanding)
+		root.GET("category/:id", categoryLanding)
+		root.GET("tag/:slug", tagLanding)
 		root.GET("blog/:slug", detailsLanding)
 		root.GET("contact", contactLanding)
 		root.GET("faq", faqLanding)

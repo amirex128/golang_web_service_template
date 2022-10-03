@@ -13,31 +13,30 @@ import (
 )
 
 type Product struct {
-	ID               uint64    `gorm:"primary_key;auto_increment" json:"id"`
-	UserID           uint64    `json:"user_id"`
-	User             User      `gorm:"foreignKey:user_id" json:"user"`
-	ShopID           uint64    `json:"shop_id"`
-	Shop             Shop      `gorm:"foreignKey:shop_id" json:"shop"`
-	Description      string    `json:"description"`
-	Name             string    `json:"name"`
-	ShortDescription string    `json:"short_description"`
-	TotalSales       uint32    `json:"total_sales"`
-	Status           string    `json:"block_status" sql:"type:ENUM('block','ok')"`
-	Quantity         uint32    `json:"quantity"`
-	Price            float32   `json:"price"`
-	Weight           uint32    `json:"weight"`
-	Height           uint32    `json:"height"`
-	Width            uint32    `json:"width"`
-	Active           byte      `json:"active"`
-	Images           string    `json:"images"`
-	CreatedAt        string    `json:"created_at"`
-	UpdatedAt        string    `json:"updated_at"`
-	StartedAt        string    `json:"started_at"`
-	EndedAt          string    `json:"ended_at"`
-	CategoryID       uint64    `json:"category_id"`
-	Category         Category  `gorm:"foreignKey:category_id" json:"category"`
-	Galleries        []Gallery `gorm:"foreignKey:product_id" json:"galleries"`
-	DeliveryTime     uint32    `json:"delivery_time"` // مدت زمان ارسال
+	ID               uint64     `gorm:"primary_key;auto_increment" json:"id"`
+	UserID           uint64     `json:"user_id"`
+	User             User       `gorm:"foreignKey:user_id" json:"user"`
+	ShopID           uint64     `json:"shop_id"`
+	Shop             Shop       `gorm:"foreignKey:shop_id" json:"shop"`
+	Description      string     `json:"description"`
+	Name             string     `json:"name"`
+	ShortDescription string     `json:"short_description"`
+	TotalSales       uint32     `json:"total_sales"`
+	Status           string     `json:"block_status" sql:"type:ENUM('block','ok')"`
+	Quantity         uint32     `json:"quantity"`
+	Price            float32    `json:"price"`
+	Weight           uint32     `json:"weight"`
+	Height           uint32     `json:"height"`
+	Width            uint32     `json:"width"`
+	Active           byte       `json:"active"`
+	Images           string     `json:"images"`
+	CreatedAt        string     `json:"created_at"`
+	UpdatedAt        string     `json:"updated_at"`
+	StartedAt        string     `json:"started_at"`
+	EndedAt          string     `json:"ended_at"`
+	Categories       []Category `gorm:"many2many:category_product;" json:"categories"`
+	Galleries        []Gallery  `gorm:"foreignKey:product_id" json:"galleries"`
+	DeliveryTime     uint32     `json:"delivery_time"` // مدت زمان ارسال
 }
 
 func (c Product) GetID() uint64 {
@@ -124,7 +123,6 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		Height:           dto.Height,
 		Width:            dto.Width,
 		Active:           1,
-		CategoryID:       dto.CategoryID,
 		Images:           strings.Join(dto.ImagePath, ","),
 		CreatedAt:        utils.NowTime(),
 		UpdatedAt:        utils.NowTime(),

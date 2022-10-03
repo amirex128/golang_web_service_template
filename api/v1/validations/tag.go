@@ -2,6 +2,7 @@ package validations
 
 import (
 	"backend/internal/app/DTOs"
+	"backend/internal/app/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -84,5 +85,9 @@ func IndexTag(c *gin.Context) (DTOs.IndexTag, error) {
 	if err != nil {
 		return dto, err
 	}
+	dto.Page = utils.StringToUint32(c.Query("page"))
+	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
+	dto.Search = c.Query("search")
+	dto.Sort = c.Query("sort")
 	return dto, nil
 }

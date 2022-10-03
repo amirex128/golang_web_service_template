@@ -10,11 +10,13 @@
 <div class="page-title-area">
     <div class="container">
         <div class="content text-center">
-            <h1>مقالات اخیر سلورا</h1>
+            <h1>{{tag.Name}}</h1>
             <ul class="list-unstyled">
-                <li class="d-inline"><a href="index">صفحه اصلی</a></li>
+                <li class="d-inline"><a href="/">صفحه اصلی</a></li>
                 <li class="d-inline">/</li>
-                <li class="d-inline active">وبلاگ</li>
+                <li class="d-inline">تگ ها</li>
+                <li class="d-inline">/</li>
+                <li class="d-inline active">{{tag.Name}}</li>
             </ul>
         </div>
     </div>
@@ -63,10 +65,10 @@
                 {% if posts.TotalPages > 1 %}
                 <div class="pagination mb-30 justify-content-center">
                     {% if posts.Page != 1 %}
-                    <a href="/blog?page={{posts.Page-1}}" class="page-numbers"><i class="fas fa-angle-right"></i>قبلی</a>
+                    <a href="/tag/{{tag.Slug}}?page={{posts.Page-1}}" class="page-numbers"><i class="fas fa-angle-right"></i>قبلی</a>
                     {% endif %}
                     {% if posts.Page < posts.TotalPages %}
-                    <a href="/blog?page={{posts.Page+1}}" class="page-numbers"><i class="fas fa-angle-left"></i>بعدی</a>
+                    <a href="/tag/{{tag.Slug}}?page={{posts.Page+1}}" class="page-numbers"><i class="fas fa-angle-left"></i>بعدی</a>
                     {% endif %}
 
                 </div>

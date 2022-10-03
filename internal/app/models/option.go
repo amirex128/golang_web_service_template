@@ -11,7 +11,7 @@ type Option struct {
 	Name       string     `json:"name"`
 	Price      float32    `json:"price"`
 	Quantity   uint32     `json:"quantity"`
-	Categories []Category `gorm:"many2many:category_options;" json:"categories"`
+	Categories []Category `gorm:"many2many:category_option;" json:"categories"`
 }
 type OptionArr []Option
 

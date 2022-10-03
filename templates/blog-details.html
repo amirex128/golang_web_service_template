@@ -10,9 +10,11 @@
 <div class="page-title-area">
     <div class="container">
         <div class="content text-center">
-            <h1>جزئیات وبلاگ</h1>
+            <h1>{{post.Title}}</h1>
             <ul class="list-unstyled">
-                <li class="d-inline"><a href="index">صفحه اصلی</a></li>
+                <li class="d-inline"><a href="/">صفحه اصلی</a></li>
+                <li class="d-inline">/</li>
+                <li class="d-inline"><a href="/blog">بلاگ</a></li>
                 <li class="d-inline">/</li>
                 <li class="d-inline active">جزئیات وبلاگ</li>
             </ul>
@@ -40,7 +42,11 @@
                             <ul class="info-list">
                                 <li><i class="far fa-calendar-alt"></i>{{post.UpdatedAt}}</li>
                                 <li><i class="fas fa-user"></i>{{post.User.Firstname}} {{post.User.Lastname}}</li>
-                                <li><i class="fas fa-tag"></i>{{post.Category.Name}}</li>
+                                <li><i class="fas fa-tag"></i>
+                                    {% for category in post.Categories %}
+                                    <span style="margin-right: 5px;">{{category.Name}}</span>
+                                    {% endfor %}
+                                </li>
                             </ul>
                             <div>
                                 {{post.Body}}
@@ -51,48 +57,29 @@
                 <div class="more-news mb-20">
                     <span class="h2 d-block mb-20">اخبار بیشتر</span>
                     <div class="row">
+                        {% for post in last_posts %}
                         <div class="col-md-6">
                             <article class="item-single mb-30">
                                 <div class="image">
-                                    <a href="blog-details" class="lazy-container aspect-ratio">
+                                    <a href="/blog/{{post.Slug}}" class="lazy-container aspect-ratio">
                                         <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                             data-src="/assets/images/blog/blog-5.jpg" alt="تصویر وبلاگ">
+                                             data-src="{{post.Thumbnail}}" alt="تصویر وبلاگ">
                                     </a>
                                 </div>
                                 <div class="content">
                                     <ul class="info-list">
-                                        <li><i class="far fa-calendar-alt"></i>8 مهر 1401</li>
-                                        <li><i class="fas fa-user"></i>ادمین</li>
+                                        <li><i class="far fa-calendar-alt"></i>{{post.UpdatedAt}}</li>
+                                        <li><i class="fas fa-user"></i>{{post.User.Firstname}} {{post.User.Lastname}}</li>
                                     </ul>
                                     <h3 class="title m-0">
-                                        <a href="blog-details">
-                                            تکنولوژی‌های جدید چه تغییراتی در زندگی ما ایجاد کرده‌اند؟
+                                        <a href="/blog/{{post.Slug}}">
+                                           {{post.Title}}
                                         </a>
                                     </h3>
                                 </div>
                             </article>
                         </div>
-                        <div class="col-md-6">
-                            <article class="item-single mb-30">
-                                <div class="image">
-                                    <a href="blog-details" class="lazy-container aspect-ratio">
-                                        <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                             data-src="/assets/images/blog/blog-6.jpg" alt="تصویر وبلاگ">
-                                    </a>
-                                </div>
-                                <div class="content">
-                                    <ul class="info-list">
-                                        <li><i class="far fa-calendar-alt"></i>18 آبان 1401</li>
-                                        <li><i class="fas fa-user"></i>مهیار حقی</li>
-                                    </ul>
-                                    <h3 class="title m-0">
-                                        <a href="blog-details">
-                                            10 نکته مهم در مورد خدمات و طراحی فناوری اطلاعات
-                                        </a>
-                                    </h3>
-                                </div>
-                            </article>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="comments mb-30">
@@ -219,95 +206,48 @@
                     </div>
                     <div class="widget widget-post mb-30">
                         <h3 class="title">پستهای اخیر</h3>
+                        {% for post in random_posts %}
                         <article class="article-item mb-30">
                             <div class="image">
-                                <a href="blog-details" class="lazy-container aspect-ratio">
+                                <a href="/blog/{{post.Slug}}" class="lazy-container aspect-ratio">
                                     <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                         data-src="/assets/images/blog/blog-1.jpg" alt="تصویر وبلاگ">
+                                         data-src="{{post.Thumbnail}}" alt="{{post.Title}}">
                                 </a>
                             </div>
                             <div class="content">
                                 <h6>
-                                    <a href="blog-details">چطور زندگی رو آسان کنیم (لذت بردن از زندگی)</a>
+                                    <a href="/blog/{{post.Slug}}">{{post.Title}}</a>
                                 </h6>
                                 <div class="time">
-                                    2 روز قبل
+                                    {{post.UpdatedAt}}
                                 </div>
                             </div>
                         </article>
-                        <article class="article-item mb-30">
-                            <div class="image">
-                                <a href="blog-details" class="lazy-container aspect-ratio">
-                                    <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                         data-src="/assets/images/blog/blog-2.jpg" alt="تصویر وبلاگ">
-                                </a>
-                            </div>
-                            <div class="content">
-                                <h6>
-                                    <a href="blog-details">10 قانون برتر موفقیت در زندگی</a>
-                                </h6>
-                                <div class="time">
-                                    3 روز قبل
-                                </div>
-                            </div>
-                        </article>
-                        <article class="article-item">
-                            <div class="image">
-                                <a href="blog-details" class="lazy-container aspect-ratio">
-                                    <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                         data-src="/assets/images/blog/blog-3.jpg" alt="تصویر وبلاگ">
-                                </a>
-                            </div>
-                            <div class="content">
-                                <h6>
-                                    <a href="blog-details">۱۲ راه برای کاهش استرس در محیط کار</a>
-                                </h6>
-                                <div class="time">
-                                    2 روز قبل
-                                </div>
-                            </div>
-                        </article>
+                        {% endfor %}
                     </div>
                     <div class="widget widget-categories mb-30">
                         <h3 class="title">دسته بندی ها</h3>
                         <ul class="list-unstyled m-0">
+                            {% for category in categories %}
                             <li class="d-flex align-items-center justify-content-between">
-                                <a href="blog"><i class="fal fa-folder"></i>فناوری</a>
-                                <span class="tqy">(11)</span>
+                                <a href="/category/{{category.ID}}"><i class="fal fa-folder"></i>{{category.Name}}</a>
+                                <!--                                <span class="tqy">(11)</span>-->
                             </li>
-                            <li class="d-flex align-items-center justify-content-between">
-                                <a href="blog"><i class="fal fa-folder"></i>کسب و کار</a>
-                                <span class="tqy">(02)</span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between">
-                                <a href="blog"><i class="fal fa-folder"></i>اندروید</a>
-                                <span class="tqy">(45)</span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between">
-                                <a href="blog"><i class="fal fa-folder"></i>اپلیکیشن</a>
-                                <span class="tqy">(26)</span>
-                            </li>
-                            <li class="d-flex align-items-center justify-content-between">
-                                <a href="blog"><i class="fal fa-folder"></i>دیدنی ها</a>
-                                <span class="tqy">(45)</span>
-                            </li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="widget widget-tag mb-30">
                         <h3 class="title">برچسب ها</h3>
                         <ul class="list-unstyled m-0">
-                            <li class="d-inline-block"><a href="blog">فناوری</a></li>
-                            <li class="d-inline-block"><a href="blog">کسب و کار</a></li>
-                            <li class="d-inline-block"><a href="blog">اپلیکیشن</a></li>
-                            <li class="d-inline-block"><a href="blog">بازار یابی</a></li>
-                            <li class="d-inline-block"><a href="blog">اجتماعی </a></li>
-                            <li class="d-inline-block"><a href="blog">سیاسی</a></li>
+                            {% for tag in tags %}
+                            <li class="d-inline-block"><a href="/tag/{{tag.Slug}}">{{tag.Name}}</a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="widget widget-adds mb-30">
                         <div class="content text-center">
                             <h3>میتونی این قالب رو با 20٪ تخفیف بگیری !!</h3>
-                            <a href="contact" class="btn secondary-btn text-uppercase">بزن بریم !</a>
+                            <a href="404-error" class="btn secondary-btn text-uppercase">بزن بریم !</a>
                         </div>
                     </div>
                 </aside>

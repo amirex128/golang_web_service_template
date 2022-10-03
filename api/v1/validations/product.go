@@ -33,6 +33,10 @@ func IndexProduct(c *gin.Context) (DTOs.IndexProduct, error) {
 	if err != nil {
 		return dto, err
 	}
+	dto.Page = utils.StringToUint32(c.Query("page"))
+	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
+	dto.Search = c.Query("search")
+	dto.Sort = c.Query("sort")
 	return dto, nil
 }
 func CreateProduct(c *gin.Context) (DTOs.CreateProduct, error) {

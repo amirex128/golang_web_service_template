@@ -6,13 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type Tag struct {
 	ID    uint64 `json:"id"`
 	Name  string `json:"name"`
 	Slug  string `json:"slug"`
-	Posts []Post `gorm:"many2many:post_tags;" json:"posts"`
+	Posts []Post `gorm:"many2many:post_tag;" json:"posts"`
 }
 type TagArr []Tag
 
@@ -35,6 +36,12 @@ func (c *Tag) Decode(ir io.Reader) error {
 }
 func initTag(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Tag{})
+	for i := 0; i < 100; i++ {
+		manager.CreateTag(&gin.Context{}, DTOs.CreateTag{
+			Name: "تگ شماره" + strconv.Itoa(i),
+			Slug: "tag" + strconv.Itoa(i),
+		})
+	}
 }
 
 func (m *MysqlManager) CreateTag(c *gin.Context, dto DTOs.CreateTag) (err error) {
@@ -108,4 +115,38 @@ func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []Tag, err er
 		return nil, err
 	}
 	return tags, nil
+}
+
+func (m *MysqlManager) GetAllTagPostWithPagination(c *gin.Context, dto DTOs.IndexPost, tagID uint64) (pagination *DTOs.Pagination, err error) {
+	conn := m.GetConn()
+	var posts []Post
+	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("posts", pagination, conn)).Where("id IN (?)", conn.Table("post_tag").Where("tag_id = ?", tagID).Select("post_id")).Preload("User").Preload("Categories").Order("id DESC")
+	if dto.Search != "" {
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
+	}
+	err = conn.Find(&posts).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
+		})
+		return nil, err
+	}
+	pagination.Data = posts
+	return pagination, nil
+}
+
+func (m *MysqlManager) FindTagBySlug(c *gin.Context, slug string) (tag *Tag, err error) {
+	tag = &Tag{}
+	err = m.GetConn().Where("slug = ?", slug).First(tag).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "خطا در یافتن تگ",
+			"error":   err.Error(),
+		})
+		return nil, err
+	}
+	return tag, nil
 }

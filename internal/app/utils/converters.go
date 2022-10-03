@@ -37,7 +37,15 @@ func StringToUint64(value string) uint64 {
 	val, _ := strconv.ParseUint(value, 10, 32)
 	return val
 }
+func StringToUint32(value string) uint32 {
+	val, _ := strconv.ParseUint(value, 10, 32)
+	return uint32(val)
+}
 
 func Uint64ToString(value uint64) string {
+	return fmt.Sprintf("%d", value)
+}
+
+func IntToString(value int) string {
 	return fmt.Sprintf("%d", value)
 }

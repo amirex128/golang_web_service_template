@@ -9,29 +9,28 @@ import (
 )
 
 type Shop struct {
-	ID          uint64    `gorm:"primary_key;auto_increment" json:"id"`
-	Name        string    `json:"name"`
-	Logo        string    `json:"logo"`
-	Type        string    `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
-	Social      string    `json:"social"`
-	Verify      bool      `json:"verify"`
-	SendPrice   float32   `json:"send_price"`
-	GuildID     uint32    `json:"guild_id"`
-	Description string    `json:"description"`
-	Phone       string    `json:"phone"`
-	Mobile      string    `json:"mobile"`
-	TelegramID  string    `json:"telegram_id"`
-	InstagramID string    `json:"instagram_id"`
-	WhatsappID  string    `json:"whatsapp_id"`
-	Email       string    `json:"email"`
-	Website     string    `json:"website"`
-	Products    []Product `gorm:"foreignKey:shop_id" json:"products"`
-	UserID      uint64    `json:"user_id"`
-	User        User      `gorm:"foreignKey:user_id" json:"user"`
-	CategoryID  uint64    `json:"category_id"`
-	Category    Category  `gorm:"foreignKey:category_id" json:"category"`
-	CreatedAt   string    `json:"created_at"`
-	UpdatedAt   string    `json:"updated_at"`
+	ID          uint64     `gorm:"primary_key;auto_increment" json:"id"`
+	Name        string     `json:"name"`
+	Logo        string     `json:"logo"`
+	Type        string     `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
+	Social      string     `json:"social"`
+	Verify      bool       `json:"verify"`
+	SendPrice   float32    `json:"send_price"`
+	GuildID     uint32     `json:"guild_id"`
+	Description string     `json:"description"`
+	Phone       string     `json:"phone"`
+	Mobile      string     `json:"mobile"`
+	TelegramID  string     `json:"telegram_id"`
+	InstagramID string     `json:"instagram_id"`
+	WhatsappID  string     `json:"whatsapp_id"`
+	Email       string     `json:"email"`
+	Website     string     `json:"website"`
+	Products    []Product  `gorm:"foreignKey:shop_id" json:"products"`
+	UserID      uint64     `json:"user_id"`
+	User        User       ` json:"user"`
+	Categories  []Category `gorm:"many2many:category_shops;" json:"categories"`
+	CreatedAt   string     `json:"created_at"`
+	UpdatedAt   string     `json:"updated_at"`
 }
 type ShopArr []Shop
 
@@ -63,11 +62,10 @@ func initShop(manager *MysqlManager) {
 }
 func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID uint64) (*Shop, error) {
 	shop := &Shop{
-		Name:       dto.Name,
-		Type:       dto.Type,
-		Social:     dto.Social,
-		CategoryID: dto.CategoryID,
-		UserID:     userID,
+		Name:   dto.Name,
+		Type:   dto.Type,
+		Social: dto.Social,
+		UserID: userID,
 	}
 	err := m.GetConn().Create(shop).Error
 	if err != nil {

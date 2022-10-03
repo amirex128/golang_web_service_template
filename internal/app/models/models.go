@@ -31,10 +31,10 @@ const (
 	ProvinceTable           = "provinces"
 	ProductProvinceTable    = "product_provinces"
 	UserTable               = "users"
-	PostTable               = "posts"
-	CommentTable            = "comments"
-	TagTable                = "tags"
-	FinancialTable          = "financials"
+
+	CommentTable   = "comments"
+	TagTable       = "tags"
+	FinancialTable = "financials"
 )
 
 type MysqlManager struct {

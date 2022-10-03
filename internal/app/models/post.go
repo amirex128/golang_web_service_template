@@ -5,25 +5,25 @@ import (
 	"backend/internal/app/utils"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 )
 
 type Post struct {
-	ID         uint64    `gorm:"primary_key;auto_increment" json:"id"`
-	Title      string    `json:"title"`
-	Body       string    `json:"body"`
-	Thumbnail  string    `json:"thumbnail"`
-	Slug       string    `json:"slug"`
-	UserID     uint64    `json:"user_id"`
-	User       User      `gorm:"foreignKey:user_id" json:"user"`
-	CategoryID uint64    `json:"category_id"`
-	Category   Category  `gorm:"foreignKey:category_id" json:"category"`
-	Tags       []Tag     `gorm:"many2many:post_tags;" json:"tags"`
-	Comments   []Comment `gorm:"foreignKey:post_id" json:"comments"`
-	CreatedAt  string    `json:"created_at"`
-	UpdatedAt  string    `json:"updated_at"`
+	ID         uint64     `gorm:"primary_key;auto_increment" json:"id"`
+	Title      string     `json:"title"`
+	Body       string     `json:"body"`
+	Thumbnail  string     `json:"thumbnail"`
+	Slug       string     `json:"slug"`
+	UserID     uint64     `json:"user_id"`
+	User       User       `gorm:"foreignKey:user_id" json:"user"`
+	Categories []Category `gorm:"many2many:category_post;" json:"categories"`
+	Tags       []Tag      `gorm:"many2many:post_tag;" json:"tags"`
+	Comments   []Comment  `gorm:"foreignKey:post_id" json:"comments"`
+	CreatedAt  string     `json:"created_at"`
+	UpdatedAt  string     `json:"updated_at"`
 }
 type PostArr []Post
 
@@ -46,15 +46,16 @@ func (c *Post) Decode(ir io.Reader) error {
 }
 func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
-	manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
-		Title:         "آموزش برنامه نویس گولنگ",
-		Body:          "این یک پست آموزشی برنامه نویسی گولنگ است",
-		ThumbnailPath: "",
-		Slug:          "learn-golang",
-		CategoryID:    1,
-		CreatedAt:     utils.NowTime(),
-		UpdatedAt:     utils.NowTime(),
-	}, 1)
+	for i := 0; i < 10; i++ {
+		manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
+			Title:         "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
+			Body:          "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
+			ThumbnailPath: "",
+			Slug:          "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
+			CreatedAt:     utils.NowTime(),
+			UpdatedAt:     utils.NowTime(),
+		}, 1)
+	}
 }
 func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
 	rowsAffected := m.GetConn().Where("slug = ?", slug).First(&Post{}).RowsAffected
@@ -69,14 +70,13 @@ func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
 
 func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID uint64) (err error) {
 	post := Post{
-		Title:      dto.Title,
-		Body:       dto.Body,
-		Thumbnail:  dto.ThumbnailPath,
-		Slug:       dto.Slug,
-		UserID:     userID,
-		CategoryID: dto.CategoryID,
-		CreatedAt:  utils.NowTime(),
-		UpdatedAt:  utils.NowTime(),
+		Title:     dto.Title,
+		Body:      dto.Body,
+		Thumbnail: dto.ThumbnailPath,
+		Slug:      dto.Slug,
+		UserID:    userID,
+		CreatedAt: utils.NowTime(),
+		UpdatedAt: utils.NowTime(),
 	}
 	err = m.GetConn().Create(&post).Error
 	if err != nil {
@@ -110,9 +110,6 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 	if dto.Slug != "" {
 		post.Slug = dto.Slug
 	}
-	if dto.CategoryID != 0 {
-		post.CategoryID = dto.CategoryID
-	}
 	post.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(&post).Error
 	if err != nil {
@@ -138,7 +135,7 @@ func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
 }
 
 func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, err error) {
-	err = m.GetConn().Where("id = ?", postID).Preload("User").Preload("Category").First(&post).Error
+	err = m.GetConn().Where("id = ?", postID).Preload("User").Preload("Categories").First(&post).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
@@ -148,16 +145,13 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, e
 	}
 	return
 }
-func (m *MysqlManager) FindPostBySlug(c *gin.Context, slug string) (post Post, err error) {
-	err = m.GetConn().Where("slug = ?", slug).Preload("User").Preload("Category").First(&post).Error
+func (m *MysqlManager) FindPostBySlug(slug string) (Post, error) {
+	var post Post
+	err := m.GetConn().Where("slug = ?", slug).Preload("User").Preload("Categories").First(&post).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مشکلی در یافتن پست پیش آمده است",
-			"error":   err.Error(),
-		})
-		return
+		return post, err
 	}
-	return
+	return post, nil
 }
 
 func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPost) (pagination *DTOs.Pagination, err error) {
@@ -165,7 +159,7 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	var posts []Post
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(PostTable, pagination, conn)).Preload("User").Preload("Category").Order("id DESC")
+	conn = conn.Scopes(DTOs.Paginate("posts", pagination, conn)).Preload("User").Preload("Categories").Order("id DESC")
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
@@ -193,7 +187,7 @@ func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err 
 	return posts, nil
 }
 func (m *MysqlManager) GetLastPost(c *gin.Context, count int) (posts []Post, err error) {
-	err = m.GetConn().Order("id DESC").Limit(count).Find(&posts).Error
+	err = m.GetConn().Preload("User").Order("id DESC").Limit(count).Find(&posts).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",

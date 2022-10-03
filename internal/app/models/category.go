@@ -3,7 +3,6 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"database/sql"
 	"encoding/gob"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -12,23 +11,22 @@ import (
 )
 
 type Category struct {
-	ID          int            `gorm:"primary_key;auto_increment" json:"id"`
-	ParentID    int            `json:"parent_id"`
-	Type        string         `json:"type" sql:"type:ENUM('post','product')"`
-	Name        string         `json:"name"`
-	Sort        uint           `json:"sort"`
-	Equivalent  sql.NullString `json:"equivalent"`
-	GuildIds    sql.NullString `json:"guild_ids"`
-	Description sql.NullString `json:"description"`
-	Icon        sql.NullString `json:"icon"`
-	Depth       uint           `json:"depth"`
-	Products    []Product      `gorm:"many2many:product_category;"`
-	Options     []Option       `gorm:"many2many:category_options;"`
+	ID          uint32    `gorm:"primary_key;auto_increment" json:"id"`
+	ParentID    uint32    `json:"parent_id"`
+	Type        string    `json:"type" sql:"type:ENUM('post','product')"`
+	Name        string    `json:"name"`
+	Sort        uint32    `json:"sort"`
+	Equivalent  string    `json:"equivalent"`
+	Description string    `json:"description"`
+	Icon        string    `json:"icon"`
+	Products    []Product `gorm:"many2many:category_product;"`
+	Posts       []Post    `gorm:"many2many:category_post;"`
+	Options     []Option  `gorm:"many2many:category_option;"`
 }
 
 type CategoryRelated struct {
-	CategoryID        int `json:"category_id"`
-	CategoryRelatedID int `json:"category_related_id"`
+	CategoryID        uint32 `json:"category_id"`
+	CategoryRelatedID uint32 `json:"category_related_id"`
 }
 
 type CategoryArr []Category
@@ -64,8 +62,43 @@ func initCategory(manager *MysqlManager) bool {
 	categoryRelated := utils.ReadCsvFile("../../csv/category_related.csv")
 	manager.CreateAllCategoryRelated(categoryRelated)
 
+	for i := 0; i < 10; i++ {
+		manager.CreateCategory(&gin.Context{}, DTOs.CreateCategory{
+			Name:        "دسته بندی " + utils.IntToString(i),
+			Type:        "post",
+			Equivalent:  "کلمه مترادف" + utils.IntToString(i),
+			Description: "توضیحات دسته بندی " + utils.IntToString(i),
+			Icon:        "icon " + utils.IntToString(i),
+		})
+	}
 	return true
 
+}
+func (m *MysqlManager) CreateCategory(c *gin.Context, dto DTOs.CreateCategory) error {
+	lastCategory := &Category{}
+	err := m.GetConn().Where("type = ?", dto.Type).Order("id desc").Find(lastCategory).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "در دریافت دسته بندی ها مشکلی به وجود آمده است",
+		})
+		return nil
+	}
+	category := Category{
+		Name:        dto.Name,
+		Type:        dto.Type,
+		Sort:        lastCategory.Sort + 1,
+		Equivalent:  dto.Equivalent,
+		Description: dto.Description,
+		Icon:        dto.Icon,
+	}
+	err = m.GetConn().Create(&category).Error
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "در ایجاد دسته بندی مشکلی به وجود آمده است",
+		})
+		return err
+	}
+	return nil
 }
 
 func (m *MysqlManager) GetLevel1Categories(c *gin.Context) ([]*Category, error) {
@@ -85,16 +118,14 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categories = append(categories, Category{
-			ID:          utils.StringToInt(value[0]),
-			ParentID:    utils.StringToInt(value[1]),
+			ID:          utils.StringToUint32(value[0]),
+			ParentID:    utils.StringToUint32(value[1]),
 			Name:        value[2],
 			Type:        "product",
-			Sort:        utils.StringToUint(value[3]),
-			Equivalent:  utils.StringConvert(value[4]),
-			GuildIds:    utils.StringConvert(value[5]),
-			Description: utils.StringConvert(value[7]),
-			Icon:        utils.StringConvert(value[8]),
-			Depth:       utils.StringToUint(value[9]),
+			Sort:        utils.StringToUint32(value[3]),
+			Equivalent:  value[4],
+			Description: value[7],
+			Icon:        value[8],
 		})
 	}
 	err := m.GetConn().CreateInBatches(categories, 100).Error
@@ -108,8 +139,8 @@ func (m *MysqlManager) CreateAllCategoryRelated(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categoryRelated = append(categoryRelated, CategoryRelated{
-			CategoryID:        utils.StringToInt(value[0]),
-			CategoryRelatedID: utils.StringToInt(value[1]),
+			CategoryID:        utils.StringToUint32(value[0]),
+			CategoryRelatedID: utils.StringToUint32(value[1]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(categoryRelated, 100).Error
@@ -135,5 +166,38 @@ func (m *MysqlManager) GetAllCategoryWithPagination(c *gin.Context, dto DTOs.Ind
 		return nil, err
 	}
 	pagination.Data = categories
+	return pagination, nil
+}
+
+func (m *MysqlManager) FindCategoryByID(c *gin.Context, id uint32) (*Category, error) {
+	category := &Category{}
+	err := m.GetConn().Where("id = ?", id).First(category).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مشکلی در یافتن دسته بندی پیش آمده است",
+		})
+		return nil, err
+	}
+	return category, nil
+}
+
+func (m *MysqlManager) GetAllCategoryPostWithPagination(c *gin.Context, dto DTOs.IndexPost, categoryID uint32) (pagination *DTOs.Pagination, err error) {
+	conn := m.GetConn()
+	var posts []Post
+	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("posts", pagination, conn)).Where("id IN (?)", conn.Table("category_post").Where("category_id = ?", categoryID).Select("post_id")).Preload("User").Preload("Categories").Order("id DESC")
+	if dto.Search != "" {
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
+	}
+	err = conn.Find(&posts).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مشکلی در یافتن پست ها پیش آمده است",
+			"error":   err.Error(),
+		})
+		return nil, err
+	}
+	pagination.Data = posts
 	return pagination, nil
 }
