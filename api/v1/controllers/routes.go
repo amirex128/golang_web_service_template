@@ -30,70 +30,82 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	}
 
 	v1 := r.Group("api/v1")
+
+	ad := v1.Group("admin")
+	ad.Use(authMiddleware.MiddlewareFunc())
 	{
-		ad := v1.Group("admin")
-		ad.Use(authMiddleware.MiddlewareFunc())
+		user := ad.Group("user")
 		{
-			product := ad.Group("product")
-			{
-				product.GET("/", indexProduct)
-				product.GET("/show/:id", showProduct)
-				product.POST("/create", createProduct)
-				product.POST("/update/:id", updateProduct)
-				product.POST("/delete/:id", deleteProduct)
-			}
-			discount := ad.Group("discount")
-			{
-				discount.GET("/", indexDiscount)
-				discount.GET("/show/:id", showDiscount)
-				discount.POST("/create", createDiscount)
-				discount.POST("/update/:id", updateDiscount)
-				discount.POST("/delete/:id", deleteDiscount)
-			}
-			post := ad.Group("post")
-			{
-				post.GET("/", indexPost)
-				post.GET("/show/:id", showPost)
-				post.POST("/create", createPost)
-				post.POST("/update/:id", updatePost)
-				post.POST("/delete/:id", deletePost)
-			}
-			category := ad.Group("category")
-			{
-				category.GET("/", indexCategory)
-			}
-			comment := ad.Group("comment")
-			{
-				comment.GET("/", indexComment)
-				comment.POST("/create", createComment)
-				comment.POST("/delete/:id", deleteComment)
-				comment.POST("/approve/:id", approveComment)
-			}
-			tag := ad.Group("tag")
-			{
-				tag.GET("/", indexTag)
-				tag.POST("/create", createTag)
-				tag.POST("/delete/:id", deleteTag)
-				tag.POST("/add", addTag)
-			}
+			user.POST("/update/:id", updateProfile)
 		}
-
-		user := v1.Group("user")
+		product := ad.Group("product")
 		{
-			r.POST("/login", authMiddleware.LoginHandler)
-			r.POST("/register", register)
-			r.POST("/forget", forget)
-			r.POST("/sadad/verify", sadadPaymentVerify)
+			product.GET("/", indexProduct)
+			product.GET("/show/:id", showProduct)
+			product.POST("/create", createProduct)
+			product.POST("/update/:id", updateProduct)
+			product.POST("/delete/:id", deleteProduct)
+		}
+		discount := ad.Group("discount")
+		{
+			discount.GET("/", indexDiscount)
+			discount.GET("/show/:id", showDiscount)
+			discount.POST("/create", createDiscount)
+			discount.POST("/update/:id", updateDiscount)
+			discount.POST("/delete/:id", deleteDiscount)
+		}
+		post := ad.Group("post")
+		{
+			post.GET("/", indexPost)
+			post.GET("/show/:id", showPost)
+			post.POST("/create", createPost)
+			post.POST("/update/:id", updatePost)
+			post.POST("/delete/:id", deletePost)
+		}
+		address := ad.Group("address")
+		{
+			address.GET("/", indexAddress)
+			address.POST("/create", createAddress)
+			address.POST("/update/:id", updateAddress)
+			address.POST("/delete/:id", deleteAddress)
+		}
+		category := ad.Group("category")
+		{
+			category.GET("/", indexCategory)
+		}
+		comment := ad.Group("comment")
+		{
+			comment.GET("/", indexComment)
+			comment.POST("/create", createComment)
+			comment.POST("/delete/:id", deleteComment)
+			comment.POST("/approve/:id", approveComment)
+		}
+		tag := ad.Group("tag")
+		{
+			tag.GET("/", indexTag)
+			tag.POST("/create", createTag)
+			tag.POST("/delete/:id", deleteTag)
+			tag.POST("/add", addTag)
+		}
+		order := ad.Group("order")
+		{
+			order.POST("/send", sendOrder)
+		}
+	}
 
-			user.POST("/order/create", createOrder)
-			user.POST("/discount/check", checkDiscount)
+	user := v1.Group("user")
+	{
+		user.POST("/verify", authMiddleware.LoginHandler)
+		user.POST("/login/register", register)
+		user.POST("/sadad/verify", sadadPaymentVerify)
 
-			customer := user.Group("customer")
-			{
-				customer.POST("create/login/request", requestCreateLoginCustomer)
-				customer.POST("create/login/verify", verifyCreateLoginCustomer)
-			}
+		user.POST("/order/create", createOrder)
+		user.POST("/discount/check", checkDiscount)
 
+		customer := user.Group("customer")
+		{
+			customer.POST("login/register", requestCreateLoginCustomer)
+			customer.POST("verify", verifyCreateLoginCustomer)
 		}
 
 	}

@@ -7,14 +7,9 @@ import (
 	"net/http"
 )
 
-func Register(c *gin.Context) (*DTOs.Register, error) {
-	var register = new(DTOs.Register)
+func RequestLoginRegister(c *gin.Context) (*DTOs.RequestLoginRegister, error) {
+	var register = new(DTOs.RequestLoginRegister)
 	tags := ValidationTags{
-		"Password": {
-			"min":      "رمز عبور باید حداقل 8 کاراکتر باشد",
-			"max":      "رمز عبور باید حداکثر 20 کاراکتر باشد",
-			"required": "رمز عبور باید وارد شود",
-		},
 		"Mobile": {
 			"required":   "شماره موبایل الزامی میباشد",
 			"min":        "شماره موبایل باید 11 رقم باشد",
@@ -39,19 +34,19 @@ func Register(c *gin.Context) (*DTOs.Register, error) {
 	return register, nil
 }
 
-func Login(c *gin.Context) (DTOs.Login, error) {
-	var login DTOs.Login
+func Verify(c *gin.Context) (DTOs.Verify, error) {
+	var login DTOs.Verify
 	tags := ValidationTags{
-		"Password": {
-			"min":      "رمز عبور باید حداقل 8 کاراکتر باشد",
-			"max":      "رمز عبور باید حداکثر 20 کاراکتر باشد",
-			"required": "رمز عبور باید وارد شود",
-		},
 		"Mobile": {
 			"required":   "شماره موبایل الزامی میباشد",
 			"min":        "شماره موبایل باید 11 رقم باشد",
 			"max":        "شماره موبایل باید 11 رقم باشد",
 			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+		"VerifyCode": {
+			"required": "کد تایید الزامی میباشد",
+			"min":      "کد تایید باید حداقل 4 رقم باشد",
+			"max":      "کد تایید باید حداکثر 4 رقم باشد",
 		},
 	}
 	err := c.Bind(&login)

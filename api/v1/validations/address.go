@@ -1,0 +1,96 @@
+package validations
+
+import (
+	"backend/internal/app/DTOs"
+	"errors"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
+	var dto DTOs.CreateAddress
+	tags := ValidationTags{
+		"Title": {
+			"required": "عنوان آدرس الزامی میباشد",
+		},
+		"ProvinceID": {
+			"required": "استان الزامی میباشد",
+			"numeric":  "استان باید عددی باشد",
+		},
+		"CityID": {
+			"required": "شهر الزامی میباشد",
+			"numeric":  "شهر باید عددی باشد",
+		},
+		"Address": {
+			"required": "آدرس الزامی میباشد",
+		},
+		"PostalCode": {
+			"required": "کد پستی الزامی میباشد",
+			"numeric":  "کد پستی باید عددی باشد",
+		},
+		"Mobile": {
+			"required":   "شماره موبایل الزامی میباشد",
+			"numeric":    "شماره موبایل باید عددی باشد",
+			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}
+
+func UpdateAddress(c *gin.Context) (DTOs.UpdateAddress, error) {
+	var dto DTOs.UpdateAddress
+	tags := ValidationTags{
+		"Title": {
+			"required": "عنوان آدرس الزامی میباشد",
+		},
+		"ProvinceID": {
+			"required": "استان الزامی میباشد",
+			"numeric":  "استان باید عددی باشد",
+		},
+		"CityID": {
+			"required": "شهر الزامی میباشد",
+			"numeric":  "شهر باید عددی باشد",
+		},
+		"Address": {
+			"required": "آدرس الزامی میباشد",
+		},
+		"PostalCode": {
+			"required": "کد پستی الزامی میباشد",
+			"numeric":  "کد پستی باید عددی باشد",
+		},
+		"Mobile": {
+			"required":   "شماره موبایل الزامی میباشد",
+			"numeric":    "شماره موبایل باید عددی باشد",
+			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}

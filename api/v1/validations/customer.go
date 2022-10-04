@@ -48,7 +48,7 @@ func CreateUpdateCustomer(c *gin.Context) (DTOs.CreateUpdateCustomer, error) {
 		},
 		"VerifyCode": {
 			"min": "کد تایید باید 4 رقم باشد",
-			"max": "کد تایید باید 20 رقم باشد",
+			"max": "کد تایید باید 4 رقم باشد",
 		},
 		"ProvinceID": {
 			"numeric": "شناسه استان باید عددی باشد",
@@ -57,7 +57,7 @@ func CreateUpdateCustomer(c *gin.Context) (DTOs.CreateUpdateCustomer, error) {
 			"numeric": "شناسه شهر باید عددی باشد",
 		},
 		"PostalCode": {
-			"startwith": "کد پستی باید با ۹ شروع شود",
+			"startswith": "کد پستی باید با ۹ شروع شود",
 		},
 	}
 	err := c.Bind(&dto)

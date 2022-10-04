@@ -22,16 +22,19 @@ func requestCreateLoginCustomer(c *gin.Context) {
 	}
 	dif := utils.DifferentWithNow(customer.LastSendSMSAt)
 	var randCode string
+	var lastSendSMSAt string
 	if dif < 7200 && dif > 0 {
 		randCode = customer.VerifyCode
+		lastSendSMSAt = customer.LastSendSMSAt
 	} else {
 		randCode = fmt.Sprintf("%d", randomizer.Number(1000, 9999))
+		lastSendSMSAt = utils.NowTime()
 	}
 	if customer.ID > 0 {
 		_, err = models.NewMainManager().UpdateCustomer(c, DTOs.CreateUpdateCustomer{
 			Mobile:        dto.Mobile,
 			VerifyCode:    randCode,
-			LastSendSMSAt: utils.NowTime(),
+			LastSendSMSAt: lastSendSMSAt,
 		})
 		if err != nil {
 			return

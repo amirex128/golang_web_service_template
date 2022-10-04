@@ -6,7 +6,7 @@
         <ServerConfiguration>
           <option name="databaseVendor" value="DatabaseVendor{name='RedisDB'}" />
           <option name="defaultKeyFilter" value="*" />
-          <option name="label" value="hamyarsale" />
+          <option name="label" value="selloora" />
           <option name="password" value="" />
           <option name="sercurityInfo">
             <SercurityInfo>

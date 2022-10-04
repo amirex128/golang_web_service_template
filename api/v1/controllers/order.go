@@ -209,6 +209,9 @@ func acceptOrder(c *gin.Context) {
 }
 func sendOrder(c *gin.Context) {
 	// TODO دریافت اطلاعات وزن بسته و ارسال به این وبسرویس برای محاسبه هزینه ارسال سیستم های پستی مختلف
+	utils.GetCitiesTipax()
+	utils.GetProvinceTipax()
+
 }
 func sadadPaymentVerify(c *gin.Context) {
 	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
@@ -229,11 +232,6 @@ func sadadPaymentVerify(c *gin.Context) {
 
 func chooseSenderOrder(c *gin.Context) {
 	// TODOki انتخاب سیستم پستی مورد نظر برای ارسال سفارش
-}
-
-func updateOrder(c *gin.Context) {
-	//TODO
-
 }
 
 func cancelOrder(c *gin.Context) {

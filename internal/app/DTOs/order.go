@@ -16,3 +16,10 @@ type CreateOrder struct {
 	Description  string      `form:"description" json:"description"`
 	VerifyCode   string      `form:"verify_code" json:"verify_code" validate:"required,numeric,min=2,max=20"`
 }
+
+type SendOrder struct {
+	PackageSize string `form:"package_size" json:"package_size" validate:"required"`
+	Weight      uint32 `form:"weight" json:"weight" validate:"required,numeric"`
+	Value       uint32 `form:"value" json:"value" validate:"required,numeric"`
+	AddressID   uint64 `form:"address_id" json:"address_id" validate:"required,numeric"`
+}

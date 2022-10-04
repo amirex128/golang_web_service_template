@@ -51,15 +51,19 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			login, err := validations.Login(c)
+			verify, err := validations.Verify(c)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
-			user, err := models.NewMainManager().FindUserByMobilePassword(login)
+			user, err := models.NewMainManager().FindUserByMobileAndCodeVerify(verify)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
-
+			user.VerifyCode = ""
+			err = models.NewMainManager().UpdateUser(c, user)
+			if err != nil {
+				return nil, jwt.ErrFailedAuthentication
+			}
 			return user, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {

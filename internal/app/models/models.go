@@ -60,6 +60,9 @@ func (r *MysqlManager) Initial() {
 	InitPost(manager)
 	initComment(manager)
 	initTag(manager)
+	initAddress(manager)
+	initOrder(manager)
+	initOrderItem(manager)
 
 	initEvent(manager)
 	initFeatureGroup(manager)
@@ -68,8 +71,6 @@ func (r *MysqlManager) Initial() {
 	initGallery(manager)
 	initGuild(manager)
 	initManufacturer(manager)
-	initOrder(manager)
-	initOrderItem(manager)
 	initOption(manager)
 
 }
