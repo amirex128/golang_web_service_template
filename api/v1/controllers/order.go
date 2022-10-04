@@ -121,11 +121,11 @@ func createOrder(c *gin.Context) {
 
 	order.SendPrice = shop.SendPrice
 	order.UserID = user.ID
+	order.ShopID = shop.ID
 	order.CustomerID = customer.ID
 	order.DiscountID = discount.ID
 	order.IP = c.ClientIP()
 	order.Status = constants.PendingPaymentOrderStatus
-	order.SendType = dto.SendType
 	order.Description = dto.Description
 	order.LastUpdateStatusAt = utils.NowTime()
 	order.CreatedAt = utils.NowTime()
@@ -159,60 +159,6 @@ func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
 	return productIDs
 }
 
-// indexOrder لیست کردن تمامی سفارشات پنل ادمین و از طریق فیلتر قابلیت تقسیم به سه بخش سفارش جدید در حتال انجام و تمام شده
-func indexOrder(c *gin.Context) {
-	orderStatus := c.Param("order_status")
-	userID := utils.GetUser(c)
-	var orders []models.Order
-	var err error
-	if orderStatus == "new" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
-			constants.PendingAcceptOrderStatus,
-		})
-	} else if orderStatus == "processing" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
-			constants.AcceptedOrderStatus,
-			constants.PendingReceivePostOrderStatus,
-			constants.ReceivedPostOrderStatus,
-			constants.ReceivedCustomerOrderStatus,
-			constants.PendingReturnOrderStatus,
-			constants.AcceptedReturnOrderStatus,
-			constants.RejectedReturnOrderStatus,
-			constants.PendingReceivePostReturnOrderStatus,
-			constants.ReceivedPostReturnOrderStatus,
-			constants.ReceivedOwnerOrderStatus,
-		})
-	} else if orderStatus == "completed" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
-			constants.FinishedOrderStatus,
-		})
-	}
-	if err != nil {
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"orders": orders,
-	})
-
-}
-func acceptOrder(c *gin.Context) {
-	orderID := utils.StringToUint64(c.Param("orderID"))
-	userID := utils.GetUser(c)
-	order, err := models.NewMainManager().FindOrderByID(c, orderID, userID)
-	err = models.NewMainManager().UpdateOrder(c, order)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در تایید سفارش",
-		})
-		return
-	}
-}
-func sendOrder(c *gin.Context) {
-	// TODO دریافت اطلاعات وزن بسته و ارسال به این وبسرویس برای محاسبه هزینه ارسال سیستم های پستی مختلف
-	utils.GetCitiesTipax()
-	utils.GetProvinceTipax()
-
-}
 func sadadPaymentVerify(c *gin.Context) {
 	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
 	if err != nil {
@@ -230,13 +176,139 @@ func sadadPaymentVerify(c *gin.Context) {
 	//}
 }
 
-func chooseSenderOrder(c *gin.Context) {
-	// TODOki انتخاب سیستم پستی مورد نظر برای ارسال سفارش
+func indexOrder(c *gin.Context) {
+	orderStatus := c.Query("order_status")
+	userID := utils.GetUser(c)
+	var orders []models.Order
+	var err error
+	if orderStatus == "new" {
+		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+			constants.PendingAcceptOrderStatus,
+		})
+	} else if orderStatus == "processing" {
+		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+			constants.AcceptedOrderStatus,
+			constants.PendingReceivePostOrderStatus,
+			constants.ReceivedPostOrderStatus,
+			constants.ReceivedCustomerOrderStatus,
+			constants.PendingReceivePostReturnOrderStatus,
+			constants.ReceivedPostReturnOrderStatus,
+			constants.ReceivedOwnerOrderStatus,
+		})
+	} else if orderStatus == "returned" {
+		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+			constants.PendingReturnOrderStatus,
+			constants.AcceptedReturnOrderStatus,
+			constants.RejectedReturnOrderStatus,
+		})
+	} else if orderStatus == "completed" {
+		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+			constants.FinishedOrderStatus,
+		})
+	}
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"orders": orders,
+	})
+
+}
+
+func approveOrder(c *gin.Context) {
+	orderID := utils.StringToUint64(c.Param("id"))
+	userID := utils.GetUser(c)
+	order, err := models.NewMainManager().FindOrderByID(c, orderID)
+	if err != nil {
+		return
+	}
+	if order.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "شما اجازه دسترسی به این سفارش را ندارید",
+		})
+		return
+	}
+	order.Status = constants.AcceptedOrderStatus
+	err = models.NewMainManager().UpdateOrder(c, order)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در تایید سفارش",
+		})
+		return
+	}
 }
 
 func cancelOrder(c *gin.Context) {
-	//TODO
+	orderID := utils.StringToUint64(c.Param("id"))
+	userID := utils.GetUser(c)
+	order, err := models.NewMainManager().FindOrderByID(c, orderID)
+	if err != nil {
+		return
+	}
+	if order.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "شما اجازه دسترسی به این سفارش را ندارید",
+		})
+		return
+	}
+	order.Status = constants.CanceledOrderStatus
+	err = models.NewMainManager().UpdateOrder(c, order)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در تایید سفارش",
+		})
+		return
+	}
+}
 
+func sendOrder(c *gin.Context) {
+	dto, err := validations.SendOrder(c)
+	if err != nil {
+		return
+	}
+	order, err := models.NewMainManager().FindOrderByID(c, dto.OrderID)
+	if err != nil {
+		return
+	}
+	if order.UserID != utils.GetUser(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "شما اجازه دسترسی به این سفارش را ندارید",
+		})
+		return
+	}
+	order.Courier = dto.Courier
+	order.AddressID = dto.AddressID
+	order.Status = constants.ChooseCourierOrderStatus
+	order.Weight = dto.Weight
+	order.PackageSize = dto.PackageSize
+	order.LastUpdateStatusAt = utils.NowTime()
+
+	err = models.NewMainManager().UpdateOrder(c, order)
+	if err != nil {
+		return
+	}
+	if dto.Courier == "tipax" {
+		err = utils.TipaxSendOrderRequest(c)
+		if err != nil {
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "اطلاعات سفارش ثبت شد در اتنظار پیک برای دریافت محصول باشید",
+	})
+}
+
+func calculateSendPrice(c *gin.Context) {
+	dto, err := validations.CalculateOrder(c)
+	if err != nil {
+		return
+	}
+
+	err = utils.CalculateSendPriceTipax(dto)
+
+	c.JSON(http.StatusOK, gin.H{
+		"tipax": "",
+	})
 }
 
 func returnedOrder(c *gin.Context) {
@@ -250,14 +322,35 @@ func acceptReturnedOrder(c *gin.Context) {
 }
 
 func showOrder(c *gin.Context) {
-	//TODO
-
+	orderID := utils.StringToUint64(c.Param("id"))
+	order, err := models.NewMainManager().FindOrderWithItemByID(c, orderID)
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"order": order,
+	})
 }
 
 func trackingOrder(c *gin.Context) {
-	// TODO
+	trackingCode := c.Param("id")
+	utils.TrackingOrder(trackingCode)
 }
 
 func indexCustomerOrders(c *gin.Context) {
-	// TODO لیست کردن سفارشات قبلی مشتری بر اساس اعتبارسنجی موبایلی پیامک
+	dto, err := validations.IndexOrderCustomer(c)
+	if err != nil {
+		return
+	}
+	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, dto.Mobile, dto.VerifyCode)
+	if err != nil {
+		return
+	}
+	orders, err := models.NewMainManager().FindOrdersByCustomerID(c, customer.ID)
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"orders": orders,
+	})
 }

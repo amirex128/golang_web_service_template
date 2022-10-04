@@ -5,15 +5,14 @@ type IModel interface {
 }
 
 const (
-	PendingPaymentOrderStatus   = "pending_payment"
-	SucceededPaymentOrderStatus = "succeeded_payment"
-	FailedPaymentOrderStatus    = "failed_payment"
+	PendingPaymentOrderStatus = "pending_payment"
+	FailedPaymentOrderStatus  = "failed_payment"
 
 	CanceledOrderStatus = "canceled"
 
-	PendingAcceptOrderStatus = "pending_accept"
-	AcceptedOrderStatus      = "accepted"
-
+	PendingAcceptOrderStatus      = "pending_accept"
+	AcceptedOrderStatus           = "accepted"
+	ChooseCourierOrderStatus      = "choose_courier"
 	PendingReceivePostOrderStatus = "pending_receive_post"
 	ReceivedPostOrderStatus       = "received_post"
 	ReceivedCustomerOrderStatus   = "received_customer"

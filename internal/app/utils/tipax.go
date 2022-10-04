@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"backend/internal/app/DTOs"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -94,8 +96,7 @@ func GetProvinceTipax() error {
 	return nil
 }
 
-// ثبت سفارش
-func CreateOrderTipax() error {
+func TipaxSendOrderRequest(*gin.Context) error {
 	body := j{
 		"packages": []j{
 			{
@@ -246,7 +247,7 @@ func CancelOrder(trackingCode string) error {
 }
 
 // محاسبه هزینه ارسال
-func CalculatePriceOrder() error {
+func CalculateSendPriceTipax(dto DTOs.CalculateOrder) error {
 	body := j{
 		"packageInputs": []j{
 			{
@@ -346,6 +347,6 @@ func CalculatePriceOrder() error {
 	return nil
 }
 
-func TrackingOrder() {
+func TrackingOrder(string) {
 
 }

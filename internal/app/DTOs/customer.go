@@ -16,3 +16,8 @@ type CreateUpdateCustomer struct {
 	PostalCode    uint64 `form:"postal_code" json:"postal_code" validate:"omitempty,startswith=9"`
 	LastSendSMSAt string
 }
+
+type IndexOrderCustomer struct {
+	Mobile     string `form:"mobile" json:"mobile" validate:"omitempty,min=11,max=11,startswith=09"`
+	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4"`
+}

@@ -52,3 +52,83 @@ func CreateOrder(c *gin.Context) (DTOs.CreateOrder, error) {
 	}
 	return dto, nil
 }
+
+func SendOrder(c *gin.Context) (DTOs.SendOrder, error) {
+	var dto DTOs.SendOrder
+	tags := ValidationTags{
+		"OrderID": {
+			"required": "شناسه سفارش الزامی است",
+			"numeric":  "شناسه سفارش باید عددی باشد",
+		},
+		"Courier": {
+			"required": "نام پیک الزامی است",
+			"oneof":    "نام پیک نامعتبر است",
+		},
+		"PackageSize": {
+			"required": "اندازه بسته الزامی است",
+		},
+		"Weight": {
+			"required": "وزن الزامی است",
+			"numeric":  "وزن باید عددی باشد",
+		},
+		"Value": {
+			"required": "ارزش الزامی است",
+			"numeric":  "ارزش باید عددی باشد",
+		},
+		"AddressID": {
+			"required": "شناسه آدرس الزامی است",
+			"numeric":  "شناسه آدرس باید عددی باشد",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}
+
+func CalculateOrder(c *gin.Context) (DTOs.CalculateOrder, error) {
+	var dto DTOs.CalculateOrder
+	tags := ValidationTags{
+		"PackageSize": {
+			"required": "اندازه بسته الزامی است",
+		},
+		"Weight": {
+			"required": "وزن الزامی است",
+			"numeric":  "وزن باید عددی باشد",
+		},
+		"Value": {
+			"required": "ارزش الزامی است",
+			"numeric":  "ارزش باید عددی باشد",
+		},
+		"AddressID": {
+			"required": "شناسه آدرس الزامی است",
+			"numeric":  "شناسه آدرس باید عددی باشد",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}

@@ -76,3 +76,35 @@ func CreateUpdateCustomer(c *gin.Context) (DTOs.CreateUpdateCustomer, error) {
 	}
 	return dto, nil
 }
+
+func IndexOrderCustomer(c *gin.Context) (DTOs.IndexOrderCustomer, error) {
+	var dto DTOs.IndexOrderCustomer
+	tags := ValidationTags{
+		"Mobile": {
+			"required":   "شماره موبایل الزامی است",
+			"min":        "شماره موبایل باید 11 رقم باشد",
+			"max":        "شماره موبایل باید 11 رقم باشد",
+			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+		"verifyCode": {
+			"required": "کد تایید الزامی است",
+			"min":      "کد تایید باید 4 رقم باشد",
+			"max":      "کد تایید باید 4 رقم باشد",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}

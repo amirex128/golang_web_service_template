@@ -90,6 +90,14 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		order := ad.Group("order")
 		{
 			order.POST("/send", sendOrder)
+			order.GET("/", indexOrder)
+			order.POST("/approve/:id", approveOrder)
+			order.POST("/cancel/:id", cancelOrder)
+			order.POST("/calculate", calculateSendPrice)
+			order.POST("/returned", returnedOrder)
+			order.POST("/returned/accept", acceptReturnedOrder)
+			order.GET("/show/:id", showOrder)
+			order.GET("/tracking/:id", trackingOrder)
 		}
 	}
 
@@ -106,6 +114,8 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			customer.POST("login/register", requestCreateLoginCustomer)
 			customer.POST("verify", verifyCreateLoginCustomer)
+			customer.POST("orders", indexCustomerOrders)
+
 		}
 
 	}
