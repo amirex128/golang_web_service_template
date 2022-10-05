@@ -218,6 +218,7 @@ func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, erro
 	}
 	return product, nil
 }
+
 func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product, error) {
 	var products []Product
 	err := m.GetConn().Where("id IN (?)", ids).Find(&products).Error
@@ -246,4 +247,29 @@ func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint
 	}
 
 	return nil
+}
+
+func (m *MysqlManager) MoveProducts(c *gin.Context, shopID, newShopID, userID uint64) error {
+	err := m.GetConn().Model(&Product{}).Where("shop_id = ? AND user_id = ?", shopID, userID).Update("shop_id", newShopID).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در انتقال محصولات",
+		})
+		return err
+	}
+	return nil
+}
+
+func (m *MysqlManager) DeleteProducts(c *gin.Context, shopID, userID uint64) error {
+	err := m.GetConn().Where("shop_id = ? AND user_id = ?", shopID, userID).Delete(&Product{}).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "خطا در حذف محصولات",
+		})
+		return err
+	}
+	return nil
+
 }

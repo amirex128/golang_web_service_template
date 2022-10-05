@@ -15,11 +15,13 @@ func createShop(c *gin.Context) {
 		return
 	}
 	userID := utils.GetUser(c)
-	image, err := utils.UploadImage(c, dto.Logo, "shop/user_"+utils.Uint64ToString(userID))
-	if err != nil {
-		return
+	if dto.Logo != nil {
+		image, err := utils.UploadImage(c, dto.Logo, "shop/user_"+utils.Uint64ToString(userID))
+		if err != nil {
+			return
+		}
+		dto.LogoPath = image
 	}
-	dto.LogoPath = image
 	err = models.NewMainManager().CreateShop(c, dto, userID)
 	if err != nil {
 		return
@@ -60,7 +62,20 @@ func updateShop(c *gin.Context) {
 func deleteShop(c *gin.Context) {
 	shopID := utils.StringToUint64(c.Param("id"))
 	userID := utils.GetUser(c)
-	err := models.NewMainManager().DeleteShop(c, shopID, userID)
+	dto, err := validations.DeleteShop(c)
+	if dto.ProductBehave == "move" {
+		err = models.NewMainManager().MoveProducts(c, shopID, dto.NewShopID, userID)
+		if err != nil {
+			return
+		}
+	} else if dto.ProductBehave == "delete_product" {
+		err = models.NewMainManager().DeleteProducts(c, shopID, userID)
+		if err != nil {
+			return
+		}
+	}
+
+	err = models.NewMainManager().DeleteShop(c, shopID, userID)
 	if err != nil {
 		return
 	}
@@ -87,12 +102,23 @@ func checkSocial(c *gin.Context) {
 	}
 	userID := utils.GetUser(c)
 	// TODO بررسی وضعیت تایید شبکه اجتماعی
+	var resultCheck bool
+	resultCheck = true
 	err = models.NewMainManager().UpdateShop(c, DTOs.UpdateShop{
 		VerifySocial: true,
 	}, dto.ShopID, userID)
 	if err != nil {
 		return
 	}
+	if resultCheck {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "تایید شبکه اجتماعی با موفقیت انجام شد",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "تایید شبکه اجتماعی با انجام نشد",
+	})
 }
 
 func sendPrice(c *gin.Context) {
@@ -108,6 +134,9 @@ func sendPrice(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "هزینه ارسال با موفقیت بروزرسانی شد",
+	})
 }
 
 func getInstagramPost(c *gin.Context) {

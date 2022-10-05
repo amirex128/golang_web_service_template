@@ -15,7 +15,7 @@ type Shop struct {
 	Logo          string     `json:"logo"`
 	Type          string     `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
 	SocialAddress string     `json:"social_address"`
-	VerifySocial  bool       `json:"verify"`
+	VerifySocial  bool       `json:"verify_social"`
 	SendPrice     float32    `json:"send_price"`
 	Description   string     `json:"description"`
 	Phone         string     `json:"phone"`
@@ -66,7 +66,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 		Type:          dto.Type,
 		SocialAddress: dto.SocialAddress,
 		VerifySocial:  false,
-		SendPrice:     0,
+		SendPrice:     dto.SendPrice,
 		Description:   dto.Description,
 		Phone:         dto.Phone,
 		Mobile:        dto.Mobile,
@@ -105,7 +105,7 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error
 
 func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, userID uint64) error {
 	shop := &Shop{}
-	err := m.GetConn().Where("shop_id = ?", shopID).First(shop).Error
+	err := m.GetConn().Where("id = ?", shopID).First(shop).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",

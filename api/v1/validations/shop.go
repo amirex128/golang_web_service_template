@@ -131,3 +131,31 @@ func SendPrice(c *gin.Context) (DTOs.SendPrice, error) {
 	}
 	return dto, nil
 }
+
+func DeleteShop(c *gin.Context) (DTOs.DeleteShop, error) {
+	var dto DTOs.DeleteShop
+	tags := ValidationTags{
+		"NewShopID": {
+			"numeric": "شناسه فروشگاه جدید باید عدد باشد",
+		},
+		"ProductBehave": {
+			"required": "رفتار محصولات را وارد کنید",
+			"oneof":    "رفتار محصولات نا درست میباشد",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}

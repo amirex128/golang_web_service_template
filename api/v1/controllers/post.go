@@ -21,11 +21,13 @@ func createPost(c *gin.Context) {
 		return
 	}
 
-	image, err := utils.UploadImage(c, dto.Thumbnail, "post")
-	if err != nil {
-		return
+	if dto.Thumbnail != nil {
+		image, err := utils.UploadImage(c, dto.Thumbnail, "post")
+		if err != nil {
+			return
+		}
+		dto.ThumbnailPath = image
 	}
-	dto.ThumbnailPath = image
 	err = models.NewMainManager().CreatePost(c, dto, userID)
 	if err != nil {
 		return

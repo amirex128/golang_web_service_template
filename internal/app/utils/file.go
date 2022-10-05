@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/csv"
+	"errors"
 	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -45,7 +46,11 @@ func UploadMultiImage(c *gin.Context, images []*multipart.FileHeader, dest strin
 		return nil, err
 	}
 	for i := range images {
-		relativePath := uuid.NewString() + "." + strings.Split(images[i].Header["Content-Type"][0], "/")[1]
+		contentType, ok := images[i].Header["Content-Type"]
+		if !ok {
+			return nil, errors.New("content type not found")
+		}
+		relativePath := uuid.NewString() + "." + strings.Split(contentType[0], "/")[1]
 		path := filepath.Join(userDir, relativePath)
 		relativePath = filepath.Join("/assets", dest, "images", relativePath)
 		err := c.SaveUploadedFile(images[i], path)
@@ -66,7 +71,11 @@ func UploadImage(c *gin.Context, image *multipart.FileHeader, dest string) (stri
 		c.JSON(http.StatusBadRequest, gin.H{"message": "خطا در آپلود تصویر"})
 		return "", err
 	}
-	relativePath := uuid.NewString() + "." + strings.Split(image.Header["Content-Type"][0], "/")[1]
+	contentType, ok := image.Header["Content-Type"]
+	if !ok {
+		return "", errors.New("content type not found")
+	}
+	relativePath := uuid.NewString() + "." + strings.Split(contentType[0], "/")[1]
 	path := filepath.Join(userDir, relativePath)
 	relativePath = filepath.Join("/assets", dest, "images", relativePath)
 	err := c.SaveUploadedFile(image, path)
