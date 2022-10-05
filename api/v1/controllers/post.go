@@ -56,8 +56,9 @@ func updatePost(c *gin.Context) {
 		}
 		dto.ThumbnailPath = image
 	}
-
-	utils.RemoveImages([]string{dto.ThumbnailRemove})
+	if dto.ThumbnailRemove != "" {
+		utils.RemoveImages([]string{dto.ThumbnailRemove})
+	}
 	err = models.NewMainManager().UpdatePost(c, dto, utils.StringToUint64(postID))
 	c.JSON(http.StatusOK, gin.H{
 		"message": "مقاله با موفقیت ویرایش شد",

@@ -105,7 +105,7 @@ func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
 	return
 }
 
-func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []Tag, err error) {
+func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []*Tag, err error) {
 	err = m.GetConn().Order("RAND()").Limit(count).Find(&tags).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{

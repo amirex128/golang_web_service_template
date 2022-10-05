@@ -6,7 +6,7 @@ type CreatePost struct {
 	Title         string                `form:"title" json:"title" validate:"required"`
 	Body          string                `form:"body" json:"body" validate:"required"`
 	Thumbnail     *multipart.FileHeader `form:"thumbnail" json:"thumbnail" validate:"required"`
-	ThumbnailPath string                `form:"thumbnail_path" json:"thumbnail_path"`
+	ThumbnailPath string                `form:"-" json:"-"`
 	Slug          string                `form:"slug" json:"slug" validate:"required"`
 	CategoryID    uint64                `form:"category_id" json:"category_id" validate:"required"`
 	CreatedAt     string                `form:"created_at" json:"created_at" validate:"required"`
@@ -14,13 +14,13 @@ type CreatePost struct {
 }
 
 type UpdatePost struct {
-	Title           string                `form:"title" json:"title" validate:"required"`
-	Body            string                `form:"body" json:"body" validate:"required"`
-	Thumbnail       *multipart.FileHeader `form:"thumbnail" json:"thumbnail"`
-	ThumbnailPath   string                `form:"thumbnail_path" json:"thumbnail_path"`
-	ThumbnailRemove string                `form:"thumbnail_remove" form:"thumbnail_remove"`
-	Slug            string                `form:"slug" json:"slug"`
-	CategoryID      uint64                `form:"category_id" json:"category_id" validate:"required"`
+	Title           string                `form:"title" json:"title" validate:"omitempty"`
+	Body            string                `form:"body" json:"body" validate:"omitempty"`
+	Thumbnail       *multipart.FileHeader `form:"thumbnail" json:"thumbnail" validate:"omitempty"`
+	ThumbnailPath   string                `form:"-" json:"-"`
+	ThumbnailRemove string                `form:"-" json:"-"`
+	Slug            string                `form:"slug" json:"slug" validate:"omitempty"`
+	CategoryID      uint64                `form:"category_id" json:"category_id" validate:"omitempty"`
 }
 
 type IndexPost struct {

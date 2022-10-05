@@ -81,7 +81,7 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 	pagination.Data = comments
 	return pagination, nil
 }
-func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []Comment, err error) {
+func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []*Comment, err error) {
 	err = m.GetConn().Order("id DESC").Find(&comments).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -72,19 +72,20 @@ func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (orderID uint64,
 	return
 }
 
-func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []string) (orders []Order, err error) {
-	err = m.GetConn().Where("user_id = ? AND status IN (?)", userID, orderStatus).Find(&orders).Error
+func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []string) ([]*Order, error) {
+	var orders []*Order
+	err := m.GetConn().Where("user_id = ? AND status IN (?)", userID, orderStatus).Find(&orders).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارشات",
 			"error":   err.Error(),
 		})
-		return
+		return orders, err
 	}
-	return
+	return orders, err
 }
-func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, customerID uint64) ([]Order, error) {
-	var orders []Order
+func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, customerID uint64) ([]*Order, error) {
+	var orders []*Order
 	err := m.GetConn().Where("customer_id = ?", customerID).Find(&orders).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

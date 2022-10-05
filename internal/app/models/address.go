@@ -154,8 +154,8 @@ func (m *MysqlManager) DeleteAddress(c *gin.Context, addressID, userID uint64) e
 	return err
 }
 
-func (m *MysqlManager) IndexAddress(c *gin.Context, userID uint64) ([]Address, error) {
-	var addresses []Address
+func (m *MysqlManager) IndexAddress(c *gin.Context, userID uint64) ([]*Address, error) {
+	var addresses []*Address
 	err := m.GetConn().Where("user_id = ?", userID).Find(&addresses).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

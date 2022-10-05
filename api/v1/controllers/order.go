@@ -179,7 +179,7 @@ func sadadPaymentVerify(c *gin.Context) {
 func indexOrder(c *gin.Context) {
 	orderStatus := c.Query("order_status")
 	userID := utils.GetUser(c)
-	var orders []models.Order
+	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {
 		orders, err = models.NewMainManager().GetOrders(c, userID, []string{

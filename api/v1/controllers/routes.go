@@ -99,6 +99,16 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			order.GET("/show/:id", showOrder)
 			order.GET("/tracking/:id", trackingOrder)
 		}
+		shop := ad.Group("shop")
+		{
+			shop.GET("/", indexShop)
+			shop.POST("/create", createShop)
+			shop.POST("/update/:id", updateShop)
+			shop.POST("/delete/:id", deleteShop)
+			shop.POST("/check", checkSocial)
+			shop.POST("/send-price", sendPrice)
+			shop.GET("/instagram", getInstagramPost)
+		}
 	}
 
 	user := v1.Group("user")

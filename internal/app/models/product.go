@@ -25,9 +25,6 @@ type Product struct {
 	Status           string     `json:"block_status" sql:"type:ENUM('block','ok')"`
 	Quantity         uint32     `json:"quantity"`
 	Price            float32    `json:"price"`
-	Weight           uint32     `json:"weight"`
-	Height           uint32     `json:"height"`
-	Width            uint32     `json:"width"`
 	Active           byte       `json:"active"`
 	Images           string     `json:"images"`
 	CreatedAt        string     `json:"created_at"`
@@ -119,9 +116,6 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		ShortDescription: dto.ShortDescription,
 		Quantity:         dto.Quantity,
 		Price:            dto.Price,
-		Weight:           dto.Weight,
-		Height:           dto.Height,
-		Width:            dto.Width,
 		Active:           1,
 		Images:           strings.Join(dto.ImagePath, ","),
 		CreatedAt:        utils.NowTime(),
@@ -164,15 +158,6 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	}
 	if dto.Price > 0 {
 		product.Price = dto.Price
-	}
-	if dto.Weight > 0 {
-		product.Weight = dto.Weight
-	}
-	if dto.Height > 0 {
-		product.Height = dto.Height
-	}
-	if dto.Width > 0 {
-		product.Width = dto.Width
 	}
 	if dto.Active != "" {
 		product.Active = utils.ActiveConvert(dto.Active)

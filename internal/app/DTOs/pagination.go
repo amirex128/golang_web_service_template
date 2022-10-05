@@ -6,12 +6,12 @@ import (
 )
 
 type Pagination struct {
-	PageSize   uint32      `json:"page_size"`
-	Page       uint32      `json:"page"`
-	Sort       string      `json:"sort,omitempty;query:sort"`
-	TotalRows  uint64      `json:"total_rows"`
-	TotalPages uint32      `json:"total_pages"`
-	Data       interface{} `json:"data"`
+	PageSize   uint32      `form:"page_size" json:"page_size"`
+	Page       uint32      `form:"page" json:"page"`
+	Sort       string      `form:"sort,omitempty" json:"sort,omitempty"`
+	TotalRows  uint64      `form:"total_rows" json:"total_rows"`
+	TotalPages uint32      `form:"total_pages" json:"total_pages"`
+	Data       interface{} `form:"data" json:"data"`
 }
 
 func (p *Pagination) GetOffset() uint32 {
