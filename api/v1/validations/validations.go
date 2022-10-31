@@ -23,6 +23,7 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "مقادیر ارسال شده نا درست میباشد",
+				"type":    "validation",
 				"error":   err.Error(),
 			})
 			return errors.New("validation error")
@@ -45,6 +46,7 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 		if len(validationErrors) > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "مقادیر ارسال شده نا درست میباشد",
+				"type":    "validation",
 				"errors":  validationErrors,
 			})
 			return err

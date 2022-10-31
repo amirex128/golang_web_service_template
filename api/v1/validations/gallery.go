@@ -2,15 +2,24 @@ package validations
 
 import (
 	"backend/internal/app/DTOs"
-	"backend/internal/app/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func IndexCategory(c *gin.Context) (DTOs.IndexCategory, error) {
-	var dto DTOs.IndexCategory
-	tags := ValidationTags{}
+func CreateGallery(c *gin.Context) (DTOs.CreateGallery, error) {
+	var dto DTOs.CreateGallery
+	tags := ValidationTags{
+		"File": {
+			"required": "فایل الزامی است",
+		},
+		"OwnerID": {
+			"required": "شناسه مالک الزامی است",
+		},
+		"OwnerType": {
+			"required": "نوع مالک الزامی است",
+		},
+	}
 	err := c.Bind(&dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -26,9 +35,5 @@ func IndexCategory(c *gin.Context) (DTOs.IndexCategory, error) {
 	if err != nil {
 		return dto, err
 	}
-	dto.Page = utils.StringToUint32(c.Query("page"))
-	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
-	dto.Search = c.Query("search")
-	dto.Sort = c.Query("sort")
 	return dto, nil
 }

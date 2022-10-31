@@ -2,20 +2,18 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
 )
 
 type Guild struct {
-	ID         int            `gorm:"primary_key;auto_increment" json:"id"`
-	ParentID   int            `json:"parent_id"`
-	Name       string         `json:"name"`
-	Icon       sql.NullString `json:"icon"`
-	Equivalent sql.NullString `json:"equivalent"`
-	Sort       uint           `json:"sort"`
-	Active     byte           `json:"active"`
+	ID         int    `gorm:"primary_key;auto_increment" json:"id"`
+	ParentID   int    `json:"parent_id"`
+	Name       string `json:"name"`
+	Equivalent string `json:"equivalent"`
+	Sort       uint   `json:"sort"`
+	Active     byte   `json:"active"`
 }
 
 type GuildProduct struct {
@@ -57,8 +55,7 @@ func (m *MysqlManager) CreateAllGuilds(files [][]string) {
 			ID:         utils.StringToInt(value[0]),
 			ParentID:   utils.StringToInt(value[1]),
 			Name:       value[2],
-			Icon:       utils.StringConvert(value[3]),
-			Equivalent: utils.StringConvert(value[4]),
+			Equivalent: value[4],
 			Sort:       utils.StringToUint(value[5]),
 			Active:     utils.ActiveConvert(value[6]),
 		})

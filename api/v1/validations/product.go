@@ -23,6 +23,7 @@ func IndexProduct(c *gin.Context) (DTOs.IndexProduct, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -98,6 +99,7 @@ func CreateProduct(c *gin.Context) (DTOs.CreateProduct, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -174,6 +176,7 @@ func UpdateProduct(c *gin.Context) (DTOs.UpdateProduct, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

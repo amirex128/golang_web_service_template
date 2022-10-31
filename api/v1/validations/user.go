@@ -37,11 +37,21 @@ func UpdateUser(c *gin.Context) (DTOs.UpdateUser, error) {
 			"required": "شماره شبا الزامی است",
 			"numeric":  "شماره شبا باید عددی باشد",
 		},
+		"Password": {
+			"min": "رمز عبور باید حداقل 6 رقم باشد",
+			"max": "رمز عبور باید حداکثر 20 رقم باشد",
+		},
+		"AgainPassword": {
+			"min":     "تکرار رمز عبور باید حداقل 6 رقم باشد",
+			"max":     "تکرار رمز عبور باید حداکثر 20 رقم باشد",
+			"eqfield": "رمز عبور و تکرار آن باید یکسان باشد",
+		},
 	}
 	err := c.Bind(&dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

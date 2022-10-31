@@ -56,6 +56,7 @@ func (m *MysqlManager) CreateOrderItem(c *gin.Context, dto []DTOs.OrderItem, ord
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در ثبت سفارش",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}

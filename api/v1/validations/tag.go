@@ -26,6 +26,7 @@ func CreateTag(c *gin.Context) (DTOs.CreateTag, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -55,6 +56,7 @@ func AddTag(c *gin.Context) (DTOs.AddTag, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -75,6 +77,7 @@ func IndexTag(c *gin.Context) (DTOs.IndexTag, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

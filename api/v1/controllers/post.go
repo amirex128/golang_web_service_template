@@ -21,13 +21,6 @@ func createPost(c *gin.Context) {
 		return
 	}
 
-	if dto.Thumbnail != nil {
-		image, err := utils.UploadImage(c, dto.Thumbnail, "post")
-		if err != nil {
-			return
-		}
-		dto.ThumbnailPath = image
-	}
 	err = models.NewMainManager().CreatePost(c, dto, userID)
 	if err != nil {
 		return
@@ -51,16 +44,6 @@ func updatePost(c *gin.Context) {
 		}
 	}
 
-	if dto.Thumbnail != nil {
-		image, err := utils.UploadImage(c, dto.Thumbnail, "post")
-		if err != nil {
-			return
-		}
-		dto.ThumbnailPath = image
-	}
-	if dto.ThumbnailRemove != "" {
-		utils.RemoveImages([]string{dto.ThumbnailRemove})
-	}
 	err = models.NewMainManager().UpdatePost(c, dto, utils.StringToUint64(postID))
 	c.JSON(http.StatusOK, gin.H{
 		"message": "مقاله با موفقیت ویرایش شد",

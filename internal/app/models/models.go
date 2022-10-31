@@ -4,39 +4,6 @@ import (
 	"backend/internal/pkg/framework/mysql"
 )
 
-const (
-	CategoryTable           = "categories"
-	CategoryOptionTable     = "category_option"
-	CategoryProductTable    = "category_product"
-	CategoryRelatedTable    = "category_related"
-	CityTable               = "cities"
-	CityProductTable        = "city_product"
-	CustomerTable           = "customers"
-	DiscountTable           = "discounts"
-	FeatureGroupTable       = "feature_groups"
-	FeatureItemTable        = "feature_items"
-	FeatureItemProductTable = "feature_item_product"
-	FeatureItemValueTable   = "feature_item_values"
-	GalleryTable            = "galleries"
-	GroupDiscountTable      = "group_discounts"
-	GuildTable              = "guilds"
-	GuildProductTable       = "guild_product"
-	ManufacturerTable       = "manufacturers"
-	OptionTable             = "options"
-	OptionValueTable        = "option_values"
-	OrderTable              = "orders"
-	OrderItemTable          = "order_items"
-	ProductTable            = "products"
-	ShopTable               = "shops"
-	ProvinceTable           = "provinces"
-	ProductProvinceTable    = "product_provinces"
-	UserTable               = "users"
-
-	CommentTable   = "comments"
-	TagTable       = "tags"
-	FinancialTable = "financials"
-)
-
 type MysqlManager struct {
 	*mysql.SingleManager
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
@@ -23,7 +22,7 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 	jsonValue, _ := json.Marshal(jsonData)
 	response, err := http.Post("https://rest.payamak-panel.com/api/SendSMS/"+op, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
-		sentry.CaptureException(err)
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در ارسال پیامک لطفا مجدد تلاش کنید",
 		})

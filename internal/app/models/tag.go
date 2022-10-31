@@ -54,6 +54,7 @@ func (m *MysqlManager) CreateTag(c *gin.Context, dto DTOs.CreateTag) (err error)
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در ایجاد تگ",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -65,7 +66,7 @@ func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTa
 	var tags []Tag
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(TagTable, pagination, conn))
+	conn = conn.Scopes(DTOs.Paginate("tags", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
@@ -74,6 +75,7 @@ func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTa
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -87,6 +89,7 @@ func (m *MysqlManager) DeleteTag(c *gin.Context, id uint64) (err error) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در حذف تگ",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -99,6 +102,7 @@ func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در افزودن تگ",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -111,6 +115,7 @@ func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []*Tag, err e
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در یافتن تگ ها",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -131,6 +136,7 @@ func (m *MysqlManager) GetAllTagPostWithPagination(c *gin.Context, dto DTOs.Inde
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -145,6 +151,7 @@ func (m *MysqlManager) FindTagBySlug(c *gin.Context, slug string) (tag *Tag, err
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در یافتن تگ",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}

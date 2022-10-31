@@ -15,7 +15,6 @@ type Post struct {
 	ID         uint64     `gorm:"primary_key;auto_increment" json:"id"`
 	Title      string     `json:"title"`
 	Body       string     `json:"body"`
-	Thumbnail  string     `json:"thumbnail"`
 	Slug       string     `json:"slug"`
 	UserID     uint64     `json:"user_id"`
 	User       User       `gorm:"foreignKey:user_id" json:"user"`
@@ -24,6 +23,7 @@ type Post struct {
 	Comments   []Comment  `gorm:"foreignKey:post_id" json:"comments"`
 	CreatedAt  string     `json:"created_at"`
 	UpdatedAt  string     `json:"updated_at"`
+	Galleries  []Gallery  `gorm:"polymorphic:Owner;"`
 }
 type PostArr []Post
 
@@ -48,12 +48,11 @@ func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
 	for i := 0; i < 10; i++ {
 		manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
-			Title:         "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
-			Body:          "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
-			ThumbnailPath: "",
-			Slug:          "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
-			CreatedAt:     utils.NowTime(),
-			UpdatedAt:     utils.NowTime(),
+			Title:     "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
+			Body:      "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
+			Slug:      "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
+			CreatedAt: utils.NowTime(),
+			UpdatedAt: utils.NowTime(),
 		}, 1)
 	}
 }
@@ -72,7 +71,6 @@ func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID ui
 	post := Post{
 		Title:     dto.Title,
 		Body:      dto.Body,
-		Thumbnail: dto.ThumbnailPath,
 		Slug:      dto.Slug,
 		UserID:    userID,
 		CreatedAt: utils.NowTime(),
@@ -83,6 +81,7 @@ func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ایجاد پست پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -95,6 +94,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -103,9 +103,6 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 	}
 	if dto.Body != "" {
 		post.Body = dto.Body
-	}
-	if dto.ThumbnailPath != "" {
-		post.Thumbnail = dto.ThumbnailPath
 	}
 	if dto.Slug != "" {
 		post.Slug = dto.Slug
@@ -116,6 +113,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -128,6 +126,7 @@ func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در حذف پست پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}
@@ -140,6 +139,7 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, e
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}
@@ -168,6 +168,7 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -181,6 +182,7 @@ func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -192,6 +194,7 @@ func (m *MysqlManager) GetLastPost(c *gin.Context, count int) (posts []Post, err
 		c.JSON(http.StatusOK, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}

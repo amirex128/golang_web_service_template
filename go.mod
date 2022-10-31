@@ -5,9 +5,11 @@ go 1.19
 require (
 	github.com/Squwid/go-randomizer v0.1.2
 	github.com/appleboy/gin-jwt/v2 v2.8.0
+	github.com/chai2010/webp v1.1.1
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/getsentry/sentry-go v0.13.0
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/go-redis/redis/v9 v9.0.0-beta.1
@@ -54,7 +56,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect

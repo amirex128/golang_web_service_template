@@ -22,6 +22,7 @@ func CheckDiscount(c *gin.Context) (DTOs.CheckDiscount, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -74,6 +75,7 @@ func CreateDiscount(c *gin.Context) (DTOs.CreateDiscount, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -129,6 +131,7 @@ func UpdateDiscount(c *gin.Context) (DTOs.UpdateDiscount, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -152,6 +155,7 @@ func IndexDiscount(c *gin.Context) (DTOs.IndexDiscount, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

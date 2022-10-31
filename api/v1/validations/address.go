@@ -38,6 +38,7 @@ func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -82,6 +83,7 @@ func UpdateAddress(c *gin.Context) (DTOs.UpdateAddress, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

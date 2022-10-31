@@ -18,7 +18,6 @@ type Category struct {
 	Sort        uint32    `json:"sort"`
 	Equivalent  string    `json:"equivalent"`
 	Description string    `json:"description"`
-	Icon        string    `json:"icon"`
 	Products    []Product `gorm:"many2many:category_product;"`
 	Posts       []Post    `gorm:"many2many:category_post;"`
 	Options     []Option  `gorm:"many2many:category_option;"`
@@ -68,7 +67,6 @@ func initCategory(manager *MysqlManager) bool {
 			Type:        "post",
 			Equivalent:  "کلمه مترادف" + utils.IntToString(i),
 			Description: "توضیحات دسته بندی " + utils.IntToString(i),
-			Icon:        "icon " + utils.IntToString(i),
 		})
 	}
 	return true
@@ -89,7 +87,6 @@ func (m *MysqlManager) CreateCategory(c *gin.Context, dto DTOs.CreateCategory) e
 		Sort:        lastCategory.Sort + 1,
 		Equivalent:  dto.Equivalent,
 		Description: dto.Description,
-		Icon:        dto.Icon,
 	}
 	err = m.GetConn().Create(&category).Error
 	if err != nil {
@@ -125,7 +122,6 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 			Sort:        utils.StringToUint32(value[3]),
 			Equivalent:  value[4],
 			Description: value[7],
-			Icon:        value[8],
 		})
 	}
 	err := m.GetConn().CreateInBatches(categories, 100).Error
@@ -154,7 +150,7 @@ func (m *MysqlManager) GetAllCategoryWithPagination(c *gin.Context, dto DTOs.Ind
 	var categories []Category
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(CategoryTable, pagination, conn)).Order("id DESC")
+	conn = conn.Scopes(DTOs.Paginate("categories", pagination, conn)).Order("id DESC")
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
@@ -195,6 +191,7 @@ func (m *MysqlManager) GetAllCategoryPostWithPagination(c *gin.Context, dto DTOs
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}

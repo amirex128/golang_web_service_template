@@ -33,6 +33,7 @@ func CreateComment(c *gin.Context) (DTOs.CreateComment, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -53,6 +54,7 @@ func IndexComment(c *gin.Context) (DTOs.IndexComment, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

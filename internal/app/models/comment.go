@@ -55,6 +55,7 @@ func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (er
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در ایجاد دیدگاه",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -66,7 +67,7 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 	var comments []Comment
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(CommentTable, pagination, conn))
+	conn = conn.Scopes(DTOs.Paginate("comments", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
@@ -75,6 +76,7 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -87,6 +89,7 @@ func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []*Comment, err 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در یافتن دیدگاه ها",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -100,6 +103,7 @@ func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در حذف دیدگاه",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -113,6 +117,7 @@ func (m *MysqlManager) ApproveComment(c *gin.Context, id uint64) (err error) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در تایید دیدگاه",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}

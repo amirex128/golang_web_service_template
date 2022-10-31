@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type Product struct {
@@ -26,14 +25,13 @@ type Product struct {
 	Quantity         uint32     `json:"quantity"`
 	Price            float32    `json:"price"`
 	Active           byte       `json:"active"`
-	Images           string     `json:"images"`
 	CreatedAt        string     `json:"created_at"`
 	UpdatedAt        string     `json:"updated_at"`
 	StartedAt        string     `json:"started_at"`
 	EndedAt          string     `json:"ended_at"`
 	Categories       []Category `gorm:"many2many:category_product;" json:"categories"`
-	Galleries        []Gallery  `gorm:"foreignKey:product_id" json:"galleries"`
 	DeliveryTime     uint32     `json:"delivery_time"` // مدت زمان ارسال
+	Galleries        []Gallery  `gorm:"polymorphic:Owner;"`
 }
 
 func (c Product) GetID() uint64 {
@@ -78,8 +76,6 @@ func InitProduct(manager *MysqlManager) {
 			DeliveryTime:     1,
 			OptionId:         1,
 			OptionItemID:     1,
-			Images:           nil,
-			ImagePath:        nil,
 			CategoryID:       1,
 		}, 1)
 	}
@@ -90,7 +86,7 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 	var products []Product
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	conn = conn.Scopes(DTOs.Paginate(ProductTable, pagination, conn))
+	conn = conn.Scopes(DTOs.Paginate("products", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
@@ -99,6 +95,7 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در دریافت محصولات",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return pagination, err
 	}
@@ -117,7 +114,6 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		Quantity:         dto.Quantity,
 		Price:            dto.Price,
 		Active:           1,
-		Images:           strings.Join(dto.ImagePath, ","),
 		CreatedAt:        utils.NowTime(),
 		UpdatedAt:        utils.NowTime(),
 		StartedAt:        utils.DateTimeConvert(dto.StartedAt),
@@ -129,6 +125,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در ایجاد محصول",
 		})
 		return err
@@ -162,9 +159,6 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	if dto.Active != "" {
 		product.Active = utils.ActiveConvert(dto.Active)
 	}
-	if len(dto.ImagePath) > 0 {
-		product.Images = strings.Join(dto.ImagePath, ",")
-	}
 	product.UpdatedAt = utils.NowTime()
 	if dto.StartedAt != "" {
 		product.StartedAt = utils.DateTimeConvert(dto.StartedAt)
@@ -180,6 +174,7 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در بروزرسانی محصول",
 		})
 		return err
@@ -188,17 +183,11 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 }
 
 func (m *MysqlManager) DeleteProduct(c *gin.Context, id uint64) error {
-	product, err := m.FindProductById(c, id)
-	if err != nil {
-		return err
-	}
-
-	utils.RemoveImages(strings.Split(product.Images, ","))
-
-	err = m.GetConn().Delete(&Product{}, id).Error
+	err := m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در حذف محصول",
 		})
 		return err
@@ -212,6 +201,7 @@ func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, erro
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در دریافت محصول",
 		})
 		return product, err
@@ -225,6 +215,7 @@ func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در دریافت محصولات",
 		})
 		return products, err
@@ -241,6 +232,7 @@ func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint
 		err = errors.New("access denied")
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
 		})
 		return err
@@ -254,6 +246,7 @@ func (m *MysqlManager) MoveProducts(c *gin.Context, shopID, newShopID, userID ui
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در انتقال محصولات",
 		})
 		return err
@@ -266,6 +259,7 @@ func (m *MysqlManager) DeleteProducts(c *gin.Context, shopID, userID uint64) err
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
+			"type":    "model",
 			"message": "خطا در حذف محصولات",
 		})
 		return err

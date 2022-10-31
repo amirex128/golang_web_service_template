@@ -13,6 +13,12 @@ func CreateShop(c *gin.Context) (DTOs.CreateShop, error) {
 		"Name": {
 			"required": "نام فروشگاه را وارد کنید",
 		},
+		"EnglishName": {
+			"required": "نام فروشگاه را وارد کنید",
+		},
+		"GalleryID": {
+			"required": "نام فروشگاه را وارد کنید",
+		},
 		"Type": {
 			"required": "نوع فروشگاه را وارد کنید",
 		},
@@ -31,6 +37,28 @@ func CreateShop(c *gin.Context) (DTOs.CreateShop, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}
+
+func IndexShop(c *gin.Context) (DTOs.IndexShop, error) {
+	var dto DTOs.IndexShop
+	tags := ValidationTags{}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -59,6 +87,7 @@ func UpdateShop(c *gin.Context) (DTOs.UpdateShop, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -90,6 +119,7 @@ func CheckSocial(c *gin.Context) (DTOs.CheckSocial, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -119,6 +149,7 @@ func SendPrice(c *gin.Context) (DTOs.SendPrice, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -139,14 +170,15 @@ func DeleteShop(c *gin.Context) (DTOs.DeleteShop, error) {
 			"numeric": "شناسه فروشگاه جدید باید عدد باشد",
 		},
 		"ProductBehave": {
-			"required": "رفتار محصولات را وارد کنید",
-			"oneof":    "رفتار محصولات نا درست میباشد",
+			"required": "رفتار حذف فروشگاه را وارد کنید",
+			"oneof":    "رفتار حذف فروشگاه نا درست میباشد",
 		},
 	}
 	err := c.Bind(&dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

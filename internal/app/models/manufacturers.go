@@ -2,19 +2,17 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"database/sql"
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
 	"io"
 )
 
 type Manufacturer struct {
-	ID               int            `gorm:"primary_key;auto_increment" json:"id"`
-	CountryName      sql.NullString `json:"country_name"`
-	ShortDescription sql.NullString `json:"short_description"`
-	Logo             sql.NullString `json:"logo"`
-	PersianName      string         `json:"persian_name"`
-	EnglishName      string         `json:"english_name"`
+	ID               int    `gorm:"primary_key;auto_increment" json:"id"`
+	CountryName      string `json:"country_name"`
+	ShortDescription string `json:"short_description"`
+	PersianName      string `json:"persian_name"`
+	EnglishName      string `json:"english_name"`
 }
 type ManufacturerArr []Manufacturer
 
@@ -47,9 +45,8 @@ func (m *MysqlManager) CreateAllManufacturer(files [][]string) {
 		value := files[i]
 		manufacturer = append(manufacturer, Manufacturer{
 			ID:               utils.StringToInt(value[0]),
-			CountryName:      utils.StringConvert(value[2]),
-			ShortDescription: utils.StringConvert(value[3]),
-			Logo:             utils.StringConvert(value[4]),
+			CountryName:      value[2],
+			ShortDescription: value[3],
 			PersianName:      value[5],
 			EnglishName:      value[6],
 		})

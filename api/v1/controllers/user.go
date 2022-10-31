@@ -42,7 +42,9 @@ func updateProfile(c *gin.Context) {
 	if dto.Shaba != "" {
 		user.Shaba = dto.Shaba
 	}
-
+	if dto.Password != "" {
+		user.Password = dto.Password
+	}
 	err = models.NewMainManager().UpdateUser(c, &user)
 	if err != nil {
 		return

@@ -21,6 +21,7 @@ func RequestLoginRegister(c *gin.Context) (*DTOs.RequestLoginRegister, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return register, errors.New("validation error")
@@ -44,15 +45,48 @@ func Verify(c *gin.Context) (DTOs.Verify, error) {
 			"startswith": "شماره موبایل باید با 09 شروع شود",
 		},
 		"VerifyCode": {
-			"required": "کد تایید الزامی میباشد",
-			"min":      "کد تایید باید حداقل 4 رقم باشد",
-			"max":      "کد تایید باید حداکثر 4 رقم باشد",
+			"min": "کد تایید باید حداقل 4 رقم باشد",
+			"max": "کد تایید باید حداکثر 4 رقم باشد",
 		},
 	}
 	err := c.Bind(&login)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
+			"error":   err.Error(),
+		})
+		return login, errors.New("validation error")
+	}
+
+	err = validate.Struct(login)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return login, err
+	}
+	return login, nil
+}
+
+func ChangePassword(c *gin.Context) (DTOs.ChangePassword, error) {
+	var login DTOs.ChangePassword
+	tags := ValidationTags{
+		"Password": {
+			"required": "رمز عبور الزامی میباشد",
+			"min":      "رمز عبور باید حداقل 6 رقم باشد",
+			"max":      "رمز عبور باید حداکثر 20 رقم باشد",
+		},
+		"AgainPassword": {
+			"required": "تکرار رمز عبور الزامی میباشد",
+			"min":      "تکرار رمز عبور باید حداقل 6 رقم باشد",
+			"max":      "تکرار رمز عبور باید حداکثر 20 رقم باشد",
+			"eqfield":  "رمز عبور و تکرار آن باید یکسان باشد",
+		},
+	}
+	err := c.Bind(&login)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return login, errors.New("validation error")

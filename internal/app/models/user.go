@@ -26,6 +26,7 @@ type User struct {
 	Financial     []Financial `gorm:"foreignKey:user_id" json:"financial"`
 	Address       Address     `gorm:"foreignKey:user_id" json:"address"`
 	LastSendSMSAt string      `json:"last_send_sms_at"`
+	Password      string      `json:"password"`
 	UpdatedAt     string      `json:"updated_at"`
 	CreatedAt     string      `json:"created_at"`
 }
@@ -60,7 +61,7 @@ func initUser(manager *MysqlManager) {
 		Firstname:  "امیر",
 		Lastname:   "شیردلی",
 		Email:      "amirex128@gmail.com",
-		Mobile:     "",
+		Mobile:     "09024809750",
 		ExpireAt:   "",
 		Status:     "",
 		VerifyCode: "",
@@ -87,6 +88,7 @@ func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -101,7 +103,14 @@ func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify) (*User, e
 	}
 	return res, nil
 }
-
+func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify) (*User, error) {
+	res := &User{}
+	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).First(res).Error
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
 func (m *MysqlManager) FindUserByMobile(mobile string) (*User, error) {
 	res := &User{}
 	err := m.GetConn().Where("mobile = ?", mobile).First(res).Error
@@ -118,6 +127,7 @@ func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -125,11 +135,60 @@ func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error
 }
 
 func (m *MysqlManager) UpdateUser(c *gin.Context, user *User) error {
-	err := m.GetConn().Save(user).Error
+	var newUser User
+	err := m.GetConn().Where("id = ?", user.ID).First(&newUser).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "کاربر یافت نشد",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return err
+	}
+	if user.Gender != "" {
+		newUser.Gender = user.Gender
+	}
+	if user.Firstname != "" {
+		newUser.Firstname = user.Firstname
+	}
+	if user.Lastname != "" {
+		newUser.Lastname = user.Lastname
+	}
+	if user.Email != "" {
+		newUser.Email = user.Email
+	}
+	if user.Mobile != "" {
+		newUser.Mobile = user.Mobile
+	}
+	if user.ExpireAt != "" {
+		newUser.ExpireAt = user.ExpireAt
+	}
+	if user.Status != "" {
+		newUser.Status = user.Status
+	}
+	if user.VerifyCode != "" {
+		newUser.VerifyCode = user.VerifyCode
+	}
+	if user.CartNumber != "" {
+		newUser.CartNumber = user.CartNumber
+	}
+	if user.Shaba != "" {
+		newUser.Shaba = user.Shaba
+	}
+	if user.LastSendSMSAt != "" {
+		newUser.LastSendSMSAt = user.LastSendSMSAt
+	}
+	if user.Password != "" {
+		newUser.Password = user.Password
+	}
+	newUser.UpdatedAt = utils.NowTime()
+
+	err = m.GetConn().Save(&newUser).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در فرایند ویرایش شما رخ داده است لطفا مجدد تلاش نمایید",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}

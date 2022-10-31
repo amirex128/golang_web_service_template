@@ -7,13 +7,58 @@ import (
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/flosch/pongo2"
-	"github.com/getsentry/sentry-go"
-	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
 )
+
+func Runner(host string, port string) {
+	r := gin.Default()
+	r.Use(Pongo2())
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://selloora.com", "http://localhost:9000"},
+		AllowMethods:     []string{"GET", "POST", "OPTION"},
+		AllowHeaders:     []string{"Authorization", "type_auth", "content-type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	//r.Use(func(c *gin.Context) {
+	//	c.Header("Access-Control-Allow-Origin", "http://localhost:9000")
+	//	c.Next()
+	//})
+	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
+		if err, ok := recovered.(string); ok {
+			c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s", err))
+		}
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}))
+
+	//r.Use(sentrygin.New(sentrygin.Options{
+	//	Repanic:         true,
+	//	WaitForDelivery: false,
+	//	Timeout:         5 * time.Second,
+	//}))
+	//r.Use(func(ctx *gin.Context) {
+	//	if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+	//		hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
+	//	}
+	//	ctx.Next()
+	//})
+
+	controllers.Routes(r, GetAuthMiddleware())
+
+	err := r.Run(host + ":" + port)
+	if err != nil {
+		//
+		panic(err)
+	}
+
+}
 
 func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 
@@ -51,20 +96,24 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			verify, err := validations.Verify(c)
+			dto, err := validations.Verify(c)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
-			user, err := models.NewMainManager().FindUserByMobileAndCodeVerify(verify)
-			if err != nil {
-				return nil, jwt.ErrFailedAuthentication
+			if dto.Password == "" {
+				user, err := models.NewMainManager().FindUserByMobileAndCodeVerify(dto)
+				if err != nil {
+					return nil, jwt.ErrFailedAuthentication
+				}
+				return user, nil
+
+			} else {
+				user, err := models.NewMainManager().FindUserByMobileAndPassword(dto)
+				if err != nil {
+					return nil, jwt.ErrFailedAuthentication
+				}
+				return user, nil
 			}
-			user.VerifyCode = ""
-			err = models.NewMainManager().UpdateUser(c, user)
-			if err != nil {
-				return nil, jwt.ErrFailedAuthentication
-			}
-			return user, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			//if v, ok := data.(*models.User); ok && v.Mobile == "09024809750" {
@@ -113,36 +162,6 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 	return authMiddleware
 }
 
-func Runner(host string, port string) {
-	r := gin.Default()
-	r.Use(Pongo2())
-	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		if err, ok := recovered.(string); ok {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s", err))
-		}
-		c.AbortWithStatus(http.StatusInternalServerError)
-	}))
-	r.Use(sentrygin.New(sentrygin.Options{
-		Repanic:         true,
-		WaitForDelivery: false,
-		Timeout:         5 * time.Second,
-	}))
-	r.Use(func(ctx *gin.Context) {
-		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-			hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
-		}
-		ctx.Next()
-	})
-
-	controllers.Routes(r, GetAuthMiddleware())
-
-	err := r.Run(host + ":" + port)
-	if err != nil {
-		sentry.CaptureException(err)
-		panic(err)
-	}
-
-}
 func Pongo2() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
@@ -157,7 +176,7 @@ func Pongo2() gin.HandlerFunc {
 		template := pongo2.Must(pongo2.FromFile(fmt.Sprintf("%s/%s", "../../templates", name)))
 		err := template.ExecuteWriter(convertContext(data), c.Writer)
 		if err != nil {
-			sentry.CaptureException(err)
+
 			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		}
 	}

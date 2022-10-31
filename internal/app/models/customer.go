@@ -64,6 +64,7 @@ func (m *MysqlManager) FindCustomerById(c *gin.Context, customerID uint64) (Cust
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "مشتری یافت نشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return customer, err
 	}
@@ -76,6 +77,7 @@ func (m *MysqlManager) FindCustomerByMobile(c *gin.Context, mobile string) (Cust
 		c.JSON(http.StatusOK, gin.H{
 			"message": "شماره موبایل تکراری یا اشتباه میباشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return customer, err
 	}
@@ -90,6 +92,7 @@ func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(c *gin.Context, mobile,
 		c.JSON(http.StatusOK, gin.H{
 			"message": "رمز عبور یا کد تایید اشتباه است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return customer, err
 	}
@@ -110,6 +113,7 @@ func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "مشکلی در ثبت نام شما پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -134,6 +138,7 @@ func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, dto DTOs.RequestCreate
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "مشکلی در ثبت نام شما پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -168,6 +173,7 @@ func (m *MysqlManager) UpdateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "مشکلی در ویرایش اطلاعات شما پیش آمده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return customer, err
 	}

@@ -67,6 +67,7 @@ func (m *MysqlManager) CreateAddress(c *gin.Context, dto DTOs.CreateAddress, use
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در ایجاد آدرس رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -80,6 +81,7 @@ func (m *MysqlManager) UpdateAddress(c *gin.Context, dto DTOs.UpdateAddress, add
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در بروزرسانی آدرس رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -121,6 +123,7 @@ func (m *MysqlManager) UpdateAddress(c *gin.Context, dto DTOs.UpdateAddress, add
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در بروزرسانی آدرس رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -134,6 +137,7 @@ func (m *MysqlManager) DeleteAddress(c *gin.Context, addressID, userID uint64) e
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در حذف آدرس رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -148,6 +152,7 @@ func (m *MysqlManager) DeleteAddress(c *gin.Context, addressID, userID uint64) e
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در حذف آدرس رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -160,7 +165,8 @@ func (m *MysqlManager) IndexAddress(c *gin.Context, userID uint64) ([]*Address, 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در دریافت آدرس ها رخ داده است",
-			"error":   err.Error(),
+						"error":   err.Error(),
+			"type":    "model",
 		})
 		return addresses, err
 	}

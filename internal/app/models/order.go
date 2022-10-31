@@ -65,6 +65,7 @@ func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (orderID uint64,
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت سفارش",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}
@@ -79,6 +80,7 @@ func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []st
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارشات",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return orders, err
 	}
@@ -91,6 +93,7 @@ func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, customerID uint64)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارشات",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return orders, err
 	}
@@ -103,6 +106,7 @@ func (m *MysqlManager) FindOrderByID(c *gin.Context, orderID uint64) (order Orde
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارش",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}
@@ -115,6 +119,7 @@ func (m *MysqlManager) UpdateOrder(c *gin.Context, order Order) (err error) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت سفارش",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}
@@ -127,6 +132,7 @@ func (m *MysqlManager) FindOrderWithItemByID(c *gin.Context, orderID uint64) (or
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در دریافت سفارش",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return
 	}

@@ -25,6 +25,7 @@ func RequestCreateLoginCustomer(c *gin.Context) (DTOs.RequestCreateLoginCustomer
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -64,6 +65,7 @@ func CreateUpdateCustomer(c *gin.Context) (DTOs.CreateUpdateCustomer, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")
@@ -96,6 +98,7 @@ func IndexOrderCustomer(c *gin.Context) (DTOs.IndexOrderCustomer, error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
 			"error":   err.Error(),
 		})
 		return dto, errors.New("validation error")

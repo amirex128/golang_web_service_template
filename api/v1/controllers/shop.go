@@ -15,13 +15,7 @@ func createShop(c *gin.Context) {
 		return
 	}
 	userID := utils.GetUser(c)
-	if dto.Logo != nil {
-		image, err := utils.UploadImage(c, dto.Logo, "shop/user_"+utils.Uint64ToString(userID))
-		if err != nil {
-			return
-		}
-		dto.LogoPath = image
-	}
+
 	err = models.NewMainManager().CreateShop(c, dto, userID)
 	if err != nil {
 		return
@@ -39,17 +33,6 @@ func updateShop(c *gin.Context) {
 	userID := utils.GetUser(c)
 	shopID := utils.StringToUint64(c.Param("id"))
 
-	if dto.Logo != nil {
-		image, err := utils.UploadImage(c, dto.Logo, "shop/user_"+utils.Uint64ToString(userID))
-		if err != nil {
-			return
-		}
-		dto.LogoPath = image
-	}
-	if dto.LogoRemove != "" {
-		utils.RemoveImages([]string{dto.LogoRemove})
-	}
-
 	err = models.NewMainManager().UpdateShop(c, dto, shopID, userID)
 	if err != nil {
 		return
@@ -63,6 +46,9 @@ func deleteShop(c *gin.Context) {
 	shopID := utils.StringToUint64(c.Param("id"))
 	userID := utils.GetUser(c)
 	dto, err := validations.DeleteShop(c)
+	if err != nil {
+		return
+	}
 	if dto.ProductBehave == "move" {
 		err = models.NewMainManager().MoveProducts(c, shopID, dto.NewShopID, userID)
 		if err != nil {
@@ -86,7 +72,8 @@ func deleteShop(c *gin.Context) {
 
 func indexShop(c *gin.Context) {
 	userID := utils.GetUser(c)
-	shops, err := models.NewMainManager().IndexShop(c, userID)
+	dto, err := validations.IndexShop(c)
+	shops, err := models.NewMainManager().GetAllShopWithPagination(c, dto, userID)
 	if err != nil {
 		return
 	}

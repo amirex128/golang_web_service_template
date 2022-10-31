@@ -30,12 +30,6 @@ func createProduct(c *gin.Context) {
 		return
 	}
 
-	images, err := utils.UploadMultiImage(c, dto.Images, "product/user_"+utils.Uint64ToString(userID))
-	if err != nil {
-		return
-	}
-
-	dto.ImagePath = images
 	err = models.NewMainManager().CreateProduct(c, dto, userID)
 	if err != nil {
 		return
@@ -59,17 +53,6 @@ func updateProduct(c *gin.Context) {
 	err = manager.CheckAccessProduct(c, dto.ID, userID)
 	if err != nil {
 		return
-	}
-
-	utils.RemoveImages(dto.ImageRemove)
-
-	if dto.Images != nil {
-		images, err := utils.UploadMultiImage(c, dto.Images, "product/user_"+utils.Uint64ToString(userID))
-		if err != nil {
-			return
-		}
-
-		dto.ImagePath = append(dto.ImagePath, images...)
 	}
 
 	err = manager.UpdateProduct(c, dto)

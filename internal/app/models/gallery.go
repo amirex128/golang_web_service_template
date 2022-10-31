@@ -2,18 +2,22 @@ package models
 
 import (
 	"encoding/gob"
+	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
 )
 
 type Gallery struct {
-	ID        int     `gorm:"primary_key;auto_increment" json:"id"`
-	ProductID int64   `json:"product_id"`
+	ID        uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Path      string  `json:"path"`
-	Caption   string  `json:"caption"`
-	Type      string  `json:"type"` // image video cover
+	UserID    uint64  `json:"user_id"`
+	OwnerID   uint64  `json:"owner_id"`
+	OwnerType string  `json:"owner_type "`
+	MimeType  string  `json:"mime_type"`
+	Size      float64 `json:"size"`
+	Width     uint32  `json:"width"`
+	Height    uint32  `json:"height"`
 	Sort      uint    `json:"sort"`
-	IsMain    byte    `json:"is_main"`
-	Product   Product `gorm:"foreignKey:product_id" json:"product"`
 }
 type GalleryArr []Gallery
 
@@ -36,4 +40,16 @@ func (c *Gallery) Decode(ir io.Reader) error {
 }
 func initGallery(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Gallery{})
+}
+
+func (m *MysqlManager) UploadImage(c *gin.Context, gallery *Gallery) (uint64, error) {
+	err := m.GetConn().Create(gallery).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در آپلود تصویر",
+			"error":   err.Error(),
+		})
+		return 0, err
+	}
+	return gallery.ID, nil
 }

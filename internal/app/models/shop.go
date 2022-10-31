@@ -5,6 +5,7 @@ import (
 	"backend/internal/app/utils"
 	"encoding/gob"
 	"github.com/gin-gonic/gin"
+	"github.com/gosimple/slug"
 	"io"
 	"net/http"
 )
@@ -12,7 +13,7 @@ import (
 type Shop struct {
 	ID            uint64     `gorm:"primary_key;auto_increment" json:"id"`
 	Name          string     `json:"name"`
-	Logo          string     `json:"logo"`
+	EnglishName   string     `json:"english_name"`
 	Type          string     `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
 	SocialAddress string     `json:"social_address"`
 	VerifySocial  bool       `json:"verify_social"`
@@ -31,6 +32,7 @@ type Shop struct {
 	Categories    []Category `gorm:"many2many:category_shops;" json:"categories"`
 	CreatedAt     string     `json:"created_at"`
 	UpdatedAt     string     `json:"updated_at"`
+	Galleries     []Gallery  `gorm:"polymorphic:Owner;"`
 }
 type ShopArr []Shop
 
@@ -53,16 +55,19 @@ func (c *Shop) Decode(ir io.Reader) error {
 }
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
-	manager.CreateShop(&gin.Context{}, DTOs.CreateShop{
-		Name:          "فروشگاه امیر",
-		Type:          "instagram",
-		SocialAddress: "amirex_dev",
-	}, 1)
+	for i := 0; i < 20; i++ {
+		manager.CreateShop(&gin.Context{}, DTOs.CreateShop{
+			Name:          "فروشگاه امیر",
+			Type:          "instagram",
+			EnglishName:   "instagram",
+			SocialAddress: "amirex_dev",
+		}, 1)
+	}
 }
 func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID uint64) error {
 	shop := &Shop{
 		Name:          dto.Name,
-		Logo:          dto.LogoPath,
+		EnglishName:   slug.MakeLang(dto.EnglishName, "en"),
 		Type:          dto.Type,
 		SocialAddress: dto.SocialAddress,
 		VerifySocial:  false,
@@ -84,6 +89,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در ایجاد فروشگاه رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -97,6 +103,7 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return nil, err
 	}
@@ -110,6 +117,7 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -122,8 +130,8 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 	if dto.Name != "" {
 		shop.Name = dto.Name
 	}
-	if dto.LogoPath != "" {
-		shop.Logo = dto.LogoPath
+	if dto.EnglishName != "" {
+		shop.EnglishName = slug.MakeLang(dto.EnglishName, "en")
 	}
 	if dto.Type != "" {
 		shop.Type = dto.Type
@@ -164,6 +172,7 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در ویرایش فروشگاه رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -177,6 +186,7 @@ func (m *MysqlManager) DeleteShop(c *gin.Context, shopID uint64, userID uint64) 
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
@@ -191,21 +201,31 @@ func (m *MysqlManager) DeleteShop(c *gin.Context, shopID uint64, userID uint64) 
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطایی در حذف فروشگاه رخ داده است",
 			"error":   err.Error(),
+			"type":    "model",
 		})
 		return err
 	}
 	return nil
 }
 
-func (m *MysqlManager) IndexShop(c *gin.Context, userID uint64) ([]*Shop, error) {
-	var res []*Shop
-	err := m.GetConn().Where("user_id = ?", userID).Find(&res).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در دریافت فروشگاه ها رخ داده است",
-			"error":   err.Error(),
-		})
-		return nil, err
+func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexShop, userID uint64) (*DTOs.Pagination, error) {
+	conn := m.GetConn()
+	var shops []Shop
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("shops", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
-	return res, nil
+	err := conn.Where("user_id = ?", userID).Find(&shops).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت فروشگاه ها",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return pagination, err
+	}
+	pagination.Data = shops
+	return pagination, nil
 }
