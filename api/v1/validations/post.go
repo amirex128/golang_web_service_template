@@ -17,7 +17,7 @@ func CreatePost(c *gin.Context) (DTOs.CreatePost, error) {
 		"Body": {
 			"required": "متن الزامی است",
 		},
-		"Thumbnail": {
+		"GalleryID": {
 			"required": "تصویر الزامی است",
 		},
 		"Slug": {

@@ -3,9 +3,7 @@ package models
 import (
 	"backend/internal/app/utils"
 	"database/sql"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type FeatureItem struct {
@@ -18,25 +16,6 @@ type FeatureItem struct {
 	Icon          sql.NullString `json:"icon"`
 	InputType     string         `json:"input_type" sql:"type:ENUM('number','text','float','all')"` //     => نوع ورودی های مجاز برای مقدار ویژگی ها
 	Sort          uint           `json:"sort"`
-}
-type FeatureItemArr []FeatureItem
-
-func (s FeatureItemArr) Len() int {
-	return len(s)
-}
-func (s FeatureItemArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s FeatureItemArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *FeatureItem) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *FeatureItem) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initFeatureItem(manager *MysqlManager) {

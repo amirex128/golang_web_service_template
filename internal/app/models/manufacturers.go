@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type Manufacturer struct {
@@ -14,25 +12,7 @@ type Manufacturer struct {
 	PersianName      string `json:"persian_name"`
 	EnglishName      string `json:"english_name"`
 }
-type ManufacturerArr []Manufacturer
 
-func (s ManufacturerArr) Len() int {
-	return len(s)
-}
-func (s ManufacturerArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ManufacturerArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Manufacturer) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Manufacturer) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initManufacturer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Manufacturer{})
 	manufacturer := utils.ReadCsvFile("../../csv/manufacturers.csv")

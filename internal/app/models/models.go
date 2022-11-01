@@ -17,6 +17,7 @@ func (r *MysqlManager) Initial() {
 	if !initCategory(manager) {
 		return
 	}
+	initGallery(manager)
 	initProvince(manager)
 	initCity(manager)
 	initUser(manager)
@@ -35,7 +36,6 @@ func (r *MysqlManager) Initial() {
 	initFeatureGroup(manager)
 	initFeatureItem(manager)
 	initFeatureItemValue(manager)
-	initGallery(manager)
 	initGuild(manager)
 	initManufacturer(manager)
 	initOption(manager)

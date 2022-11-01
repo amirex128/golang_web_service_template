@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -17,25 +15,7 @@ type OrderItem struct {
 	Count     uint32  `json:"count"`
 	OptionID  uint64  `json:"option_id"`
 }
-type OrderItemArr []OrderItem
 
-func (s OrderItemArr) Len() int {
-	return len(s)
-}
-func (s OrderItemArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s OrderItemArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *OrderItem) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *OrderItem) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initOrderItem(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&OrderItem{})
 }

@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type Guild struct {
@@ -19,25 +17,6 @@ type Guild struct {
 type GuildProduct struct {
 	GuildID   int   `json:"guild_id"`
 	ProductID int64 `json:"product_id"`
-}
-type GuildArr []Guild
-
-func (s GuildArr) Len() int {
-	return len(s)
-}
-func (s GuildArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s GuildArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Guild) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Guild) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initGuild(manager *MysqlManager) {

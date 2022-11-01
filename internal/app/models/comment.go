@@ -3,9 +3,7 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -18,28 +16,6 @@ type Comment struct {
 	Email     string `json:"email"`
 	Approve   byte   `json:"accept"`
 	CreatedAt string `json:"created_at"`
-}
-type CommentArr []Comment
-
-func (s CommentArr) Len() int {
-	return len(s)
-}
-func (s CommentArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s CommentArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Comment) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Comment) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
-func initComment(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Comment{})
 }
 
 func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (err error) {

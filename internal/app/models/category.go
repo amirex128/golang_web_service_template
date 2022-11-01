@@ -3,10 +3,8 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 )
 
@@ -26,26 +24,6 @@ type Category struct {
 type CategoryRelated struct {
 	CategoryID        uint32 `json:"category_id"`
 	CategoryRelatedID uint32 `json:"category_related_id"`
-}
-
-type CategoryArr []Category
-
-func (s CategoryArr) Len() int {
-	return len(s)
-}
-func (s CategoryArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s CategoryArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Category) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Category) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initCategory(manager *MysqlManager) bool {

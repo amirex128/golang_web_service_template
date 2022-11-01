@@ -3,11 +3,9 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -30,33 +28,14 @@ type Product struct {
 	StartedAt        string     `json:"started_at"`
 	EndedAt          string     `json:"ended_at"`
 	Categories       []Category `gorm:"many2many:category_product;" json:"categories"`
+	Galleries        []Gallery  `gorm:"many2many:gallery_product;" json:"galleries"`
 	DeliveryTime     uint32     `json:"delivery_time"` // مدت زمان ارسال
-	Galleries        []Gallery  `gorm:"polymorphic:Owner;"`
 }
 
 func (c Product) GetID() uint64 {
 	return c.ID
 }
 
-type ProductArr []Product
-
-func (s ProductArr) Len() int {
-	return len(s)
-}
-func (s ProductArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ProductArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Product) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Product) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 	for i := 0; i < 100; i++ {
@@ -77,6 +56,7 @@ func InitProduct(manager *MysqlManager) {
 			OptionId:         1,
 			OptionItemID:     1,
 			CategoryID:       1,
+			GalleryIDs:       []uint64{1},
 		}, 1)
 	}
 }
@@ -121,7 +101,21 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 		DeliveryTime:     dto.DeliveryTime,
 	}
 
+	var galleryIDs []Gallery
+	for i := range dto.GalleryIDs {
+		galleryIDs = append(galleryIDs, Gallery{ID: dto.GalleryIDs[i]})
+
+	}
 	err := m.GetConn().Create(&product).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"type":    "model",
+			"message": "خطا در ایجاد محصول",
+		})
+		return err
+	}
+	err = m.GetConn().Model(&product).Association("Galleries").Append(galleryIDs)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),

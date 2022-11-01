@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type FeatureItemValue struct {
@@ -12,25 +10,7 @@ type FeatureItemValue struct {
 	FeatureItemID int    `json:"feature_item_id"`
 	Value         string `json:"value"`
 }
-type FeatureItemValueArr []FeatureItemValue
 
-func (s FeatureItemValueArr) Len() int {
-	return len(s)
-}
-func (s FeatureItemValueArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s FeatureItemValueArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *FeatureItemValue) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *FeatureItemValue) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initFeatureItemValue(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItemValue{})
 	featureItemValues := utils.ReadCsvFile("../../csv/feature_item_values.csv")

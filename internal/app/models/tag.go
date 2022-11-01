@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 	"strconv"
 )
@@ -15,25 +13,7 @@ type Tag struct {
 	Slug  string `json:"slug"`
 	Posts []Post `gorm:"many2many:post_tag;" json:"posts"`
 }
-type TagArr []Tag
 
-func (s TagArr) Len() int {
-	return len(s)
-}
-func (s TagArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s TagArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Tag) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Tag) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initTag(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Tag{})
 	for i := 0; i < 100; i++ {

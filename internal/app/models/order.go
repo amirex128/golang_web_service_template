@@ -1,9 +1,7 @@
 package models
 
 import (
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -36,25 +34,6 @@ type Order struct {
 	CreatedAt                 string      `json:"created_at"`
 }
 
-type OrderArr []Order
-
-func (s OrderArr) Len() int {
-	return len(s)
-}
-func (s OrderArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s OrderArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Order) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Order) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }

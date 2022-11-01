@@ -33,14 +33,17 @@ func createGallery(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	size := float64(info.Size() / 1024)
+	if size > 1024 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "image size is too large", "message": "حجم تصویر بیشتر از 1 مگابایت است"})
+	}
 	gallery := &models.Gallery{
-		UserID:    userID,
-		OwnerID:   dto.OwnerID,
-		OwnerType: dto.OwnerType,
-		Size:      float64(info.Size() / 1024),
-		Path:      relativePath,
-		Width:     dto.Width,
-		Height:    dto.Height,
+		UserID:   userID,
+		Size:     size,
+		Path:     relativePath,
+		Width:    dto.Width,
+		Height:   dto.Height,
+		MimeType: "image/webp",
 	}
 	_, err = models.NewMainManager().UploadImage(c, gallery)
 	if err != nil {

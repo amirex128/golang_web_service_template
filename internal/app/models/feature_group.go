@@ -3,9 +3,7 @@ package models
 import (
 	"backend/internal/app/utils"
 	"database/sql"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type FeatureGroup struct {
@@ -15,26 +13,6 @@ type FeatureGroup struct {
 	Icon        sql.NullString `json:"icon"`
 	Sort        uint           `json:"sort"`
 	Description sql.NullString `json:"description"`
-}
-
-type FeatureGroupArr []FeatureGroup
-
-func (s FeatureGroupArr) Len() int {
-	return len(s)
-}
-func (s FeatureGroupArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s FeatureGroupArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *FeatureGroup) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *FeatureGroup) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initFeatureGroup(manager *MysqlManager) {

@@ -3,10 +3,8 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -27,30 +25,10 @@ type User struct {
 	Address       Address     `gorm:"foreignKey:user_id" json:"address"`
 	LastSendSMSAt string      `json:"last_send_sms_at"`
 	Password      string      `json:"password"`
+	GalleryID     uint64      `json:"gallery_id"`
+	Gallery       Gallery     `gorm:"foreignKey:gallery_id" json:"gallery"`
 	UpdatedAt     string      `json:"updated_at"`
 	CreatedAt     string      `json:"created_at"`
-}
-
-type UserArr []User
-
-func (s UserArr) Len() int {
-	return len(s)
-}
-
-func (s UserArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s UserArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *User) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *User) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initUser(manager *MysqlManager) {
@@ -69,6 +47,7 @@ func initUser(manager *MysqlManager) {
 		Shaba:      "",
 		IsAdmin:    1,
 		Financial:  nil,
+		GalleryID:  1,
 		UpdatedAt:  utils.NowTime(),
 		CreatedAt:  utils.NowTime(),
 	})

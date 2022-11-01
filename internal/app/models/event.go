@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 	"strconv"
 )
 
@@ -16,25 +14,6 @@ type Event struct {
 	EndedAt   string `json:"ended_at"`
 }
 
-type EventArr []Event
-
-func (s EventArr) Len() int {
-	return len(s)
-}
-func (s EventArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s EventArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Event) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Event) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initEvent(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Event{})
 	events := utils.ReadCsvFile("../../csv/events.csv")

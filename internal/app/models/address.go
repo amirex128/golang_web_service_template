@@ -2,9 +2,7 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -22,26 +20,6 @@ type Address struct {
 	FullName   string   `gorm:"not null" json:"full_name"`
 	Lat        string   `json:"lat"`
 	Long       string   `json:"long"`
-}
-
-type AddressArr []Address
-
-func (s AddressArr) Len() int {
-	return len(s)
-}
-func (s AddressArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s AddressArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Address) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Address) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initAddress(manager *MysqlManager) {
@@ -165,7 +143,7 @@ func (m *MysqlManager) IndexAddress(c *gin.Context, userID uint64) ([]*Address, 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در دریافت آدرس ها رخ داده است",
-						"error":   err.Error(),
+			"error":   err.Error(),
 			"type":    "model",
 		})
 		return addresses, err

@@ -3,9 +3,7 @@ package models
 import (
 	"backend/internal/app/utils"
 	"database/sql"
-	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"io"
 )
 
 type City struct {
@@ -18,25 +16,6 @@ type City struct {
 	Lng         sql.NullString `json:"lng"`
 }
 
-type CityArr []City
-
-func (s CityArr) Len() int {
-	return len(s)
-}
-func (s CityArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s CityArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *City) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *City) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initCity(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&City{})
 	cities := utils.ReadCsvFile("../../csv/cities.csv")

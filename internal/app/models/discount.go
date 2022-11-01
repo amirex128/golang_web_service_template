@@ -3,10 +3,8 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 	"strings"
 )
@@ -26,25 +24,6 @@ type Discount struct {
 	Status     byte    `json:"status"`
 	CreatedAt  string  `json:"created_at"`
 	UpdatedAt  string  `json:"updated_at"`
-}
-type DiscountArr []Discount
-
-func (s DiscountArr) Len() int {
-	return len(s)
-}
-func (s DiscountArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s DiscountArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Discount) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Discount) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
 }
 
 func initDiscount(manager *MysqlManager) {

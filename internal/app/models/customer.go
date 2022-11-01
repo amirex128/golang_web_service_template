@@ -3,10 +3,8 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"io"
 	"net/http"
 )
 
@@ -23,25 +21,7 @@ type Customer struct {
 	UpdatedAt     string `json:"updated_at"`
 	LastSendSMSAt string `json:"last_send_sms_at"`
 }
-type CustomerArr []Customer
 
-func (s CustomerArr) Len() int {
-	return len(s)
-}
-func (s CustomerArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s CustomerArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
-}
-
-func (c *Customer) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Customer) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initCustomer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Customer{})
 	manager.CreateCustomer(&gin.Context{}, DTOs.CreateUpdateCustomer{

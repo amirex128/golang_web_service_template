@@ -3,10 +3,8 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
-	"encoding/gob"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
-	"io"
 	"net/http"
 )
 
@@ -28,31 +26,14 @@ type Shop struct {
 	Website       string     `json:"website"`
 	Products      []Product  `gorm:"foreignKey:shop_id" json:"products"`
 	UserID        uint64     `json:"user_id"`
-	User          User       ` json:"user"`
+	User          User       `gorm:"foreignKey:user_id" json:"user"`
 	Categories    []Category `gorm:"many2many:category_shops;" json:"categories"`
 	CreatedAt     string     `json:"created_at"`
 	UpdatedAt     string     `json:"updated_at"`
-	Galleries     []Gallery  `gorm:"polymorphic:Owner;"`
-}
-type ShopArr []Shop
-
-func (s ShopArr) Len() int {
-	return len(s)
-}
-func (s ShopArr) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ShopArr) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
+	GalleryID     uint64     `json:"gallery_id"`
+	Gallery       Gallery    `json:"gallery"`
 }
 
-func (c *Shop) Encode(iw io.Writer) error {
-	return gob.NewEncoder(iw).Encode(c)
-}
-
-func (c *Shop) Decode(ir io.Reader) error {
-	return gob.NewDecoder(ir).Decode(c)
-}
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
 	for i := 0; i < 20; i++ {
@@ -61,6 +42,7 @@ func initShop(manager *MysqlManager) {
 			Type:          "instagram",
 			EnglishName:   "instagram",
 			SocialAddress: "amirex_dev",
+			GalleryID:     1,
 		}, 1)
 	}
 }
@@ -81,6 +63,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 		Email:         dto.Email,
 		Website:       dto.Website,
 		UserID:        userID,
+		GalleryID:     dto.GalleryID,
 		CreatedAt:     utils.NowTime(),
 		UpdatedAt:     utils.NowTime(),
 	}
@@ -98,7 +81,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 
 func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error) {
 	res := &Shop{}
-	err := m.GetConn().Where("id = ?", shopID).First(res).Error
+	err := m.GetConn().Where("id = ?", shopID).Preload("Gallery").First(res).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
@@ -147,6 +130,9 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 	}
 	if dto.Mobile != "" {
 		shop.Mobile = dto.Mobile
+	}
+	if dto.GalleryID != 0 {
+		shop.GalleryID = dto.GalleryID
 	}
 	if dto.TelegramID != "" {
 		shop.TelegramID = dto.TelegramID
@@ -217,7 +203,7 @@ func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexSh
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
-	err := conn.Where("user_id = ?", userID).Find(&shops).Error
+	err := conn.Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در دریافت فروشگاه ها",
