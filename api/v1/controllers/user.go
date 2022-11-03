@@ -15,7 +15,7 @@ func updateProfile(c *gin.Context) {
 	}
 
 	id := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	if userID == id {
 		c.JSON(http.StatusUnauthorized, gin.H{

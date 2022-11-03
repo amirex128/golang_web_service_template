@@ -23,7 +23,7 @@ func indexProduct(c *gin.Context) {
 }
 
 func createProduct(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	dto, err := validations.CreateProduct(c)
 	if err != nil {
@@ -42,7 +42,7 @@ func createProduct(c *gin.Context) {
 }
 
 func updateProduct(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	dto, err := validations.UpdateProduct(c)
 	if err != nil {
@@ -67,7 +67,7 @@ func updateProduct(c *gin.Context) {
 }
 
 func deleteProduct(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()

@@ -13,7 +13,7 @@ func createAddress(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	err = models.NewMainManager().CreateAddress(c, dto, userID)
 	if err != nil {
 		return
@@ -28,7 +28,7 @@ func updateAddress(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	addressID := utils.StringToUint64(c.Param("id"))
 	err = models.NewMainManager().UpdateAddress(c, dto, addressID, userID)
 	if err != nil {
@@ -40,7 +40,7 @@ func updateAddress(c *gin.Context) {
 }
 
 func deleteAddress(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	addressID := utils.StringToUint64(c.Param("id"))
 	err := models.NewMainManager().DeleteAddress(c, addressID, userID)
 	if err != nil {
@@ -52,7 +52,7 @@ func deleteAddress(c *gin.Context) {
 }
 
 func indexAddress(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	addresses, err := models.NewMainManager().IndexAddress(c, userID)
 	if err != nil {
 		return

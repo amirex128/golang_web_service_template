@@ -20,7 +20,7 @@ type User struct {
 	VerifyCode    string      `json:"verify_code"`
 	CartNumber    string      `json:"cart_number"`
 	Shaba         string      `json:"shaba"`
-	IsAdmin       byte        `json:"is_admin"`
+	IsAdmin       bool        `json:"is_admin"`
 	Financial     []Financial `gorm:"foreignKey:user_id" json:"financial"`
 	Address       Address     `gorm:"foreignKey:user_id" json:"address"`
 	LastSendSMSAt string      `json:"last_send_sms_at"`
@@ -45,7 +45,7 @@ func initUser(manager *MysqlManager) {
 		VerifyCode: "",
 		CartNumber: "",
 		Shaba:      "",
-		IsAdmin:    1,
+		IsAdmin:    true,
 		Financial:  nil,
 		GalleryID:  1,
 		UpdatedAt:  utils.NowTime(),
@@ -84,7 +84,7 @@ func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify) (*User, e
 }
 func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify) (*User, error) {
 	res := &User{}
-	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, utils.GeneratePasswordHash(user.Password)).First(res).Error
+	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, GeneratePasswordHash(user.Password)).First(res).Error
 	if err != nil {
 		return nil, err
 	}

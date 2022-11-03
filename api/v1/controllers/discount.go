@@ -75,7 +75,7 @@ func createDiscount(c *gin.Context) {
 		return
 	}
 
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	err = models.NewMainManager().CreateDiscount(c, dto, userID)
 
@@ -90,7 +90,7 @@ func updateDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	discountID := c.Param("id")
 
 	err = models.NewMainManager().UpdateDiscount(c, dto, userID, discountID)
@@ -107,7 +107,7 @@ func indexDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, dto, userID)
 	if err != nil {
@@ -120,7 +120,7 @@ func indexDiscount(c *gin.Context) {
 
 func deleteDiscount(c *gin.Context) {
 	id := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	err := models.NewMainManager().DeleteDiscount(c, id, userID)
 	if err != nil {
@@ -133,7 +133,7 @@ func deleteDiscount(c *gin.Context) {
 
 func showDiscount(c *gin.Context) {
 	id := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	discount, err := models.NewMainManager().FindDiscountById(c, id)
 	if err != nil {

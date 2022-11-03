@@ -1,4 +1,4 @@
-package utils
+package models
 
 import (
 	"backend/internal/pkg/framework/hash"
@@ -11,4 +11,14 @@ func GetUser(c *gin.Context) uint64 {
 }
 func GeneratePasswordHash(pass string) string {
 	return hash.Sha512EncodeSaltIter(pass, 2, "amirex128-selloora")
+}
+
+func IsAdmin(c *gin.Context) bool {
+	userID := GetUser(c)
+	user, err := NewMainManager().FindUserByID(c, userID)
+	if err != nil {
+		return false
+	}
+
+	return user.IsAdmin
 }

@@ -18,6 +18,18 @@ type Comment struct {
 	CreatedAt string `json:"created_at"`
 }
 
+func InitComment(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Comment{})
+	for i := 0; i < 10; i++ {
+		manager.CreateComment(&gin.Context{}, DTOs.CreateComment{
+			PostID: 1,
+			Title:  "test test test",
+			Body:   "test test test",
+			Email:  "test@test.com",
+		})
+	}
+}
+
 func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (err error) {
 	comment := Comment{
 		PostID:    dto.PostID,

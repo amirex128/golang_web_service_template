@@ -178,7 +178,7 @@ func sadadPaymentVerify(c *gin.Context) {
 
 func indexOrder(c *gin.Context) {
 	orderStatus := c.Query("order_status")
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {
@@ -217,7 +217,7 @@ func indexOrder(c *gin.Context) {
 
 func approveOrder(c *gin.Context) {
 	orderID := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	order, err := models.NewMainManager().FindOrderByID(c, orderID)
 	if err != nil {
 		return
@@ -240,7 +240,7 @@ func approveOrder(c *gin.Context) {
 
 func cancelOrder(c *gin.Context) {
 	orderID := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	order, err := models.NewMainManager().FindOrderByID(c, orderID)
 	if err != nil {
 		return
@@ -270,7 +270,7 @@ func sendOrder(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	if order.UserID != utils.GetUser(c) {
+	if order.UserID != models.GetUser(c) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه دسترسی به این سفارش را ندارید",
 		})

@@ -93,10 +93,10 @@ func changePassword(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	err = models.NewMainManager().UpdateUser(c, &models.User{
 		ID:       userID,
-		Password: utils.GeneratePasswordHash(dto.Password),
+		Password: models.GeneratePasswordHash(dto.Password),
 	})
 	if err != nil {
 		return

@@ -14,7 +14,7 @@ func createPost(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	dto.Slug = slug.MakeLang(dto.Slug, "en")
 	err = models.NewMainManager().CheckSlug(c, dto.Slug)
 	if err != nil {

@@ -14,7 +14,7 @@ func createShop(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	err = models.NewMainManager().CreateShop(c, dto, userID)
 	if err != nil {
@@ -30,7 +30,7 @@ func updateShop(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	shopID := utils.StringToUint64(c.Param("id"))
 
 	err = models.NewMainManager().UpdateShop(c, dto, shopID, userID)
@@ -44,7 +44,7 @@ func updateShop(c *gin.Context) {
 
 func deleteShop(c *gin.Context) {
 	shopID := utils.StringToUint64(c.Param("id"))
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	dto, err := validations.DeleteShop(c)
 	if err != nil {
 		return
@@ -71,7 +71,7 @@ func deleteShop(c *gin.Context) {
 }
 
 func indexShop(c *gin.Context) {
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	dto, err := validations.IndexShop(c)
 	shops, err := models.NewMainManager().GetAllShopWithPagination(c, dto, userID)
 	if err != nil {
@@ -87,7 +87,7 @@ func checkSocial(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 	// TODO بررسی وضعیت تایید شبکه اجتماعی
 	var resultCheck bool
 	resultCheck = true
@@ -113,7 +113,7 @@ func sendPrice(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := utils.GetUser(c)
+	userID := models.GetUser(c)
 
 	err = models.NewMainManager().UpdateShop(c, DTOs.UpdateShop{
 		SendPrice: dto.SendPrice,
