@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 )
@@ -48,4 +50,9 @@ func Uint64ToString(value uint64) string {
 
 func IntToString(value int) string {
 	return fmt.Sprintf("%d", value)
+}
+
+func GetMD5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }

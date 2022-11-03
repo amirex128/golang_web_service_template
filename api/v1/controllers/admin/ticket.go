@@ -1,4 +1,4 @@
-package controllers
+package admin
 
 import (
 	"backend/api/v1/validations"
@@ -22,7 +22,7 @@ func createTicket(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "تیکت شما با موفقیت ثبت شد و همکاران ما به زودی با شما تماس خواهد گرفت",
+		"message": "تیکت با موفقیت ثبت شد",
 	})
 }
 func indexTicket(c *gin.Context) {

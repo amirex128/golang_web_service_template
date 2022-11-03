@@ -10,7 +10,7 @@ import (
 func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
 	var dto DTOs.CreateAddress
 	tags := ValidationTags{
-		"Title": {
+		"Name": {
 			"required": "عنوان آدرس الزامی میباشد",
 		},
 		"ProvinceID": {
@@ -55,7 +55,7 @@ func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
 func UpdateAddress(c *gin.Context) (DTOs.UpdateAddress, error) {
 	var dto DTOs.UpdateAddress
 	tags := ValidationTags{
-		"Title": {
+		"Name": {
 			"required": "عنوان آدرس الزامی میباشد",
 		},
 		"ProvinceID": {

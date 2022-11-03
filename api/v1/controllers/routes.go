@@ -31,6 +31,9 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	v1.POST("/verify", authMiddleware.LoginHandler)
 	v1.POST("/login/register", registerLogin)
 
+	v1.POST("/user/ticket/create", createTicket)
+	v1.POST("user/comment/create", createComment)
+
 	user := v1.Group("user")
 	user.Use(authMiddleware.MiddlewareFunc())
 	{
@@ -38,7 +41,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			profile.POST("/update/:id", updateProfile)
 			profile.POST("/change-password", changePassword)
-
 		}
 		product := user.Group("product")
 		{
@@ -47,6 +49,11 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			product.POST("/create", createProduct)
 			product.POST("/update/:id", updateProduct)
 			product.POST("/delete/:id", deleteProduct)
+		}
+		ticket := user.Group("ticket")
+		{
+			ticket.GET("/list", indexTicket)
+			ticket.GET("/show/:id", showTicket)
 		}
 		gallery := user.Group("gallery")
 		{
@@ -60,14 +67,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			discount.POST("/update/:id", updateDiscount)
 			discount.POST("/delete/:id", deleteDiscount)
 		}
-		post := user.Group("post")
-		{
-			post.GET("/list", indexPost)
-			post.GET("/show/:id", showPost)
-			post.POST("/create", createPost)
-			post.POST("/update/:id", updatePost)
-			post.POST("/delete/:id", deletePost)
-		}
 		address := user.Group("address")
 		{
 			address.GET("/list", indexAddress)
@@ -78,20 +77,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		category := user.Group("category")
 		{
 			category.GET("/list", indexCategory)
-		}
-		comment := user.Group("comment")
-		{
-			comment.GET("/list", indexComment)
-			comment.POST("/create", createComment)
-			comment.POST("/delete/:id", deleteComment)
-			comment.POST("/approve/:id", approveComment)
-		}
-		tag := user.Group("tag")
-		{
-			tag.GET("/list", indexTag)
-			tag.POST("/create", createTag)
-			tag.POST("/delete/:id", deleteTag)
-			tag.POST("/add", addTag)
 		}
 		order := user.Group("order")
 		{
@@ -120,7 +105,82 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	admin := v1.Group("admin")
 	admin.Use(authMiddleware.MiddlewareFunc())
 	{
-
+		ticket := admin.Group("ticket")
+		{
+			ticket.POST("/create", createTicket)
+			ticket.GET("/list", indexTicket)
+			ticket.GET("/show/:id", showTicket)
+		}
+		product := admin.Group("product")
+		{
+			product.GET("/list", indexProduct)
+			product.GET("/show/:id", showProduct)
+			product.POST("/create", createProduct)
+			product.POST("/update/:id", updateProduct)
+			product.POST("/delete/:id", deleteProduct)
+		}
+		gallery := admin.Group("gallery")
+		{
+			gallery.POST("/create", createGallery)
+		}
+		discount := admin.Group("discount")
+		{
+			discount.GET("/list", indexDiscount)
+			discount.GET("/show/:id", showDiscount)
+			discount.POST("/create", createDiscount)
+			discount.POST("/update/:id", updateDiscount)
+			discount.POST("/delete/:id", deleteDiscount)
+		}
+		post := admin.Group("post")
+		{
+			post.GET("/list", indexPostAdmin)
+			post.GET("/show/:id", showPostAdmin)
+			post.POST("/create", createPostAdmin)
+			post.POST("/update/:id", updatePostAdmin)
+			post.POST("/delete/:id", deletePostAdmin)
+		}
+		address := admin.Group("address")
+		{
+			address.GET("/list", indexAddress)
+			address.POST("/create", createAddress)
+			address.POST("/update/:id", updateAddress)
+			address.POST("/delete/:id", deleteAddress)
+		}
+		category := admin.Group("category")
+		{
+			category.GET("/list", indexCategory)
+		}
+		comment := admin.Group("comment")
+		{
+			comment.GET("/list", indexCommentAdmin)
+			comment.POST("/delete/:id", deleteCommentAdmin)
+			comment.POST("/approve/:id", approveCommentAdmin)
+		}
+		tag := admin.Group("tag")
+		{
+			tag.GET("/list", indexTag)
+			tag.POST("/create", createTag)
+			tag.POST("/delete/:id", deleteTag)
+			tag.POST("/add", addTag)
+		}
+		order := admin.Group("order")
+		{
+			order.POST("/send", sendOrder)
+			order.GET("/list", indexOrder)
+			order.POST("/approve/:id", approveOrder)
+			order.POST("/cancel/:id", cancelOrder)
+			order.POST("/calculate", calculateSendPrice)
+			order.POST("/returned", returnedOrder)
+			order.POST("/returned/accept", acceptReturnedOrder)
+			order.GET("/show/:id", showOrder)
+			order.GET("/tracking/:id", trackingOrder)
+		}
+		shop := admin.Group("shop")
+		{
+			shop.GET("list", indexShop)
+			shop.POST("/update/:id", updateShop)
+			shop.POST("/delete/:id", deleteShop)
+		}
 	}
 
 	customer := v1.Group("customer")

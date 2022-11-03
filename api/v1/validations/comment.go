@@ -15,7 +15,7 @@ func CreateComment(c *gin.Context) (DTOs.CreateComment, error) {
 			"required": "شناسه پست الزامی میباشد",
 			"numeric":  "شناسه پست باید عددی باشد",
 		},
-		"Title": {
+		"Name": {
 			"required": "عنوان نظر الزامی میباشد",
 			"min":      "عنوان نظر باید حداقل 3 کاراکتر باشد",
 			"max":      "عنوان نظر باید حداکثر 255 کاراکتر باشد",

@@ -11,7 +11,7 @@ import (
 func CreatePost(c *gin.Context) (DTOs.CreatePost, error) {
 	var dto DTOs.CreatePost
 	tags := ValidationTags{
-		"Title": {
+		"Name": {
 			"required": "عنوان الزامی است",
 		},
 		"Body": {
@@ -47,7 +47,7 @@ func CreatePost(c *gin.Context) (DTOs.CreatePost, error) {
 func UpdatePost(c *gin.Context) (DTOs.UpdatePost, error) {
 	var dto DTOs.UpdatePost
 	tags := ValidationTags{
-		"Title": {
+		"Name": {
 			"required": "عنوان الزامی است",
 		},
 		"Body": {

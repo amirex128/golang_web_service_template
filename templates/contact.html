@@ -5,8 +5,32 @@
 {% block content %}
 
 {% include "components/header.html" with color="9" %}
-
-<!-- Start Page Title area-->
+{% block script %}
+<script>
+    const userAction = () => {
+        fetch('/api/v1/user/ticket/create', {
+            method: 'POST',
+            body: JSON.stringify({
+                guest_name: document.getElementById("guest_name").value,
+                guest_mobile: document.getElementById("guest_mobile").value,
+                title: document.getElementById("title").value,
+                body: document.getElementById("body").value,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => response.json())
+            .then(data => {
+                alert(data.message)
+                document.getElementById("guest_name").value = ""
+                document.getElementById("guest_mobile").value = ""
+                document.getElementById("title").value = ""
+                document.getElementById("body").value = ""
+            })
+    }
+</script>
+{% endblock %}
+<!-- Start Page Name area-->
 <div class="page-title-area">
     <div class="container">
         <div class="content text-center">
@@ -19,7 +43,7 @@
         </div>
     </div>
 </div>
-<!-- End Page Title area -->
+<!-- End Page Name area -->
 
 <!-- Start Contact Area -->
 <div id="contact" class="contact-area contact-6 pt-120 pb-90">
@@ -58,40 +82,56 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-6 mb-30">
-                <form id="contactForm">
+        <div class="section-title">
+            <h2 class="title">تماس با ما</h2>
+            <p class="">ما از هم صحبتی با شما خوشحال میشیم ، به ما پیام بده تا در اسرع وقت پاسخگوی شما باشیم
+                .</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <form id="contactForm" method="post" action="/api/v1/user/ticket/create"
+                      onsubmit="event.preventDefault(); userAction()">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-30">
-                                <input type="text" name="name" class="form-control" id="name" required data-error="لطفا نام خودتون رو وارد کنید" placeholder="نام شما *" />
+                                <input type="text" name="guest_name" class="form-control" id="guest_name" required
+                                       data-error="لطفا نام خودتون رو وارد کنید" placeholder="نام شما"/>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group mb-30">
-                                <input type="email" name="email" class="form-control" id="email" required data-error="لطفا پست الکترونیک خودتون رو وارد کنید" placeholder="پست الکترونیک شما *" />
+                                <input minlength="11" maxlength="11" type="number" name="guest_mobile"
+                                       class="form-control" id="guest_mobile" required
+                                       data-error="لطفا شمراه همراه خودتون رو وارد کنید" placeholder="شماره هماره"/>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="form-group mb-30">
-                                <textarea name="message" id="message" class="form-control" cols="30" rows="8" required data-error="لطفا پیام خودتون رو وارد کنید" placeholder="پیامی بنویس ..."></textarea>
+                                <input type="text" name="title" class="form-control" id="title" required
+                                       data-error="عنوان درخواست خود را وارد نمایید" placeholder="عنوان پیام"/>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-30">
+                                <textarea name="body" id="body" class="form-control" cols="30" rows="8" required
+                                          data-error="لطفا پیام خودتون رو وارد کنید"
+                                          placeholder="پیامی بنویس ..."></textarea>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" class="btn primary-btn primary-btn-5" title="ارسال پیام">ارسال</button>
+                            <button type="submit" class="btn primary-btn" title="ارسال پیام">ارسال</button>
                             <div id="msgSubmit"></div>
+
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="col-lg-6 mb-30">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d57015.866600733796!2d-80.1461976445511!3d26.72868216144084!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sWest%20Palm%20Beach%2C%204669%2C%20Travis!5e0!3m2!1sen!2sbd!4v1653371634659!5m2!1sen!2sbd" style="border:0;" allowfullscreen="" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </div>

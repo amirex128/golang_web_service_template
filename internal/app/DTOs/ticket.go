@@ -1,13 +1,13 @@
 package DTOs
 
 type CreateTicket struct {
-	ParentID    uint64 `json:"parent_id" validate:"omitempty"`
-	IsAnswer    bool   `json:"is_answer" validate:"omitempty"`
-	GuestName   string `json:"guest_name" validate:"omitempty"`
-	GuestMobile string `json:"guest_mobile" validate:"omitempty"`
-	Title       string `json:"title" validate:"required"`
-	Body        string `json:"body" validate:"required"`
-	GalleryID   uint64 `json:"gallery_id" validate:"omitempty"`
+	ParentID    uint64 `form:"parent_id" json:"parent_id" validate:"omitempty,numeric"`
+	IsAnswer    bool   `form:"is_answer" json:"is_answer" validate:"omitempty,boolean"`
+	GuestName   string `form:"guest_name" json:"guest_name" validate:"omitempty"`
+	GuestMobile string `form:"guest_mobile" json:"guest_mobile" validate:"omitempty"`
+	Title       string `form:"title" json:"title" validate:"required"`
+	Body        string `form:"body" json:"body" validate:"required"`
+	GalleryID   uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty,numeric"`
 }
 
 type IndexTicket struct {

@@ -11,7 +11,7 @@ import (
 func CreateTag(c *gin.Context) (DTOs.CreateTag, error) {
 	var dto DTOs.CreateTag
 	tags := ValidationTags{
-		"Title": {
+		"Name": {
 			"required": "عنوان الزامی است",
 			"min":      "عنوان باید حداقل 3 کاراکتر باشد",
 			"max":      "عنوان باید حداکثر 40 کاراکتر باشد",

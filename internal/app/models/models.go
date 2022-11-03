@@ -27,6 +27,7 @@ func (r *MysqlManager) Initial() {
 	initDiscount(manager)
 	InitPost(manager)
 	InitComment(manager)
+	InitTicket(manager)
 	initTag(manager)
 	initAddress(manager)
 	initOrder(manager)

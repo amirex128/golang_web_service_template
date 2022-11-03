@@ -246,9 +246,12 @@ func detailsLanding(c *gin.Context) {
 		lastPost[i].CreatedAt = utils.DateToJalaali(lastPost[i].CreatedAt)
 		lastPost[i].UpdatedAt = utils.DateToJalaali(lastPost[i].UpdatedAt)
 	}
-	comments, err := models.NewMainManager().GetAllComments(c)
+	comments, err := models.NewMainManager().GetAllComments(c, post.ID)
 	if err != nil {
 		return
+	}
+	for i := range comments {
+		comments[i].EmailHash = utils.GetMD5Hash(comments[i].Email)
 	}
 	c.Set("template", "blog-details.html")
 	c.Set("data", map[string]interface{}{

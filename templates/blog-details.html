@@ -5,8 +5,32 @@
 {% block content %}
 
 {% include "components/header.html" with color="9" %}
-
-<!-- Start Page Title area-->
+{% block script %}
+<script>
+    const sendComment = () => {
+        fetch('/api/v1/user/comment/create', {
+            method: 'POST',
+            body: JSON.stringify({
+                post_id: parseInt(document.getElementById("post_id").value),
+                name: document.getElementById("name").value,
+                body: document.getElementById("body").value,
+                email: document.getElementById("email").value,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => response.json())
+            .then(data => {
+                alert(data.message)
+                document.getElementById("name").value = ""
+                document.getElementById("body").value = ""
+                document.getElementById("email").value = ""
+                window.location.reload()
+            })
+    }
+</script>
+{% endblock %}
+<!-- Start Page Name area-->
 <div class="page-title-area">
     <div class="container">
         <div class="content text-center">
@@ -21,7 +45,7 @@
         </div>
     </div>
 </div>
-<!-- End Page Title area -->
+<!-- End Page Name area -->
 
 <!-- Start Blog Details Area -->
 <div class="blog-details-area pt-120 pb-90">
@@ -86,63 +110,22 @@
                     <div class="comment-box mb-50">
                         <span class="h2 d-block mb-20">نظرات</span>
                         <ol class="comment-list">
+                            {% for comment in comments %}
                             <li class="comment">
                                 <div class="comment-body">
                                     <div class="comment-author">
                                         <div class="lazy-container aspect-ratio aspect-ratio-1-1">
-                                            <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                                 data-src="/assets/images/blog/author-1.jpg" alt="image"/>
+                                            <img class="lazyload lazy-image" src="https://www.gravatar.com/avatar/{{comment.EmailHash}}"
+                                                 data-src="https://www.gravatar.com/avatar/{{comment.EmailHash}}" alt="image"/>
                                         </div>
                                     </div>
                                     <div class="comment-content">
-                                        <h4 class="name">آیدا حمتی</h4>
-                                        <p>
-                                            مقاله جالب و قابل تاملی بود ! واقعا دنیای مجازی باعث شده خیلی کمتر با هم
-                                            دیگه ارتباط و معاشرت داشته باشیم متاسفانه .
-                                        </p>
-                                        <a href="404-error" class="btn-reply"><i class="fas fa-reply-all"></i>پاسخ</a>
+                                        <h4 class="name">{{comment.Name}}</h4>
+                                        <p>{{comment.Body}}</p>
                                     </div>
                                 </div>
                             </li>
-                            <li class="comment">
-                                <div class="comment-body">
-                                    <div class="comment-author">
-                                        <div class="lazy-container aspect-ratio aspect-ratio-1-1">
-                                            <img class="lazyload lazy-image" src="/assets/images/placeholder.png"
-                                                 data-src="/assets/images/blog/author-2.jpg" alt="image"/>
-                                        </div>
-                                    </div>
-                                    <div class="comment-content">
-                                        <h4 class="name">دانیال مروی</h4>
-                                        <p>
-                                            یک از مهارت های مهمی که لازم داریم و حتما باید در موردش آموزش ببینیم !
-                                            ممنونم از اطلاعات مفید و کاربردیتون .
-                                        </p>
-                                        <a href="404-error" class="btn-reply"><i class="fas fa-reply-all"></i>پاسخ</a>
-                                    </div>
-                                </div>
-                                <ol class="children">
-                                    <li class="comment">
-                                        <div class="comment-body">
-                                            <div class="comment-author">
-                                                <div class="lazy-container aspect-ratio aspect-ratio-1-1">
-                                                    <img class="lazyload lazy-image"
-                                                         src="/assets/images/placeholder.png"
-                                                         data-src="/assets/images/blog/author-3.jpg" alt="image"/>
-                                                </div>
-                                            </div>
-                                            <div class="comment-content">
-                                                <h4 class="name">مهیار حقی</h4>
-                                                <p>
-                                                    از نظر شما ممنونم ، لطفا از پست های دیگر سایت هم دیدن کنید . با تشکر
-                                                    از شما
-                                                </p>
-                                                <a href="404-error" class="btn-reply"><i class="fas fa-reply-all"></i>پاسخ</a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ol>
-                            </li>
+                            {% endfor %}
                         </ol>
                     </div>
                     <div class="comment-reply mb-30">
@@ -152,17 +135,18 @@
                             فیلدهای الزامی علامت گذاری شده اند
                             <span class="required">*</span>
                         </p>
-                        <form id="commentForm" class="comment-form">
+                        <form id="commentForm" class="comment-form" method="post" onsubmit="event.preventDefault();sendComment()" action="/api/v1/user/comment/create">
+                            <input type="hidden" name="post_id" id="post_id" value="{{post.ID}}">
                             <div class="form-group mb-20">
-                                <input type="text" class="form-control" name="name" placeholder=" نام * "
+                                <input type="text" class="form-control" name="name" id="name" placeholder=" نام * "
                                        required="required"/>
                             </div>
                             <div class="form-group mb-20">
-                                <input type="email" class="form-control" name="email" placeholder=" پست الکترونیک * "
+                                <input type="email" class="form-control" name="email" id="email" placeholder=" پست الکترونیک * "
                                        required="required"/>
                             </div>
                             <div class="form-group mb-30">
-                                <textarea name="message" class="form-control" placeholder="نظر شما" required="required"
+                                <textarea name="body" id="body" class="form-control" placeholder="نظر شما" required="required"
                                           rows="6"></textarea>
                             </div>
                             <button type="submit" class="btn primary-btn primary-btn-5">

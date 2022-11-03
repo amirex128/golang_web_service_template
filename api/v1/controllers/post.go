@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func createPost(c *gin.Context) {
+func createPostAdmin(c *gin.Context) {
 	dto, err := validations.CreatePost(c)
 	if err != nil {
 		return
@@ -30,7 +30,7 @@ func createPost(c *gin.Context) {
 	})
 }
 
-func updatePost(c *gin.Context) {
+func updatePostAdmin(c *gin.Context) {
 	dto, err := validations.UpdatePost(c)
 	if err != nil {
 		return
@@ -50,7 +50,7 @@ func updatePost(c *gin.Context) {
 	})
 }
 
-func showPost(c *gin.Context) {
+func showPostAdmin(c *gin.Context) {
 	postID := c.Param("id")
 	post, err := models.NewMainManager().FindPostByID(c, utils.StringToUint64(postID))
 	if err != nil {
@@ -61,7 +61,7 @@ func showPost(c *gin.Context) {
 	})
 }
 
-func indexPost(c *gin.Context) {
+func indexPostAdmin(c *gin.Context) {
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
@@ -76,7 +76,7 @@ func indexPost(c *gin.Context) {
 
 }
 
-func deletePost(c *gin.Context) {
+func deletePostAdmin(c *gin.Context) {
 	postID := c.Param("id")
 	err := models.NewMainManager().DeletePost(c, utils.StringToUint64(postID))
 	if err != nil {

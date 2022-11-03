@@ -12,49 +12,65 @@ type Ticket struct {
 	ID          uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	ParentID    uint64  `gorm:"default:0" json:"parent_id"`
 	IsAnswer    bool    `gorm:"default:false" json:"is_answer"`
-	UserID      uint64  `gorm:"default:0" json:"user_id"`
-	User        User    `json:"user"`
+	UserID      *uint64 `gorm:"default:null" json:"user_id"`
+	User        User    `gorm:"foreignKey:user_id" json:"user"`
 	GuestName   string  `json:"guest_name"`
 	GuestMobile string  `json:"guest_mobile"`
 	Title       string  `json:"title"`
 	Body        string  `json:"body"`
-	GalleryID   uint64  `json:"gallery_id"`
-	Gallery     Gallery `json:"gallery"`
+	GalleryID   *uint64 `gorm:"default:null" json:"gallery_id"`
+	Gallery     Gallery `gorm:"foreignKey:gallery_id" json:"gallery"`
 	CreatedAt   string  `json:"created_at"`
+}
+
+func InitTicket(manager *MysqlManager) {
+	manager.GetConn().AutoMigrate(&Ticket{})
 }
 
 func (m *MysqlManager) CreateTicket(c *gin.Context, dto DTOs.CreateTicket, userID uint64) error {
 	var parentTicket Ticket
-	err := m.GetConn().Update("is_answer", true).Where("id = ?", dto.ParentID).First(&parentTicket).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت تیکت ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
-	}
-	if parentTicket.UserID != userID && IsAdmin(c) == false {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت تیکت ها",
-			"error":   "شما اجازه ارسال پاسخ به این تیکت را ندارید",
-			"type":    "model",
-		})
-		return err
+	if dto.ParentID != 0 {
+		err := m.GetConn().Model(&parentTicket).Where("id = ?", dto.ParentID).Update("is_answer", true).First(&parentTicket).Error
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "خطا در دریافت تیکت ها",
+				"error":   err.Error(),
+				"type":    "model",
+			})
+			return err
+		}
+		if *parentTicket.UserID != userID && IsAdmin(c) == false {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "خطا در دریافت تیکت ها",
+				"error":   "شما اجازه ارسال پاسخ به این تیکت را ندارید",
+				"type":    "model",
+			})
+			return err
+		}
 	}
 
 	ticket := Ticket{
-		UserID:      userID,
+		UserID: func() *uint64 {
+			if userID == 0 {
+				return nil
+			}
+			return &userID
+		}(),
 		ParentID:    dto.ParentID,
 		IsAnswer:    dto.IsAnswer,
 		GuestName:   dto.GuestName,
 		GuestMobile: dto.GuestMobile,
 		Title:       dto.Title,
 		Body:        dto.Body,
-		GalleryID:   dto.GalleryID,
-		CreatedAt:   utils.NowTime(),
+		GalleryID: func() *uint64 {
+			if dto.GalleryID == 0 {
+				return nil
+			}
+			return &dto.GalleryID
+		}(),
+		CreatedAt: utils.NowTime(),
 	}
-	err = m.GetConn().Create(&ticket).Error
+	err := m.GetConn().Create(&ticket).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در ثبت تیکت",

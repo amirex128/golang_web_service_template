@@ -18,11 +18,11 @@ func createComment(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "دیدگاه با موفقیت ایجاد شد",
+		"message": "نظر شما با موفقیت ثبت شد و پس از تایید مدیر نمایش داده خواهد شد",
 	})
 }
 
-func approveComment(c *gin.Context) {
+func approveCommentAdmin(c *gin.Context) {
 	id := c.Param("id")
 	err := models.NewMainManager().ApproveComment(c, utils.StringToUint64(id))
 	if err != nil {
@@ -33,7 +33,7 @@ func approveComment(c *gin.Context) {
 	})
 }
 
-func deleteComment(c *gin.Context) {
+func deleteCommentAdmin(c *gin.Context) {
 	id := c.Param("id")
 	err := models.NewMainManager().DeleteComment(c, utils.StringToUint64(id))
 	if err != nil {
@@ -44,7 +44,7 @@ func deleteComment(c *gin.Context) {
 	})
 }
 
-func indexComment(c *gin.Context) {
+func indexCommentAdmin(c *gin.Context) {
 	dto, err := validations.IndexComment(c)
 	if err != nil {
 		return

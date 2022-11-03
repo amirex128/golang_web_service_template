@@ -7,7 +7,20 @@ import (
 )
 
 func GetUser(c *gin.Context) uint64 {
-	return uint64(jwt.ExtractClaims(c)["id"].(float64))
+	var userID uint64
+	defer func() {
+		if r := recover(); r != nil {
+			userID = 0
+		}
+	}()
+	userIDString := jwt.ExtractClaims(c)["id"]
+	if userIDString != "" && userIDString != nil {
+		userID = uint64(userIDString.(float64))
+	} else {
+		userID = 0
+	}
+
+	return userID
 }
 func GeneratePasswordHash(pass string) string {
 	return hash.Sha512EncodeSaltIter(pass, 2, "amirex128-selloora")

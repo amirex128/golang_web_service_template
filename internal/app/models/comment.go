@@ -11,10 +11,11 @@ type Comment struct {
 	ID        uint64 `gorm:"primary_key;auto_increment" json:"id"`
 	PostID    uint64 `json:"post_id"`
 	Post      Post   `gorm:"foreignKey:post_id" json:"post"`
-	Title     string `json:"title"`
+	Name      string `json:"title"`
+	EmailHash string `gorm:"-:all" json:"email_hash"`
 	Body      string `json:"body"`
 	Email     string `json:"email"`
-	Approve   byte   `json:"accept"`
+	Approve   bool   `json:"accept"`
 	CreatedAt string `json:"created_at"`
 }
 
@@ -23,7 +24,7 @@ func InitComment(manager *MysqlManager) {
 	for i := 0; i < 10; i++ {
 		manager.CreateComment(&gin.Context{}, DTOs.CreateComment{
 			PostID: 1,
-			Title:  "test test test",
+			Name:   "test test test",
 			Body:   "test test test",
 			Email:  "test@test.com",
 		})
@@ -33,7 +34,7 @@ func InitComment(manager *MysqlManager) {
 func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (err error) {
 	comment := Comment{
 		PostID:    dto.PostID,
-		Title:     dto.Title,
+		Name:      dto.Name,
 		Body:      dto.Body,
 		Email:     dto.Email,
 		CreatedAt: utils.NowTime(),
@@ -71,8 +72,9 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 	pagination.Data = comments
 	return pagination, nil
 }
-func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []*Comment, err error) {
-	err = m.GetConn().Order("id DESC").Find(&comments).Error
+
+func (m *MysqlManager) GetAllComments(c *gin.Context, postID uint64) (comments []*Comment, err error) {
+	err = m.GetConn().Where("post_id = ?", postID).Where("approve = ?", true).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در یافتن دیدگاه ها",
@@ -84,6 +86,7 @@ func (m *MysqlManager) GetAllComments(c *gin.Context) (comments []*Comment, err 
 	return comments, nil
 
 }
+
 func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
 	conn := m.GetConn()
 	err = conn.Where("id = ?", id).Delete(&Comment{}).Error
@@ -100,7 +103,7 @@ func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
 
 func (m *MysqlManager) ApproveComment(c *gin.Context, id uint64) (err error) {
 	conn := m.GetConn()
-	err = conn.Model(&Comment{}).Where("id = ?", id).Update("approve", 1).Error
+	err = conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در تایید دیدگاه",
