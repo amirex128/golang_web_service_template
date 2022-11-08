@@ -70,6 +70,18 @@ func deleteShop(c *gin.Context) {
 	})
 }
 
+func showShop(c *gin.Context) {
+	shopID := utils.StringToUint64(c.Param("id"))
+	userID := models.GetUser(c)
+	shop, err := models.NewMainManager().FindShopByID(c, shopID, userID)
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"shop": shop,
+	})
+}
+
 func indexShop(c *gin.Context) {
 	userID := models.GetUser(c)
 	dto, err := validations.IndexShop(c)

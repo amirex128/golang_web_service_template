@@ -23,7 +23,7 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	shop, err := models.NewMainManager().FindShopByID(c, dto.ShopID)
+	shop, err := models.NewMainManager().FindShopByID(c, dto.ShopID, 0)
 	if err != nil {
 		return
 	}

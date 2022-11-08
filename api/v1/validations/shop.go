@@ -16,9 +16,6 @@ func CreateShop(c *gin.Context) (DTOs.CreateShop, error) {
 		"EnglishName": {
 			"required": "نام فروشگاه را وارد کنید",
 		},
-		"GalleryID": {
-			"required": "نام فروشگاه را وارد کنید",
-		},
 		"Type": {
 			"required": "نوع فروشگاه را وارد کنید",
 		},

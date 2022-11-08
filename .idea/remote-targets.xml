@@ -15,6 +15,19 @@
           </config>
         </ContributedStateBase>
       </target>
+      <target name="WSL - Ubuntu" type="wsl" uuid="6d835e03-69cc-4b6e-b473-e96ee0d1c440">
+        <config>
+          <option name="distributionMsId" value="Ubuntu" />
+          <option name="projectRootOnTarget" value="/mnt/c/Program Files/JetBrains/GoLand 2022.2.4/jbr/bin&#10;/backend" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/home/amirex128/go" />
+            <option name="goRoot" value="/usr/local/go/bin/go" />
+            <option name="goVersion" value="go1.19.3 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
     </targets>
   </component>
 </project>

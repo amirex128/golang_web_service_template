@@ -14,8 +14,8 @@ type Post struct {
 	Title      string     `json:"title"`
 	Body       string     `json:"body"`
 	Slug       string     `json:"slug"`
-	GalleryID  uint64     `json:"gallery_id"`
-	Gallery    Gallery    `gorm:"foreignKey:gallery_id" json:"gallery"`
+	GalleryID  *uint64    `gorm:"default:null" json:"gallery_id"`
+	Gallery    *Gallery   `gorm:"foreignKey:gallery_id" json:"gallery"`
 	UserID     uint64     `json:"user_id"`
 	User       User       `gorm:"foreignKey:user_id" json:"user"`
 	Categories []Category `gorm:"many2many:category_post;" json:"categories"`
@@ -51,10 +51,15 @@ func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
 
 func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID uint64) (err error) {
 	post := Post{
-		Title:     dto.Title,
-		Body:      dto.Body,
-		Slug:      dto.Slug,
-		GalleryID: dto.GalleryID,
+		Title: dto.Title,
+		Body:  dto.Body,
+		Slug:  dto.Slug,
+		GalleryID: func() *uint64 {
+			if dto.GalleryID != 0 {
+				return &dto.GalleryID
+			}
+			return nil
+		}(),
 		UserID:    userID,
 		CreatedAt: utils.NowTime(),
 		UpdatedAt: utils.NowTime(),
@@ -91,7 +96,7 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 		post.Slug = dto.Slug
 	}
 	if dto.GalleryID != 0 {
-		post.GalleryID = dto.GalleryID
+		post.GalleryID = &dto.GalleryID
 	}
 	post.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(&post).Error

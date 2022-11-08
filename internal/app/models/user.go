@@ -25,8 +25,8 @@ type User struct {
 	Address       Address     `gorm:"foreignKey:user_id" json:"address"`
 	LastSendSMSAt string      `json:"last_send_sms_at"`
 	Password      string      `json:"password"`
-	GalleryID     uint64      `json:"gallery_id"`
-	Gallery       Gallery     `gorm:"foreignKey:gallery_id" json:"gallery"`
+	GalleryID     *uint64     `gorm:"default:null" json:"gallery_id"`
+	Gallery       *Gallery    `gorm:"foreignKey:gallery_id" json:"gallery"`
 	UpdatedAt     string      `json:"updated_at"`
 	CreatedAt     string      `json:"created_at"`
 }
@@ -47,7 +47,7 @@ func initUser(manager *MysqlManager) {
 		Shaba:      "",
 		IsAdmin:    true,
 		Financial:  nil,
-		GalleryID:  1,
+		GalleryID:  nil,
 		UpdatedAt:  utils.NowTime(),
 		CreatedAt:  utils.NowTime(),
 	})
@@ -153,6 +153,9 @@ func (m *MysqlManager) UpdateUser(c *gin.Context, user *User) error {
 	}
 	if user.Shaba != "" {
 		newUser.Shaba = user.Shaba
+	}
+	if *user.GalleryID != 0 {
+		newUser.GalleryID = user.GalleryID
 	}
 	if user.LastSendSMSAt != "" {
 		newUser.LastSendSMSAt = user.LastSendSMSAt

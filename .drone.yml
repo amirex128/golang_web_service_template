@@ -1,0 +1,42 @@
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+
+  arch: amd64
+
+clone:
+  retries: 3
+
+trigger:
+  branch:
+    - master
+
+steps:
+  - name: backend
+    image: golang:1.19.3-alpine
+    when:
+      branch:
+        - master
+    environment:
+      GOOS: linux
+      GOARCH: amd64
+      HAMYARSALE_MYSQL_MAIN_DB: selloora
+      HAMYARSALE_MYSQL_MAIN_HOST: localhost
+      HAMYARSALE_MYSQL_MAIN_PASSWORD: a6766581
+      HAMYARSALE_MYSQL_MAIN_PORT: 3306
+      HAMYARSALE_MYSQL_MAIN_USER: root
+      HAMYARSALE_REDIS_DB: 1
+      HAMYARSALE_REDIS_HOST: localhost
+      HAMYARSALE_REDIS_PORT: 6379
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8585
+    commands:
+      - go mod download
+      - go mod tidy
+      - go mod vendor
+      - go build ./cmd/...
+
+

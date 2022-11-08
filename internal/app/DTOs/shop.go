@@ -3,8 +3,8 @@ package DTOs
 type CreateShop struct {
 	Name          string  `form:"name" json:"name" validate:"required"`
 	EnglishName   string  `form:"english_name" json:"english_name" validate:"required"`
-	GalleryID     uint64  `form:"gallery_id" json:"gallery_id" validate:"required"`
-	Type          string  `form:"type" json:"type" validate:"required,oneof=instagram telegram"`
+	GalleryID     uint64  `form:"gallery_id" json:"gallery_id" validate:"omitempty"`
+	Type          string  `form:"type" json:"type" validate:"required,oneof=instagram telegram website rubika"`
 	SocialAddress string  `form:"social_address" json:"social_address" validate:"required"`
 	Description   string  `form:"description" json:"description" validate:"omitempty"`
 	Phone         string  `form:"phone" json:"phone" validate:"omitempty"`
@@ -21,7 +21,7 @@ type UpdateShop struct {
 	Name          string  `form:"name" json:"name" validate:"omitempty"`
 	EnglishName   string  `form:"english_name" json:"english_name" validate:"omitempty"`
 	GalleryID     uint64  `form:"gallery_id" json:"gallery_id" validate:"omitempty"`
-	Type          string  `form:"type" json:"type" validate:"omitempty,oneof=instagram telegram"`
+	Type          string  `form:"type" json:"type" validate:"omitempty,oneof=instagram telegram website rubika"`
 	SocialAddress string  `form:"social_address" json:"social_address" validate:"omitempty"`
 	Description   string  `form:"description" json:"description" validate:"omitempty"`
 	Phone         string  `form:"phone" json:"phone" validate:"omitempty"`

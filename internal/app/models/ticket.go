@@ -9,18 +9,18 @@ import (
 
 // تیکتی که پرنت ایدی ان صفر باشد به عنوان تیکت اصلی نمایش داده میشود و بعد از باز کردن آن تمامی تیکت های که پرنت ایدی ان را داشته باشند بر اساس تاریخ مرتب میشوند
 type Ticket struct {
-	ID          uint64  `gorm:"primary_key;auto_increment" json:"id"`
-	ParentID    uint64  `gorm:"default:0" json:"parent_id"`
-	IsAnswer    bool    `gorm:"default:false" json:"is_answer"`
-	UserID      *uint64 `gorm:"default:null" json:"user_id"`
-	User        User    `gorm:"foreignKey:user_id" json:"user"`
-	GuestName   string  `json:"guest_name"`
-	GuestMobile string  `json:"guest_mobile"`
-	Title       string  `json:"title"`
-	Body        string  `json:"body"`
-	GalleryID   *uint64 `gorm:"default:null" json:"gallery_id"`
-	Gallery     Gallery `gorm:"foreignKey:gallery_id" json:"gallery"`
-	CreatedAt   string  `json:"created_at"`
+	ID          uint64   `gorm:"primary_key;auto_increment" json:"id"`
+	ParentID    uint64   `gorm:"default:0" json:"parent_id"`
+	IsAnswer    bool     `gorm:"default:false" json:"is_answer"`
+	UserID      *uint64  `gorm:"default:null" json:"user_id"`
+	User        User     `gorm:"foreignKey:user_id" json:"user"`
+	GuestName   string   `json:"guest_name"`
+	GuestMobile string   `json:"guest_mobile"`
+	Title       string   `json:"title"`
+	Body        string   `json:"body"`
+	GalleryID   *uint64  `gorm:"default:null" json:"gallery_id"`
+	Gallery     *Gallery `gorm:"foreignKey:gallery_id" json:"gallery"`
+	CreatedAt   string   `json:"created_at"`
 }
 
 func InitTicket(manager *MysqlManager) {

@@ -3,6 +3,7 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"net/http"
@@ -30,8 +31,8 @@ type Shop struct {
 	Categories    []Category `gorm:"many2many:category_shops;" json:"categories"`
 	CreatedAt     string     `json:"created_at"`
 	UpdatedAt     string     `json:"updated_at"`
-	GalleryID     uint64     `json:"gallery_id"`
-	Gallery       Gallery    `json:"gallery"`
+	GalleryID     *uint64    `gorm:"default:null" json:"gallery_id"`
+	Gallery       *Gallery   `gorm:"foreignKey:gallery_id" json:"gallery"`
 }
 
 func initShop(manager *MysqlManager) {
@@ -63,9 +64,14 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 		Email:         dto.Email,
 		Website:       dto.Website,
 		UserID:        userID,
-		GalleryID:     dto.GalleryID,
-		CreatedAt:     utils.NowTime(),
-		UpdatedAt:     utils.NowTime(),
+		GalleryID: func() *uint64 {
+			if dto.GalleryID == 0 {
+				return nil
+			}
+			return &dto.GalleryID
+		}(),
+		CreatedAt: utils.NowTime(),
+		UpdatedAt: utils.NowTime(),
 	}
 	err := m.GetConn().Create(shop).Error
 	if err != nil {
@@ -79,7 +85,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 	return nil
 }
 
-func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error) {
+func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64, userID uint64) (*Shop, error) {
 	res := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).Preload("Gallery").First(res).Error
 	if err != nil {
@@ -87,6 +93,14 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64) (*Shop, error
 			"message": "فروشگاه یافت نشد",
 			"error":   err.Error(),
 			"type":    "model",
+		})
+		return nil, err
+	}
+	if res.UserID != userID && userID != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",
+			"error":   errors.New("شما اجازه دسترسی به این فروشگاه را ندارید"),
+			"type":    "permission",
 		})
 		return nil, err
 	}
@@ -132,7 +146,7 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 		shop.Mobile = dto.Mobile
 	}
 	if dto.GalleryID != 0 {
-		shop.GalleryID = dto.GalleryID
+		shop.GalleryID = &dto.GalleryID
 	}
 	if dto.TelegramID != "" {
 		shop.TelegramID = dto.TelegramID

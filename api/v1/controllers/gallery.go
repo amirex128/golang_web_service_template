@@ -55,6 +55,31 @@ func createGallery(c *gin.Context) {
 	})
 }
 
+func deleteGallery(c *gin.Context) {
+	galleryID := c.Param("id")
+	userID := models.GetUser(c)
+	gallery, err := models.NewMainManager().FindGalleryByID(c, utils.StringToUint64(galleryID), userID)
+	if err != nil {
+		return
+	}
+	abs, _ := filepath.Abs("../../")
+	path := filepath.Join(abs, gallery.Path)
+	if err := os.Remove(path); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در حذف تصویر",
+			"error":   err.Error(),
+		})
+		return
+	}
+	err = models.NewMainManager().DeleteGallery(c, utils.StringToUint64(galleryID))
+	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "تصویر با موفقیت حذف شد",
+	})
+}
+
 func createDirectory(c *gin.Context, userID uint64) (string, string, error) {
 	abs, _ := filepath.Abs("../../assets")
 	galleryAddress := "gallery/user_" + utils.Uint64ToString(userID)

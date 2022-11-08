@@ -58,6 +58,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		gallery := user.Group("gallery")
 		{
 			gallery.POST("/create", createGallery)
+			gallery.POST("/delete/:id", deleteGallery)
 		}
 		discount := user.Group("discount")
 		{
@@ -95,6 +96,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			shop.GET("list", indexShop)
 			shop.POST("/create", createShop)
 			shop.POST("/update/:id", updateShop)
+			shop.GET("/show/:id", showShop)
 			shop.POST("/delete/:id", deleteShop)
 			shop.POST("/check", checkSocial)
 			shop.POST("/send-price", sendPrice)
@@ -122,6 +124,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		gallery := admin.Group("gallery")
 		{
 			gallery.POST("/create", createGallery)
+			gallery.POST("/delete/:id", deleteGallery)
 		}
 		discount := admin.Group("discount")
 		{
