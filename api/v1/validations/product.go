@@ -34,6 +34,8 @@ func IndexProduct(c *gin.Context) (DTOs.IndexProduct, error) {
 	if err != nil {
 		return dto, err
 	}
+	dto.ShopID = utils.StringToUint64(c.Query("shop_id"))
+	dto.WithoutPagination = c.Query("without_pagination") == "true"
 	dto.Page = utils.StringToUint32(c.Query("page"))
 	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
 	dto.Search = c.Query("search")

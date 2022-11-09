@@ -83,12 +83,23 @@ func showShop(c *gin.Context) {
 }
 
 func indexShop(c *gin.Context) {
-	userID := models.GetUser(c)
 	dto, err := validations.IndexShop(c)
-	shops, err := models.NewMainManager().GetAllShopWithPagination(c, dto, userID)
 	if err != nil {
 		return
 	}
+	var shops interface{}
+	if dto.WithoutPagination {
+		shops, err = models.NewMainManager().GetAllShop(c)
+		if err != nil {
+			return
+		}
+	} else {
+		shops, err = models.NewMainManager().GetAllShopWithPagination(c, dto)
+		if err != nil {
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"shops": shops,
 	})

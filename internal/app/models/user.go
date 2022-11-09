@@ -154,7 +154,7 @@ func (m *MysqlManager) UpdateUser(c *gin.Context, user *User) error {
 	if user.Shaba != "" {
 		newUser.Shaba = user.Shaba
 	}
-	if *user.GalleryID != 0 {
+	if user.GalleryID != nil && *(user.GalleryID) != 0 {
 		newUser.GalleryID = user.GalleryID
 	}
 	if user.LastSendSMSAt != "" {

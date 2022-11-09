@@ -208,9 +208,10 @@ func (m *MysqlManager) DeleteShop(c *gin.Context, shopID uint64, userID uint64) 
 	return nil
 }
 
-func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexShop, userID uint64) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexShop) (*DTOs.Pagination, error) {
 	conn := m.GetConn()
 	var shops []Shop
+	userID := GetUser(c)
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
 	conn = conn.Scopes(DTOs.Paginate("shops", pagination, conn))
@@ -228,4 +229,19 @@ func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexSh
 	}
 	pagination.Data = shops
 	return pagination, nil
+}
+
+func (m *MysqlManager) GetAllShop(c *gin.Context) ([]Shop, error) {
+	userID := GetUser(c)
+	var shops []Shop
+	err := m.GetConn().Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت فروشگاه ها",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return shops, err
+	}
+	return shops, nil
 }

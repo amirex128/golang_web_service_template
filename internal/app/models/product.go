@@ -70,7 +70,7 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
 	}
-	err := conn.Find(&products).Error
+	err := conn.Where("shop_id=?", dto.ShopID).Find(&products).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در دریافت محصولات",
@@ -82,7 +82,20 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 	pagination.Data = products
 	return pagination, nil
 }
-
+func (m *MysqlManager) GetAllProduct(c *gin.Context, shopID uint64) ([]Product, error) {
+	userID := GetUser(c)
+	var products []Product
+	err := m.GetConn().Where("user_id = ?", userID).Where("shop_id=?", shopID).Find(&products).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت محصولات",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return products, err
+	}
+	return products, nil
+}
 func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, userID uint64) error {
 
 	var product = Product{

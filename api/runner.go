@@ -38,18 +38,6 @@ func Runner(host string, port string) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
 
-	//r.Use(sentrygin.New(sentrygin.Options{
-	//	Repanic:         true,
-	//	WaitForDelivery: false,
-	//	Timeout:         5 * time.Second,
-	//}))
-	//r.Use(func(ctx *gin.Context) {
-	//	if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-	//		hub.Scope().SetTag("someRandomTag", "maybeYouNeedIt")
-	//	}
-	//	ctx.Next()
-	//})
-
 	controllers.Routes(r, GetAuthMiddleware())
 
 	err := r.Run(host + ":" + port)

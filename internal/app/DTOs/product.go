@@ -2,6 +2,7 @@ package DTOs
 
 type IndexProduct struct {
 	Index
+	ShopID uint64 `form:"shop_id" json:"shop_id"`
 }
 
 type CreateProduct struct {

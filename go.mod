@@ -8,7 +8,6 @@ require (
 	github.com/chai2010/webp v1.1.1
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3
 	github.com/fsnotify/fsnotify v1.5.4
-	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0

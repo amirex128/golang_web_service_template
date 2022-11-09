@@ -9,16 +9,25 @@ import (
 )
 
 func indexProduct(c *gin.Context) {
-
 	dto, err := validations.IndexProduct(c)
 	if err != nil {
 		return
 	}
-	products, err := models.NewMainManager().GetAllProductWithPagination(c, dto)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "خطا در دریافت اطلاعات"})
+	var products interface{}
+	if dto.WithoutPagination {
+		products, err = models.NewMainManager().GetAllProduct(c, dto.ShopID)
+		if err != nil {
+			return
+		}
+	} else {
+		products, err = models.NewMainManager().GetAllProductWithPagination(c, dto)
+		if err != nil {
+			return
+		}
 	}
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, gin.H{
+		"products": products,
+	})
 	return
 }
 
@@ -95,6 +104,8 @@ func showProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, product)
+	c.JSON(http.StatusOK, gin.H{
+		"product": product,
+	})
 	return
 }
