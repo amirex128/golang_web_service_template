@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -13,7 +13,7 @@ const (
 	siteName = " | سلورا دستیار فروش اینستاگرام شما"
 )
 
-func indexLanding(c *gin.Context) {
+func IndexLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "indexLanding", "request")
 	defer span.End()
 	c.Set("template", "index.html")
@@ -22,7 +22,7 @@ func indexLanding(c *gin.Context) {
 	})
 }
 
-func blogLanding(c *gin.Context) {
+func BlogLanding(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "blogLanding", "request")
 	defer span.End()
 	dto, err := validations.IndexPost(c)
@@ -79,7 +79,7 @@ func blogLanding(c *gin.Context) {
 	})
 }
 
-func categoryLanding(c *gin.Context) {
+func CategoryLanding(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "categoryLanding", "request")
 	defer span.End()
 	dto, err := validations.IndexPost(c)
@@ -142,7 +142,7 @@ func categoryLanding(c *gin.Context) {
 	})
 }
 
-func tagLanding(c *gin.Context) {
+func TagLanding(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "tagLanding", "request")
 	defer span.End()
 	dto, err := validations.IndexPost(c)
@@ -205,7 +205,7 @@ func tagLanding(c *gin.Context) {
 	})
 }
 
-func detailsLanding(c *gin.Context) {
+func DetailsLanding(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "detailsLanding", "request")
 	defer span.End()
 	slug := c.Param("slug")
@@ -276,7 +276,7 @@ func detailsLanding(c *gin.Context) {
 	})
 }
 
-func contactLanding(c *gin.Context) {
+func ContactLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "contactLanding", "request")
 	defer span.End()
 	c.Set("template", "contact.html")
@@ -285,7 +285,7 @@ func contactLanding(c *gin.Context) {
 	})
 }
 
-func faqLanding(c *gin.Context) {
+func FaqLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "faqLanding", "request")
 	defer span.End()
 	c.Set("template", "faq.html")
@@ -294,7 +294,7 @@ func faqLanding(c *gin.Context) {
 	})
 }
 
-func pricingLanding(c *gin.Context) {
+func PricingLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "pricingLanding", "request")
 	defer span.End()
 	c.Set("template", "pricing.html")
@@ -303,7 +303,7 @@ func pricingLanding(c *gin.Context) {
 	})
 }
 
-func servicesLanding(c *gin.Context) {
+func ServicesLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "servicesLanding", "request")
 	defer span.End()
 	c.Set("template", "services.html")
@@ -312,7 +312,7 @@ func servicesLanding(c *gin.Context) {
 	})
 }
 
-func testimonialLanding(c *gin.Context) {
+func TestimonialLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "testimonialLanding", "request")
 	defer span.End()
 	c.Set("template", "testimonial.html")
@@ -321,7 +321,7 @@ func testimonialLanding(c *gin.Context) {
 	})
 }
 
-func learnLanding(c *gin.Context) {
+func LearnLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "learnLanding", "request")
 	defer span.End()
 	c.Set("template", "learn.html")
@@ -330,7 +330,7 @@ func learnLanding(c *gin.Context) {
 	})
 }
 
-func rulesLanding(c *gin.Context) {
+func RulesLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "rulesLanding", "request")
 	defer span.End()
 	c.Set("template", "rules.html")
@@ -339,7 +339,7 @@ func rulesLanding(c *gin.Context) {
 	})
 }
 
-func returnRulesLanding(c *gin.Context) {
+func ReturnRulesLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "returnRulesLanding", "request")
 	defer span.End()
 	c.Set("template", "return-rules.html")

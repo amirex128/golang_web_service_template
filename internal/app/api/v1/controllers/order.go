@@ -1,22 +1,22 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/DTOs"
 	"backend/internal/app/constants"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	validations2 "backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 	"strings"
 )
 
-// createOrder ثبت یک سفارش جدید
-func createOrder(c *gin.Context) {
+// CreateOrder ثبت یک سفارش جدید
+func CreateOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createOrder", "request")
 	defer span.End()
-	dto, err := validations.CreateOrder(c)
+	dto, err := validations2.CreateOrder(c)
 	if err != nil {
 		return
 	}
@@ -162,7 +162,7 @@ func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
 	return productIDs
 }
 
-func sadadPaymentVerify(c *gin.Context) {
+func SadadPaymentVerify(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "sadadPaymentVerify", "request")
 	defer span.End()
 	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
@@ -181,7 +181,7 @@ func sadadPaymentVerify(c *gin.Context) {
 	//}
 }
 
-func indexOrder(c *gin.Context) {
+func IndexOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexOrder", "request")
 	defer span.End()
 	orderStatus := c.Query("order_status")
@@ -222,7 +222,7 @@ func indexOrder(c *gin.Context) {
 
 }
 
-func approveOrder(c *gin.Context) {
+func ApproveOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "approveOrder", "request")
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
@@ -247,7 +247,7 @@ func approveOrder(c *gin.Context) {
 	}
 }
 
-func cancelOrder(c *gin.Context) {
+func CancelOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "cancelOrder", "request")
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
@@ -272,10 +272,10 @@ func cancelOrder(c *gin.Context) {
 	}
 }
 
-func sendOrder(c *gin.Context) {
+func SendOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "sendOrder", "request")
 	defer span.End()
-	dto, err := validations.SendOrder(c)
+	dto, err := validations2.SendOrder(c)
 	if err != nil {
 		return
 	}
@@ -311,10 +311,10 @@ func sendOrder(c *gin.Context) {
 	})
 }
 
-func calculateSendPrice(c *gin.Context) {
+func CalculateSendPrice(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "calculateSendPrice", "request")
 	defer span.End()
-	dto, err := validations.CalculateOrder(c)
+	dto, err := validations2.CalculateOrder(c)
 	if err != nil {
 		return
 	}
@@ -326,21 +326,21 @@ func calculateSendPrice(c *gin.Context) {
 	})
 }
 
-func returnedOrder(c *gin.Context) {
+func ReturnedOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "returnedOrder", "request")
 	defer span.End()
 	//TODO
 
 }
 
-func acceptReturnedOrder(c *gin.Context) {
+func AcceptReturnedOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "acceptReturnedOrder", "request")
 	defer span.End()
 	//TODO
 
 }
 
-func showOrder(c *gin.Context) {
+func ShowOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showOrder", "request")
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
@@ -353,17 +353,17 @@ func showOrder(c *gin.Context) {
 	})
 }
 
-func trackingOrder(c *gin.Context) {
+func TrackingOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "trackingOrder", "request")
 	defer span.End()
 	trackingCode := c.Param("id")
 	utils.TrackingOrder(trackingCode)
 }
 
-func indexCustomerOrders(c *gin.Context) {
+func IndexCustomerOrders(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexCustomerOrders", "request")
 	defer span.End()
-	dto, err := validations.IndexOrderCustomer(c)
+	dto, err := validations2.IndexOrderCustomer(c)
 	if err != nil {
 		return
 	}

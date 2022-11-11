@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createComment(c *gin.Context) {
+func CreateComment(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createComment", "request")
 	defer span.End()
 	dto, err := validations.CreateComment(c)
@@ -25,7 +25,7 @@ func createComment(c *gin.Context) {
 	})
 }
 
-func approveCommentAdmin(c *gin.Context) {
+func ApproveCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "approveCommentAdmin", "request")
 	defer span.End()
 	id := c.Param("id")
@@ -38,7 +38,7 @@ func approveCommentAdmin(c *gin.Context) {
 	})
 }
 
-func deleteCommentAdmin(c *gin.Context) {
+func DeleteCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCommentAdmin", "request")
 	defer span.End()
 	id := c.Param("id")
@@ -51,7 +51,7 @@ func deleteCommentAdmin(c *gin.Context) {
 	})
 }
 
-func indexCommentAdmin(c *gin.Context) {
+func IndexCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexCommentAdmin", "request")
 	defer span.End()
 	dto, err := validations.IndexComment(c)

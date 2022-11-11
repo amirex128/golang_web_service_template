@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"errors"
 	"github.com/chai2010/webp"
 	"github.com/gin-gonic/gin"
@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-func createGallery(c *gin.Context) {
+func CreateGallery(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createGallery", "request")
 	defer span.End()
 	dto, err := validations.CreateGallery(c)
@@ -58,7 +58,7 @@ func createGallery(c *gin.Context) {
 	})
 }
 
-func deleteGallery(c *gin.Context) {
+func DeleteGallery(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteGallery", "request")
 	defer span.End()
 	galleryID := c.Param("id")

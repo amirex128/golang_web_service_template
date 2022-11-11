@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"fmt"
 	"github.com/Squwid/go-randomizer"
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func requestCreateLoginCustomer(c *gin.Context) {
+func RequestCreateLoginCustomer(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "requestCreateLoginCustomer", "request")
 	defer span.End()
 	dto, err := validations.RequestCreateLoginCustomer(c)
@@ -64,7 +64,7 @@ func requestCreateLoginCustomer(c *gin.Context) {
 	return
 }
 
-func verifyCreateLoginCustomer(c *gin.Context) {
+func VerifyCreateLoginCustomer(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "verifyCreateLoginCustomer", "request")
 	defer span.End()
 	dto, err := validations.CreateUpdateCustomer(c)

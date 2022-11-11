@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func indexCategory(c *gin.Context) {
+func IndexCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexCategory", "request")
 	defer span.End()
 	dto, err := validations.IndexCategory(c)
@@ -26,7 +26,7 @@ func indexCategory(c *gin.Context) {
 
 }
 
-func createCategory(c *gin.Context) {
+func CreateCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createCategory", "request")
 	defer span.End()
 	dto, err := validations.CreateCategory(c)
@@ -42,7 +42,7 @@ func createCategory(c *gin.Context) {
 	})
 }
 
-func updateCategory(c *gin.Context) {
+func UpdateCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateCategory", "request")
 	defer span.End()
 	dto, err := validations.UpdateCategory(c)
@@ -58,7 +58,7 @@ func updateCategory(c *gin.Context) {
 	})
 }
 
-func deleteCategory(c *gin.Context) {
+func DeleteCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCategory", "request")
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))

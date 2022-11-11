@@ -135,7 +135,7 @@
                             فیلدهای الزامی علامت گذاری شده اند
                             <span class="required">*</span>
                         </p>
-                        <form id="commentForm" class="comment-form" method="post" onsubmit="event.preventDefault();sendComment()" action="/api/v1/user/comment/create">
+                        <form id="commentForm" class="comment-form" method="post" onsubmit="event.preventDefault();sendComment()" action="/internal/app/api/v1/user/comment/create">
                             <input type="hidden" name="post_id" id="post_id" value="{{post.ID}}">
                             <div class="form-group mb-20">
                                 <input type="text" class="form-control" name="name" id="name" placeholder=" نام * "

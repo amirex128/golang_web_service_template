@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createTag(c *gin.Context) {
+func CreateTag(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createTag", "request")
 	defer span.End()
 	dto, err := validations.CreateTag(c)
@@ -26,7 +26,7 @@ func createTag(c *gin.Context) {
 
 }
 
-func indexTag(c *gin.Context) {
+func IndexTag(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexTag", "request")
 	defer span.End()
 	dto, err := validations.IndexTag(c)
@@ -42,7 +42,7 @@ func indexTag(c *gin.Context) {
 	})
 }
 
-func deleteTag(c *gin.Context) {
+func DeleteTag(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteTag", "request")
 	defer span.End()
 	id := c.Param("id")
@@ -55,7 +55,7 @@ func deleteTag(c *gin.Context) {
 	})
 }
 
-func addTag(c *gin.Context) {
+func AddTag(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "addTag", "request")
 	defer span.End()
 	dto, err := validations.AddTag(c)

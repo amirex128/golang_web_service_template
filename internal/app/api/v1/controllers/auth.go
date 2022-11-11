@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"fmt"
 	"github.com/Squwid/go-randomizer"
 	"github.com/gin-gonic/gin"
@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func registerLogin(c *gin.Context) {
+func RegisterLogin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
 	defer span.End()
 	dto, err := validations.RequestLoginRegister(c)
@@ -91,7 +91,7 @@ func registerLogin(c *gin.Context) {
 	})
 }
 
-func changePassword(c *gin.Context) {
+func ChangePassword(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "changePassword", "request")
 	defer span.End()
 	dto, err := validations.ChangePassword(c)

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/api"
+	"backend/internal/app/api"
 	"backend/internal/pkg/framework/bredis"
 	"backend/internal/pkg/framework/config"
 	"backend/internal/pkg/framework/container"

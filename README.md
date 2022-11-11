@@ -90,7 +90,7 @@ Note that since [`1.13`](https://golang.org/doc/go1.13#modules) Go also enabled 
 
 OpenAPI/Swagger specs, JSON schema files, protocol definition files.
 
-See the [`/api`](api/README.md) directory for examples.
+See the [`/api`](internal/app/api/README.md) directory for examples.
 
 ## Web Application Directories
 

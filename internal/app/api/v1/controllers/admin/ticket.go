@@ -1,16 +1,16 @@
-package controllers
+package admin
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
+func createTicketAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createTicketAdmin", "request")
 	defer span.End()
 	dto, err := validations.CreateTicket(c)
 	if err != nil {
@@ -25,11 +25,11 @@ func createTicket(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "تیکت شما با موفقیت ثبت شد و همکاران ما به زودی با شما تماس خواهد گرفت",
+		"message": "تیکت با موفقیت ثبت شد",
 	})
 }
-func indexTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicket", "request")
+func indexTicketAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicketAdmin", "request")
 	defer span.End()
 	userID := models.GetUser(c)
 	dto, err := validations.IndexTicket(c)
@@ -42,8 +42,8 @@ func indexTicket(c *gin.Context) {
 	})
 }
 
-func showTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showTicket", "request")
+func showTicketAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showTicketAdmin", "request")
 	defer span.End()
 	ticketID := utils.StringToUint64(c.Param("ticketID"))
 	ticket, err := models.NewMainManager().GetTicketWithChildren(c, ctx, ticketID)

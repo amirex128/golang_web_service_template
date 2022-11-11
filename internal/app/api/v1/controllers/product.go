@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func indexProduct(c *gin.Context) {
+func IndexProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexProduct", "request")
 	defer span.End()
 	dto, err := validations.IndexProduct(c)
@@ -34,7 +34,7 @@ func indexProduct(c *gin.Context) {
 	return
 }
 
-func createProduct(c *gin.Context) {
+func CreateProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createProduct", "request")
 	defer span.End()
 	userID := models.GetUser(c)
@@ -55,7 +55,7 @@ func createProduct(c *gin.Context) {
 	return
 }
 
-func updateProduct(c *gin.Context) {
+func UpdateProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateProduct", "request")
 	defer span.End()
 	userID := models.GetUser(c)
@@ -82,7 +82,7 @@ func updateProduct(c *gin.Context) {
 	return
 }
 
-func deleteProduct(c *gin.Context) {
+func DeleteProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteProduct", "request")
 	defer span.End()
 	userID := models.GetUser(c)
@@ -104,7 +104,7 @@ func deleteProduct(c *gin.Context) {
 	return
 }
 
-func showProduct(c *gin.Context) {
+func ShowProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showProduct", "request")
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))

@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createAddress(c *gin.Context) {
+func CreateAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createAddress", "request")
 	defer span.End()
 	dto, err := validations.CreateAddress(c)
@@ -26,7 +26,7 @@ func createAddress(c *gin.Context) {
 	})
 }
 
-func updateAddress(c *gin.Context) {
+func UpdateAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateAddress", "request")
 	defer span.End()
 	dto, err := validations.UpdateAddress(c)
@@ -44,7 +44,7 @@ func updateAddress(c *gin.Context) {
 	})
 }
 
-func deleteAddress(c *gin.Context) {
+func DeleteAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteAddress", "request")
 	defer span.End()
 	userID := models.GetUser(c)
@@ -58,7 +58,7 @@ func deleteAddress(c *gin.Context) {
 	})
 }
 
-func indexAddress(c *gin.Context) {
+func IndexAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexAddress", "request")
 	defer span.End()
 	userID := models.GetUser(c)

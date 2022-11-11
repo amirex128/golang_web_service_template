@@ -1,9 +1,8 @@
 package api
 
 import (
-	"backend/api/v1/controllers"
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
+	"backend/internal/app/validations"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/flosch/pongo2"
@@ -36,7 +35,7 @@ func Runner(host string, port string) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
 
-	controllers.Routes(r, GetAuthMiddleware())
+	Routes(r, GetAuthMiddleware())
 
 	err := r.Run(host + ":" + port)
 	if err != nil {

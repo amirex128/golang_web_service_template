@@ -81,6 +81,7 @@ func (m *MysqlManager) CreatePost(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	return
 }
+
 func (m *MysqlManager) UpdatePost(c *gin.Context, ctx context.Context, dto DTOs.UpdatePost, postID uint64) (err error) {
 	span, ctx := apm.StartSpan(ctx, "UpdatePost", "model")
 	defer span.End()
@@ -148,6 +149,7 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, ctx context.Context, postID 
 	}
 	return
 }
+
 func (m *MysqlManager) FindPostBySlug(slug string, ctx context.Context) (Post, error) {
 	span, ctx := apm.StartSpan(ctx, "FindPostBySlug", "model")
 	defer span.End()
@@ -197,6 +199,7 @@ func (m *MysqlManager) RandomPost(c *gin.Context, ctx context.Context, count int
 	}
 	return posts, nil
 }
+
 func (m *MysqlManager) GetLastPost(c *gin.Context, ctx context.Context, count int) (posts []Post, err error) {
 	span, ctx := apm.StartSpan(ctx, "GetLastPost", "model")
 	defer span.End()

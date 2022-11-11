@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createShop(c *gin.Context) {
+func CreateShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createShop", "request")
 	defer span.End()
 	dto, err := validations.CreateShop(c)
@@ -28,7 +28,7 @@ func createShop(c *gin.Context) {
 	})
 }
 
-func updateShop(c *gin.Context) {
+func UpdateShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateShop", "request")
 	defer span.End()
 	dto, err := validations.UpdateShop(c)
@@ -47,7 +47,7 @@ func updateShop(c *gin.Context) {
 	})
 }
 
-func deleteShop(c *gin.Context) {
+func DeleteShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteShop", "request")
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
@@ -77,7 +77,7 @@ func deleteShop(c *gin.Context) {
 	})
 }
 
-func showShop(c *gin.Context) {
+func ShowShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showShop", "request")
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
@@ -91,7 +91,7 @@ func showShop(c *gin.Context) {
 	})
 }
 
-func indexShop(c *gin.Context) {
+func IndexShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexShop", "request")
 	defer span.End()
 	dto, err := validations.IndexShop(c)
@@ -116,7 +116,7 @@ func indexShop(c *gin.Context) {
 	})
 }
 
-func checkSocial(c *gin.Context) {
+func CheckSocial(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "checkSocial", "request")
 	defer span.End()
 	dto, err := validations.CheckSocial(c)
@@ -144,7 +144,7 @@ func checkSocial(c *gin.Context) {
 	})
 }
 
-func sendPrice(c *gin.Context) {
+func SendPrice(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "sendPrice", "request")
 	defer span.End()
 	dto, err := validations.SendPrice(c)
@@ -164,7 +164,7 @@ func sendPrice(c *gin.Context) {
 	})
 }
 
-func getInstagramPost(c *gin.Context) {
+func GetInstagramPost(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "getInstagramPost", "request")
 	defer span.End()
 

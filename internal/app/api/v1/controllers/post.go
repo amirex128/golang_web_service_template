@@ -1,17 +1,17 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func createPostAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createPostAdmin", "request")
+func CreatePost(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createPost", "request")
 	defer span.End()
 	dto, err := validations.CreatePost(c)
 	if err != nil {
@@ -33,8 +33,8 @@ func createPostAdmin(c *gin.Context) {
 	})
 }
 
-func updatePostAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updatePostAdmin", "request")
+func UpdatePost(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "updatePost", "request")
 	defer span.End()
 	dto, err := validations.UpdatePost(c)
 	if err != nil {
@@ -55,8 +55,8 @@ func updatePostAdmin(c *gin.Context) {
 	})
 }
 
-func showPostAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showPostAdmin", "request")
+func ShowPost(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showPost", "request")
 	defer span.End()
 	postID := c.Param("id")
 	post, err := models.NewMainManager().FindPostByID(c, ctx, utils.StringToUint64(postID))
@@ -68,8 +68,8 @@ func showPostAdmin(c *gin.Context) {
 	})
 }
 
-func indexPostAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexPostAdmin", "request")
+func IndexPost(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexPost", "request")
 	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
@@ -85,8 +85,8 @@ func indexPostAdmin(c *gin.Context) {
 
 }
 
-func deletePostAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deletePostAdmin", "request")
+func DeletePost(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deletePost", "request")
 	defer span.End()
 	postID := c.Param("id")
 	err := models.NewMainManager().DeletePost(c, ctx, utils.StringToUint64(postID))

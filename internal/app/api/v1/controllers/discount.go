@@ -1,17 +1,17 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/DTOs"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 	"strings"
 )
 
-func checkDiscount(c *gin.Context) {
+func CheckDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "checkDiscount", "request")
 	defer span.End()
 	dto, err := validations.CheckDiscount(c)
@@ -72,7 +72,7 @@ func checkDiscount(c *gin.Context) {
 	})
 }
 
-func createDiscount(c *gin.Context) {
+func CreateDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createDiscount", "request")
 	defer span.End()
 	dto, err := validations.CreateDiscount(c)
@@ -90,7 +90,7 @@ func createDiscount(c *gin.Context) {
 
 }
 
-func updateDiscount(c *gin.Context) {
+func UpdateDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateDiscount", "request")
 	defer span.End()
 	dto, err := validations.UpdateDiscount(c)
@@ -109,7 +109,7 @@ func updateDiscount(c *gin.Context) {
 	})
 }
 
-func indexDiscount(c *gin.Context) {
+func IndexDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexDiscount", "request")
 	defer span.End()
 	dto, err := validations.IndexDiscount(c)
@@ -127,7 +127,7 @@ func indexDiscount(c *gin.Context) {
 	})
 }
 
-func deleteDiscount(c *gin.Context) {
+func DeleteDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
@@ -142,7 +142,7 @@ func deleteDiscount(c *gin.Context) {
 	})
 }
 
-func showDiscount(c *gin.Context) {
+func ShowDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showDiscount", "request")
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))

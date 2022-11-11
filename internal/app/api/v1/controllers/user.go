@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"backend/api/v1/validations"
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
+	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
-func updateProfile(c *gin.Context) {
+func UpdateProfile(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
 	defer span.End()
 	dto, err := validations.UpdateUser(c)
