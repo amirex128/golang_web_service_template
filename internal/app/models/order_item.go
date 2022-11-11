@@ -2,7 +2,9 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -20,7 +22,9 @@ func initOrderItem(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&OrderItem{})
 }
 
-func (m *MysqlManager) CreateOrderItem(c *gin.Context, dto []DTOs.OrderItem, orderID uint64) error {
+func (m *MysqlManager) CreateOrderItem(c *gin.Context, ctx context.Context, dto []DTOs.OrderItem, orderID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "CreateOrderItem", "model")
+	defer span.End()
 	var orderItems []OrderItem
 	for i := range dto {
 		orderItem := OrderItem{

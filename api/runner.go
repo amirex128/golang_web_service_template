@@ -9,6 +9,8 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/module/apmgin"
+	"go.elastic.co/apm/v2"
 	"log"
 	"net/http"
 	"time"
@@ -17,6 +19,7 @@ import (
 func Runner(host string, port string) {
 	r := gin.Default()
 	r.Use(Pongo2())
+	r.Use(apmgin.Middleware(r))
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://selloora.com", "http://localhost:9000"},
@@ -26,11 +29,6 @@ func Runner(host string, port string) {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
-	//r.Use(func(c *gin.Context) {
-	//	c.Header("Access-Control-Allow-Origin", "http://localhost:9000")
-	//	c.Next()
-	//})
 	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
 			c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s", err))
@@ -84,19 +82,21 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
+			span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
+			defer span.End()
 			dto, err := validations.Verify(c)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
 			if dto.Password == "" {
-				user, err := models.NewMainManager().FindUserByMobileAndCodeVerify(dto)
+				user, err := models.NewMainManager().FindUserByMobileAndCodeVerify(dto, ctx)
 				if err != nil {
 					return nil, jwt.ErrFailedAuthentication
 				}
 				return user, nil
 
 			} else {
-				user, err := models.NewMainManager().FindUserByMobileAndPassword(dto)
+				user, err := models.NewMainManager().FindUserByMobileAndPassword(dto, ctx)
 				if err != nil {
 					return nil, jwt.ErrFailedAuthentication
 				}

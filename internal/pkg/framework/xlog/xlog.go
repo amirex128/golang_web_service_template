@@ -4,13 +4,13 @@ import (
 	"backend/internal/pkg/framework/assert"
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"go.elastic.co/apm/module/apmlogrus/v2"
 	"net"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 type contextKey int
@@ -88,6 +88,7 @@ func setupFileWriterHook(appName string, level string, logLevel []logrus.Level, 
 		Formatter: formatter,
 	}
 	logrus.AddHook(hook)
+	logrus.AddHook(&apmlogrus.Hook{})
 
 	go watchFile(appName, level, hook)
 }

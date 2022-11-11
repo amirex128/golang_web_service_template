@@ -3,7 +3,9 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -22,7 +24,7 @@ type Comment struct {
 func InitComment(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Comment{})
 	for i := 0; i < 10; i++ {
-		manager.CreateComment(&gin.Context{}, DTOs.CreateComment{
+		manager.CreateComment(&gin.Context{}, nil, DTOs.CreateComment{
 			PostID: 1,
 			Name:   "test test test",
 			Body:   "test test test",
@@ -31,7 +33,9 @@ func InitComment(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (err error) {
+func (m *MysqlManager) CreateComment(c *gin.Context, ctx context.Context, dto DTOs.CreateComment) (err error) {
+	span, ctx := apm.StartSpan(ctx, "CreateComment", "model")
+	defer span.End()
 	comment := Comment{
 		PostID:    dto.PostID,
 		Name:      dto.Name,
@@ -51,7 +55,9 @@ func (m *MysqlManager) CreateComment(c *gin.Context, dto DTOs.CreateComment) (er
 	return
 }
 
-func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.IndexComment) (pagination *DTOs.Pagination, err error) {
+func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexComment) (pagination *DTOs.Pagination, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllCommentWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var comments []Comment
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -73,7 +79,9 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, dto DTOs.Inde
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetAllComments(c *gin.Context, postID uint64) (comments []*Comment, err error) {
+func (m *MysqlManager) GetAllComments(c *gin.Context, ctx context.Context, postID uint64) (comments []*Comment, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllComments", "model")
+	defer span.End()
 	err = m.GetConn().Where("post_id = ?", postID).Where("approve = ?", true).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -87,7 +95,9 @@ func (m *MysqlManager) GetAllComments(c *gin.Context, postID uint64) (comments [
 
 }
 
-func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
+func (m *MysqlManager) DeleteComment(c *gin.Context, ctx context.Context, id uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "DeleteComment", "model")
+	defer span.End()
 	conn := m.GetConn()
 	err = conn.Where("id = ?", id).Delete(&Comment{}).Error
 	if err != nil {
@@ -101,7 +111,9 @@ func (m *MysqlManager) DeleteComment(c *gin.Context, id uint64) (err error) {
 	return
 }
 
-func (m *MysqlManager) ApproveComment(c *gin.Context, id uint64) (err error) {
+func (m *MysqlManager) ApproveComment(c *gin.Context, ctx context.Context, id uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "ApproveComment", "model")
+	defer span.End()
 	conn := m.GetConn()
 	err = conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
 	if err != nil {

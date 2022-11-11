@@ -2,7 +2,9 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -27,7 +29,9 @@ func initAddress(manager *MysqlManager) {
 
 }
 
-func (m *MysqlManager) CreateAddress(c *gin.Context, dto DTOs.CreateAddress, userID uint64) error {
+func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DTOs.CreateAddress, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "GetTicketWithChildren", "model")
+	defer span.End()
 	address := Address{
 		UserID:     userID,
 		Title:      dto.Title,
@@ -52,7 +56,9 @@ func (m *MysqlManager) CreateAddress(c *gin.Context, dto DTOs.CreateAddress, use
 	return err
 }
 
-func (m *MysqlManager) UpdateAddress(c *gin.Context, dto DTOs.UpdateAddress, addressID uint64, userID uint64) error {
+func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DTOs.UpdateAddress, addressID uint64, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "UpdateAddress", "model")
+	defer span.End()
 	address := Address{}
 	err := m.GetConn().First(&address, addressID).Error
 	if err != nil {
@@ -108,7 +114,9 @@ func (m *MysqlManager) UpdateAddress(c *gin.Context, dto DTOs.UpdateAddress, add
 	return err
 }
 
-func (m *MysqlManager) DeleteAddress(c *gin.Context, addressID, userID uint64) error {
+func (m *MysqlManager) DeleteAddress(c *gin.Context, ctx context.Context, addressID, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "DeleteAddress", "model")
+	defer span.End()
 	address := Address{}
 	err := m.GetConn().First(&address, addressID).Error
 	if err != nil {
@@ -137,7 +145,9 @@ func (m *MysqlManager) DeleteAddress(c *gin.Context, addressID, userID uint64) e
 	return err
 }
 
-func (m *MysqlManager) IndexAddress(c *gin.Context, userID uint64) ([]*Address, error) {
+func (m *MysqlManager) IndexAddress(c *gin.Context, ctx context.Context, userID uint64) ([]*Address, error) {
+	span, ctx := apm.StartSpan(ctx, "IndexAddress", "model")
+	defer span.End()
 	var addresses []*Address
 	err := m.GetConn().Where("user_id = ?", userID).Find(&addresses).Error
 	if err != nil {

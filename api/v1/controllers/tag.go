@@ -5,15 +5,18 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func createTag(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createTag", "request")
+	defer span.End()
 	dto, err := validations.CreateTag(c)
 	if err != nil {
 		return
 	}
-	err = models.NewMainManager().CreateTag(c, dto)
+	err = models.NewMainManager().CreateTag(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -24,11 +27,13 @@ func createTag(c *gin.Context) {
 }
 
 func indexTag(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexTag", "request")
+	defer span.End()
 	dto, err := validations.IndexTag(c)
 	if err != nil {
 		return
 	}
-	pagination, err := models.NewMainManager().GetAllTagsWithPagination(c, dto)
+	pagination, err := models.NewMainManager().GetAllTagsWithPagination(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -38,8 +43,10 @@ func indexTag(c *gin.Context) {
 }
 
 func deleteTag(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteTag", "request")
+	defer span.End()
 	id := c.Param("id")
-	err := models.NewMainManager().DeleteTag(c, utils.StringToUint64(id))
+	err := models.NewMainManager().DeleteTag(c, ctx, utils.StringToUint64(id))
 	if err != nil {
 		return
 	}
@@ -49,11 +56,13 @@ func deleteTag(c *gin.Context) {
 }
 
 func addTag(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "addTag", "request")
+	defer span.End()
 	dto, err := validations.AddTag(c)
 	if err != nil {
 		return
 	}
-	err = models.NewMainManager().AddTag(c, dto)
+	err = models.NewMainManager().AddTag(c, ctx, dto)
 	if err != nil {
 		return
 	}

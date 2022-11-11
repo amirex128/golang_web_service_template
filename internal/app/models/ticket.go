@@ -3,7 +3,9 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -27,7 +29,9 @@ func InitTicket(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Ticket{})
 }
 
-func (m *MysqlManager) CreateTicket(c *gin.Context, dto DTOs.CreateTicket, userID uint64) error {
+func (m *MysqlManager) CreateTicket(c *gin.Context, ctx context.Context, dto DTOs.CreateTicket, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "CreateTicket", "model")
+	defer span.End()
 	var parentTicket Ticket
 	if dto.ParentID != 0 {
 		err := m.GetConn().Model(&parentTicket).Where("id = ?", dto.ParentID).Update("is_answer", true).First(&parentTicket).Error
@@ -82,7 +86,9 @@ func (m *MysqlManager) CreateTicket(c *gin.Context, dto DTOs.CreateTicket, userI
 	return nil
 }
 
-func (m *MysqlManager) GetAllTicketWithPagination(c *gin.Context, dto DTOs.IndexTicket, userID uint64) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllTicketWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexTicket, userID uint64) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllTicketWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var tickets []Ticket
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -104,7 +110,9 @@ func (m *MysqlManager) GetAllTicketWithPagination(c *gin.Context, dto DTOs.Index
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetTicketWithChildren(c *gin.Context, ticketID uint64) ([]Ticket, error) {
+func (m *MysqlManager) GetTicketWithChildren(c *gin.Context, ctx context.Context, ticketID uint64) ([]Ticket, error) {
+	span, ctx := apm.StartSpan(ctx, "GetTicketWithChildren", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var tickets []Ticket
 	var mainTicket Ticket

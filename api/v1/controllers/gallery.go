@@ -9,6 +9,7 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.elastic.co/apm/v2"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -19,6 +20,8 @@ import (
 )
 
 func createGallery(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createGallery", "request")
+	defer span.End()
 	dto, err := validations.CreateGallery(c)
 	if err != nil {
 		return
@@ -45,7 +48,7 @@ func createGallery(c *gin.Context) {
 		Height:   dto.Height,
 		MimeType: "image/webp",
 	}
-	_, err = models.NewMainManager().UploadImage(c, gallery)
+	_, err = models.NewMainManager().UploadImage(c, ctx, gallery)
 	if err != nil {
 		return
 	}
@@ -56,9 +59,11 @@ func createGallery(c *gin.Context) {
 }
 
 func deleteGallery(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteGallery", "request")
+	defer span.End()
 	galleryID := c.Param("id")
 	userID := models.GetUser(c)
-	gallery, err := models.NewMainManager().FindGalleryByID(c, utils.StringToUint64(galleryID), userID)
+	gallery, err := models.NewMainManager().FindGalleryByID(c, ctx, utils.StringToUint64(galleryID), userID)
 	if err != nil {
 		return
 	}
@@ -71,7 +76,7 @@ func deleteGallery(c *gin.Context) {
 		})
 		return
 	}
-	err = models.NewMainManager().DeleteGallery(c, utils.StringToUint64(galleryID))
+	err = models.NewMainManager().DeleteGallery(c, ctx, utils.StringToUint64(galleryID))
 	if err != nil {
 		return
 	}

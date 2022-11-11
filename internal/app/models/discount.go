@@ -3,8 +3,10 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 	"strings"
 )
@@ -28,7 +30,7 @@ type Discount struct {
 
 func initDiscount(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Discount{})
-	manager.CreateDiscount(&gin.Context{}, DTOs.CreateDiscount{
+	manager.CreateDiscount(&gin.Context{}, nil, DTOs.CreateDiscount{
 		Code:       "test",
 		StartedAt:  "2021-01-01 00:00:00",
 		EndedAt:    "2024-01-01 00:00:00",
@@ -40,10 +42,11 @@ func initDiscount(manager *MysqlManager) {
 		Status:     1,
 	}, 1)
 }
-func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, userID uint64) error {
-
+func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto DTOs.CreateDiscount, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, pId)
+		product, err := m.FindProductById(c, nil, pId)
 		if err != nil {
 			return err
 		}
@@ -83,10 +86,11 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, dto DTOs.CreateDiscount, u
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, userID uint64, discountID string) error {
-
+func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto DTOs.UpdateDiscount, userID uint64, discountID string) error {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, pId)
+		product, err := m.FindProductById(c, nil, pId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "محصول یافت نشد",
@@ -161,7 +165,9 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, dto DTOs.UpdateDiscount, u
 	}
 	return nil
 }
-func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64, userID uint64) error {
+func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, discountID uint64, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
@@ -192,7 +198,9 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, discountID uint64, userID 
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, dto DTOs.IndexDiscount, userID uint64) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexDiscount, userID uint64) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var discounts []Discount
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -214,7 +222,9 @@ func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, dto DTOs.Ind
 	return pagination, nil
 }
 
-func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Discount, error) {
+func (m *MysqlManager) FindDiscountById(c *gin.Context, ctx context.Context, discountID uint64) (Discount, error) {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
@@ -229,8 +239,9 @@ func (m *MysqlManager) FindDiscountById(c *gin.Context, discountID uint64) (Disc
 	return discount, nil
 }
 
-func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, code string, userID uint64) (Discount, error) {
-
+func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, ctx context.Context, code string, userID uint64) (Discount, error) {
+	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+	defer span.End()
 	discount := Discount{}
 	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
 	if err != nil {

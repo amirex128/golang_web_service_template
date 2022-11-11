@@ -3,8 +3,10 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -24,7 +26,7 @@ type Customer struct {
 
 func initCustomer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Customer{})
-	manager.CreateCustomer(&gin.Context{}, DTOs.CreateUpdateCustomer{
+	manager.CreateCustomer(&gin.Context{}, context.Background(), DTOs.CreateUpdateCustomer{
 		ShopID:        1,
 		Mobile:        "09123456789",
 		VerifyCode:    "1234",
@@ -36,8 +38,9 @@ func initCustomer(manager *MysqlManager) {
 		LastSendSMSAt: "2020-01-01 00:00:00",
 	})
 }
-func (m *MysqlManager) FindCustomerById(c *gin.Context, customerID uint64) (Customer, error) {
-
+func (m *MysqlManager) FindCustomerById(c *gin.Context, ctx context.Context, customerID uint64) (Customer, error) {
+	span, ctx := apm.StartSpan(ctx, "FindCustomerById", "model")
+	defer span.End()
 	customer := Customer{}
 	err := m.GetConn().Where("id = ?", customerID).First(&customer).Error
 	if err != nil {
@@ -50,7 +53,9 @@ func (m *MysqlManager) FindCustomerById(c *gin.Context, customerID uint64) (Cust
 	}
 	return customer, nil
 }
-func (m *MysqlManager) FindCustomerByMobile(c *gin.Context, mobile string) (Customer, error) {
+func (m *MysqlManager) FindCustomerByMobile(c *gin.Context, ctx context.Context, mobile string) (Customer, error) {
+	span, ctx := apm.StartSpan(ctx, "FindCustomerByMobile", "model")
+	defer span.End()
 	customer := Customer{}
 	err := m.GetConn().Where("mobile = ?", mobile).Find(&customer).Error
 	if err != nil {
@@ -64,8 +69,9 @@ func (m *MysqlManager) FindCustomerByMobile(c *gin.Context, mobile string) (Cust
 	return customer, nil
 }
 
-func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(c *gin.Context, mobile, verifyCode string) (Customer, error) {
-
+func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(c *gin.Context, ctx context.Context, mobile, verifyCode string) (Customer, error) {
+	span, ctx := apm.StartSpan(ctx, "FindCustomerByMobileAndVerifyCode", "model")
+	defer span.End()
 	customer := Customer{}
 	err := m.GetConn().Where("mobile = ?", mobile).Where("verify_code = ?", verifyCode).First(&customer).Error
 	if err != nil {
@@ -78,7 +84,9 @@ func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(c *gin.Context, mobile,
 	}
 	return customer, nil
 }
-func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCustomer) error {
+func (m *MysqlManager) CreateCustomer(c *gin.Context, ctx context.Context, dto DTOs.CreateUpdateCustomer) error {
+	span, ctx := apm.StartSpan(ctx, "CreateCustomer", "model")
+	defer span.End()
 	customer := Customer{
 		FullName:   dto.FullName,
 		Mobile:     dto.Mobile,
@@ -99,7 +107,9 @@ func (m *MysqlManager) CreateCustomer(c *gin.Context, dto DTOs.CreateUpdateCusto
 	}
 	return nil
 }
-func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, dto DTOs.RequestCreateLoginCustomer, encryptPassword string) error {
+func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, ctx context.Context, dto DTOs.RequestCreateLoginCustomer, encryptPassword string) error {
+	span, ctx := apm.StartSpan(ctx, "CreateCodeCustomer", "model")
+	defer span.End()
 	rowsAffected := m.GetConn().Where("mobile = ?", dto.Mobile).First(&Customer{}).RowsAffected
 	if rowsAffected > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -124,8 +134,10 @@ func (m *MysqlManager) CreateCodeCustomer(c *gin.Context, dto DTOs.RequestCreate
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateCustomer(c *gin.Context, dto DTOs.CreateUpdateCustomer) (Customer, error) {
-	customer, err := m.FindCustomerByMobile(c, dto.Mobile)
+func (m *MysqlManager) UpdateCustomer(c *gin.Context, ctx context.Context, dto DTOs.CreateUpdateCustomer) (Customer, error) {
+	span, ctx := apm.StartSpan(ctx, "UpdateCustomer", "model")
+	defer span.End()
+	customer, err := m.FindCustomerByMobile(c, nil, dto.Mobile)
 	if err != nil {
 		return customer, err
 	}

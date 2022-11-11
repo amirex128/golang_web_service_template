@@ -78,6 +78,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		category := user.Group("category")
 		{
 			category.GET("/list", indexCategory)
+			category.GET("/create", createCategory)
 		}
 		order := user.Group("order")
 		{
@@ -152,6 +153,8 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		category := admin.Group("category")
 		{
 			category.GET("/list", indexCategory)
+			category.GET("/create", createCategory)
+
 		}
 		comment := admin.Group("comment")
 		{

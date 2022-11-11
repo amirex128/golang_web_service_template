@@ -5,10 +5,13 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func createTicket(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
+	defer span.End()
 	dto, err := validations.CreateTicket(c)
 	if err != nil {
 		return
@@ -17,7 +20,7 @@ func createTicket(c *gin.Context) {
 	if dto.GuestMobile == "" {
 		userID = models.GetUser(c)
 	}
-	err = models.NewMainManager().CreateTicket(c, dto, userID)
+	err = models.NewMainManager().CreateTicket(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -26,9 +29,11 @@ func createTicket(c *gin.Context) {
 	})
 }
 func indexTicket(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicket", "request")
+	defer span.End()
 	userID := models.GetUser(c)
 	dto, err := validations.IndexTicket(c)
-	shops, err := models.NewMainManager().GetAllTicketWithPagination(c, dto, userID)
+	shops, err := models.NewMainManager().GetAllTicketWithPagination(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -38,8 +43,10 @@ func indexTicket(c *gin.Context) {
 }
 
 func showTicket(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showTicket", "request")
+	defer span.End()
 	ticketID := utils.StringToUint64(c.Param("ticketID"))
-	ticket, err := models.NewMainManager().GetTicketWithChildren(c, ticketID)
+	ticket, err := models.NewMainManager().GetTicketWithChildren(c, ctx, ticketID)
 	if err != nil {
 		return
 	}

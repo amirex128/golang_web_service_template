@@ -5,16 +5,19 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func createAddress(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createAddress", "request")
+	defer span.End()
 	dto, err := validations.CreateAddress(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
-	err = models.NewMainManager().CreateAddress(c, dto, userID)
+	err = models.NewMainManager().CreateAddress(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -24,13 +27,15 @@ func createAddress(c *gin.Context) {
 }
 
 func updateAddress(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "updateAddress", "request")
+	defer span.End()
 	dto, err := validations.UpdateAddress(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
 	addressID := utils.StringToUint64(c.Param("id"))
-	err = models.NewMainManager().UpdateAddress(c, dto, addressID, userID)
+	err = models.NewMainManager().UpdateAddress(c, ctx, dto, addressID, userID)
 	if err != nil {
 		return
 	}
@@ -40,9 +45,11 @@ func updateAddress(c *gin.Context) {
 }
 
 func deleteAddress(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteAddress", "request")
+	defer span.End()
 	userID := models.GetUser(c)
 	addressID := utils.StringToUint64(c.Param("id"))
-	err := models.NewMainManager().DeleteAddress(c, addressID, userID)
+	err := models.NewMainManager().DeleteAddress(c, ctx, addressID, userID)
 	if err != nil {
 		return
 	}
@@ -52,8 +59,10 @@ func deleteAddress(c *gin.Context) {
 }
 
 func indexAddress(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexAddress", "request")
+	defer span.End()
 	userID := models.GetUser(c)
-	addresses, err := models.NewMainManager().IndexAddress(c, userID)
+	addresses, err := models.NewMainManager().IndexAddress(c, ctx, userID)
 	if err != nil {
 		return
 	}

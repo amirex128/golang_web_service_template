@@ -7,15 +7,18 @@ import (
 	"fmt"
 	"github.com/Squwid/go-randomizer"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
 func registerLogin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
+	defer span.End()
 	dto, err := validations.RequestLoginRegister(c)
 	if err != nil {
 		return
 	}
-	user, err := models.NewMainManager().FindUserByMobile(dto.Mobile)
+	user, err := models.NewMainManager().FindUserByMobile(ctx, dto.Mobile)
 	if err == nil {
 		if user.Password != "" {
 			c.JSON(http.StatusOK, gin.H{
@@ -43,14 +46,14 @@ func registerLogin(c *gin.Context) {
 			VerifyCode:    randCode,
 			LastSendSMSAt: lastSendSMSAt,
 		}
-		err = models.NewMainManager().UpdateUser(c, &newUser)
+		err = models.NewMainManager().UpdateUser(c, ctx, &newUser)
 		if err != nil {
 			return
 		}
 
 		text := fmt.Sprintf("%s : %s \n %s", "کد ورود به سامانه سلورا", randCode, "سلورا دستیار فروش شما")
 
-		err := utils.SendSMS(c, user.Mobile, text, true)
+		err := utils.SendSMS(c, ctx, user.Mobile, text, true)
 		if err != nil {
 			return
 		}
@@ -65,7 +68,7 @@ func registerLogin(c *gin.Context) {
 
 	randCode := fmt.Sprintf("%d", randomizer.Number(1000, 9999))
 	text := fmt.Sprintf("%s : %s \n %s", "کد ورود به سامانه سلورا", randCode, "سلورا دستیار فروش شما")
-	err = utils.SendSMS(c, dto.Mobile, text, true)
+	err = utils.SendSMS(c, ctx, dto.Mobile, text, true)
 	if err != nil {
 		return
 	}
@@ -76,7 +79,7 @@ func registerLogin(c *gin.Context) {
 		LastSendSMSAt: utils.NowTime(),
 	}
 
-	err = models.NewMainManager().CreateUser(c, &newUser)
+	err = models.NewMainManager().CreateUser(c, ctx, &newUser)
 	if err != nil {
 		return
 	}
@@ -89,12 +92,14 @@ func registerLogin(c *gin.Context) {
 }
 
 func changePassword(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "changePassword", "request")
+	defer span.End()
 	dto, err := validations.ChangePassword(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
-	err = models.NewMainManager().UpdateUser(c, &models.User{
+	err = models.NewMainManager().UpdateUser(c, ctx, &models.User{
 		ID:       userID,
 		Password: models.GeneratePasswordHash(dto.Password),
 	})

@@ -6,6 +6,7 @@ import (
 	"backend/internal/app/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 )
 
 const (
@@ -13,6 +14,8 @@ const (
 )
 
 func indexLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "indexLanding", "request")
+	defer span.End()
 	c.Set("template", "index.html")
 	c.Set("data", map[string]interface{}{
 		"title": "صفحه اصلی" + siteName,
@@ -20,11 +23,13 @@ func indexLanding(c *gin.Context) {
 }
 
 func blogLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "blogLanding", "request")
+	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
 	}
-	posts, err := models.NewMainManager().GetAllPostWithPagination(c, dto)
+	posts, err := models.NewMainManager().GetAllPostWithPagination(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -34,17 +39,17 @@ func blogLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMainManager().RandomTags(c, 20)
+	tags, err := models.NewMainManager().RandomTags(c, ctx, 20)
 	if err != nil {
 		return
 	}
 
-	categories, err := models.NewMainManager().GetLevel1Categories(c)
+	categories, err := models.NewMainManager().GetLevel1Categories(c, ctx)
 	if err != nil {
 		return
 	}
 
-	randomPosts, err := models.NewMainManager().RandomPost(c, 6)
+	randomPosts, err := models.NewMainManager().RandomPost(c, ctx, 6)
 	if err != nil {
 		return
 	}
@@ -75,16 +80,18 @@ func blogLanding(c *gin.Context) {
 }
 
 func categoryLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "categoryLanding", "request")
+	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
 	}
 	categoryID := c.Param("id")
-	category, err := models.NewMainManager().FindCategoryByID(c, utils.StringToUint32(categoryID))
+	category, err := models.NewMainManager().FindCategoryByID(c, ctx, utils.StringToUint64(categoryID))
 	if err != nil {
 		return
 	}
-	posts, err := models.NewMainManager().GetAllCategoryPostWithPagination(c, dto, utils.StringToUint32(categoryID))
+	posts, err := models.NewMainManager().GetAllCategoryPostWithPagination(c, ctx, dto, utils.StringToUint32(categoryID))
 	if err != nil {
 		return
 	}
@@ -94,17 +101,17 @@ func categoryLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMainManager().RandomTags(c, 20)
+	tags, err := models.NewMainManager().RandomTags(c, ctx, 20)
 	if err != nil {
 		return
 	}
 
-	categories, err := models.NewMainManager().GetLevel1Categories(c)
+	categories, err := models.NewMainManager().GetLevel1Categories(c, ctx)
 	if err != nil {
 		return
 	}
 
-	randomPosts, err := models.NewMainManager().RandomPost(c, 6)
+	randomPosts, err := models.NewMainManager().RandomPost(c, ctx, 6)
 	if err != nil {
 		return
 	}
@@ -136,16 +143,18 @@ func categoryLanding(c *gin.Context) {
 }
 
 func tagLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "tagLanding", "request")
+	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
 	}
 	tagSlug := c.Param("slug")
-	tag, err := models.NewMainManager().FindTagBySlug(c, tagSlug)
+	tag, err := models.NewMainManager().FindTagBySlug(c, ctx, tagSlug)
 	if err != nil {
 		return
 	}
-	posts, err := models.NewMainManager().GetAllTagPostWithPagination(c, dto, tag.ID)
+	posts, err := models.NewMainManager().GetAllTagPostWithPagination(c, ctx, dto, tag.ID)
 	if err != nil {
 		return
 	}
@@ -155,17 +164,17 @@ func tagLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMainManager().RandomTags(c, 20)
+	tags, err := models.NewMainManager().RandomTags(c, ctx, 20)
 	if err != nil {
 		return
 	}
 
-	categories, err := models.NewMainManager().GetLevel1Categories(c)
+	categories, err := models.NewMainManager().GetLevel1Categories(c, ctx)
 	if err != nil {
 		return
 	}
 
-	randomPosts, err := models.NewMainManager().RandomPost(c, 6)
+	randomPosts, err := models.NewMainManager().RandomPost(c, ctx, 6)
 	if err != nil {
 		return
 	}
@@ -197,8 +206,10 @@ func tagLanding(c *gin.Context) {
 }
 
 func detailsLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "detailsLanding", "request")
+	defer span.End()
 	slug := c.Param("slug")
-	post, err := models.NewMainManager().FindPostBySlug(slug)
+	post, err := models.NewMainManager().FindPostBySlug(slug, ctx)
 	if err != nil {
 		c.Set("template", "404-error.html")
 		return
@@ -207,17 +218,17 @@ func detailsLanding(c *gin.Context) {
 	post.CreatedAt = utils.DateToJalaali(post.CreatedAt)
 	post.UpdatedAt = utils.DateToJalaali(post.UpdatedAt)
 
-	tags, err := models.NewMainManager().RandomTags(c, 20)
+	tags, err := models.NewMainManager().RandomTags(c, ctx, 20)
 	if err != nil {
 		return
 	}
 
-	categories, err := models.NewMainManager().GetLevel1Categories(c)
+	categories, err := models.NewMainManager().GetLevel1Categories(c, ctx)
 	if err != nil {
 		return
 	}
 
-	randomPosts, err := models.NewMainManager().RandomPost(c, 6)
+	randomPosts, err := models.NewMainManager().RandomPost(c, ctx, 6)
 	if err != nil {
 		return
 	}
@@ -238,7 +249,7 @@ func detailsLanding(c *gin.Context) {
 		}()
 	}
 
-	lastPost, err := models.NewMainManager().GetLastPost(c, 4)
+	lastPost, err := models.NewMainManager().GetLastPost(c, ctx, 4)
 	if err != nil {
 		return
 	}
@@ -246,7 +257,7 @@ func detailsLanding(c *gin.Context) {
 		lastPost[i].CreatedAt = utils.DateToJalaali(lastPost[i].CreatedAt)
 		lastPost[i].UpdatedAt = utils.DateToJalaali(lastPost[i].UpdatedAt)
 	}
-	comments, err := models.NewMainManager().GetAllComments(c, post.ID)
+	comments, err := models.NewMainManager().GetAllComments(c, ctx, post.ID)
 	if err != nil {
 		return
 	}
@@ -266,6 +277,8 @@ func detailsLanding(c *gin.Context) {
 }
 
 func contactLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "contactLanding", "request")
+	defer span.End()
 	c.Set("template", "contact.html")
 	c.Set("data", map[string]interface{}{
 		"title": "تماس با ما" + siteName,
@@ -273,6 +286,8 @@ func contactLanding(c *gin.Context) {
 }
 
 func faqLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "faqLanding", "request")
+	defer span.End()
 	c.Set("template", "faq.html")
 	c.Set("data", map[string]interface{}{
 		"title": "سوالات متداول" + siteName,
@@ -280,6 +295,8 @@ func faqLanding(c *gin.Context) {
 }
 
 func pricingLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "pricingLanding", "request")
+	defer span.End()
 	c.Set("template", "pricing.html")
 	c.Set("data", map[string]interface{}{
 		"title": "تعرفه ها" + siteName,
@@ -287,6 +304,8 @@ func pricingLanding(c *gin.Context) {
 }
 
 func servicesLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "servicesLanding", "request")
+	defer span.End()
 	c.Set("template", "services.html")
 	c.Set("data", map[string]interface{}{
 		"title": "خدمات" + siteName,
@@ -294,6 +313,8 @@ func servicesLanding(c *gin.Context) {
 }
 
 func testimonialLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "testimonialLanding", "request")
+	defer span.End()
 	c.Set("template", "testimonial.html")
 	c.Set("data", map[string]interface{}{
 		"title": "نظرات مشتریان" + siteName,
@@ -301,6 +322,8 @@ func testimonialLanding(c *gin.Context) {
 }
 
 func learnLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "learnLanding", "request")
+	defer span.End()
 	c.Set("template", "learn.html")
 	c.Set("data", map[string]interface{}{
 		"title": "آموزش کار با سامانه" + siteName,
@@ -308,6 +331,8 @@ func learnLanding(c *gin.Context) {
 }
 
 func rulesLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "rulesLanding", "request")
+	defer span.End()
 	c.Set("template", "rules.html")
 	c.Set("data", map[string]interface{}{
 		"title": "قوانین فروش" + siteName,
@@ -315,6 +340,8 @@ func rulesLanding(c *gin.Context) {
 }
 
 func returnRulesLanding(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "returnRulesLanding", "request")
+	defer span.End()
 	c.Set("template", "return-rules.html")
 	c.Set("data", map[string]interface{}{
 		"title": "قوانین مرجوعی" + siteName,

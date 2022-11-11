@@ -3,9 +3,11 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -28,7 +30,7 @@ type Post struct {
 func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
 	for i := 0; i < 10; i++ {
-		manager.CreatePost(&gin.Context{}, DTOs.CreatePost{
+		manager.CreatePost(&gin.Context{}, nil, DTOs.CreatePost{
 			Title:     "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
 			Body:      "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
 			Slug:      "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
@@ -38,7 +40,9 @@ func InitPost(manager *MysqlManager) {
 		}, 1)
 	}
 }
-func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
+func (m *MysqlManager) CheckSlug(c *gin.Context, ctx context.Context, slug string) (err error) {
+	span, ctx := apm.StartSpan(ctx, "CheckSlug", "model")
+	defer span.End()
 	rowsAffected := m.GetConn().Where("slug = ?", slug).First(&Post{}).RowsAffected
 	if rowsAffected > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -49,7 +53,9 @@ func (m *MysqlManager) CheckSlug(c *gin.Context, slug string) (err error) {
 	return
 }
 
-func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID uint64) (err error) {
+func (m *MysqlManager) CreatePost(c *gin.Context, ctx context.Context, dto DTOs.CreatePost, userID uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "CreatePost", "model")
+	defer span.End()
 	post := Post{
 		Title: dto.Title,
 		Body:  dto.Body,
@@ -75,7 +81,9 @@ func (m *MysqlManager) CreatePost(c *gin.Context, dto DTOs.CreatePost, userID ui
 	}
 	return
 }
-func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID uint64) (err error) {
+func (m *MysqlManager) UpdatePost(c *gin.Context, ctx context.Context, dto DTOs.UpdatePost, postID uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "UpdatePost", "model")
+	defer span.End()
 	post := Post{}
 	err = m.GetConn().Where("id = ?", postID).First(&post).Error
 	if err != nil {
@@ -111,7 +119,9 @@ func (m *MysqlManager) UpdatePost(c *gin.Context, dto DTOs.UpdatePost, postID ui
 	return
 }
 
-func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
+func (m *MysqlManager) DeletePost(c *gin.Context, ctx context.Context, postID uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "DeletePost", "model")
+	defer span.End()
 	err = m.GetConn().Where("id = ?", postID).Delete(&Post{}).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -124,7 +134,9 @@ func (m *MysqlManager) DeletePost(c *gin.Context, postID uint64) (err error) {
 	return
 }
 
-func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, err error) {
+func (m *MysqlManager) FindPostByID(c *gin.Context, ctx context.Context, postID uint64) (post Post, err error) {
+	span, ctx := apm.StartSpan(ctx, "FindPostByID", "model")
+	defer span.End()
 	err = m.GetConn().Where("id = ?", postID).Preload("User").Preload("Categories").First(&post).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -136,7 +148,9 @@ func (m *MysqlManager) FindPostByID(c *gin.Context, postID uint64) (post Post, e
 	}
 	return
 }
-func (m *MysqlManager) FindPostBySlug(slug string) (Post, error) {
+func (m *MysqlManager) FindPostBySlug(slug string, ctx context.Context) (Post, error) {
+	span, ctx := apm.StartSpan(ctx, "FindPostBySlug", "model")
+	defer span.End()
 	var post Post
 	err := m.GetConn().Where("slug = ?", slug).Preload("User").Preload("Categories").Preload("Gallery").First(&post).Error
 	if err != nil {
@@ -145,7 +159,9 @@ func (m *MysqlManager) FindPostBySlug(slug string) (Post, error) {
 	return post, nil
 }
 
-func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPost) (pagination *DTOs.Pagination, err error) {
+func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexPost) (pagination *DTOs.Pagination, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllPostWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var posts []Post
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -167,7 +183,9 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, dto DTOs.IndexPo
 	return pagination, nil
 }
 
-func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err error) {
+func (m *MysqlManager) RandomPost(c *gin.Context, ctx context.Context, count int) (posts []Post, err error) {
+	span, ctx := apm.StartSpan(ctx, "RandomPost", "model")
+	defer span.End()
 	err = m.GetConn().Order("RAND()").Limit(count).Preload("User").Preload("Gallery").Find(&posts).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -179,7 +197,9 @@ func (m *MysqlManager) RandomPost(c *gin.Context, count int) (posts []Post, err 
 	}
 	return posts, nil
 }
-func (m *MysqlManager) GetLastPost(c *gin.Context, count int) (posts []Post, err error) {
+func (m *MysqlManager) GetLastPost(c *gin.Context, ctx context.Context, count int) (posts []Post, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetLastPost", "model")
+	defer span.End()
 	err = m.GetConn().Preload("User").Preload("Gallery").Order("id DESC").Limit(count).Find(&posts).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{

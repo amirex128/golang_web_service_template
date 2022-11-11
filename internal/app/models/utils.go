@@ -28,7 +28,7 @@ func GeneratePasswordHash(pass string) string {
 
 func IsAdmin(c *gin.Context) bool {
 	userID := GetUser(c)
-	user, err := NewMainManager().FindUserByID(c, userID)
+	user, err := NewMainManager().FindUserByID(c, nil, userID)
 	if err != nil {
 		return false
 	}

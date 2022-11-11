@@ -6,17 +6,20 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func createShop(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createShop", "request")
+	defer span.End()
 	dto, err := validations.CreateShop(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
 
-	err = models.NewMainManager().CreateShop(c, dto, userID)
+	err = models.NewMainManager().CreateShop(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -26,6 +29,8 @@ func createShop(c *gin.Context) {
 }
 
 func updateShop(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "updateShop", "request")
+	defer span.End()
 	dto, err := validations.UpdateShop(c)
 	if err != nil {
 		return
@@ -33,7 +38,7 @@ func updateShop(c *gin.Context) {
 	userID := models.GetUser(c)
 	shopID := utils.StringToUint64(c.Param("id"))
 
-	err = models.NewMainManager().UpdateShop(c, dto, shopID, userID)
+	err = models.NewMainManager().UpdateShop(c, ctx, dto, shopID, userID)
 	if err != nil {
 		return
 	}
@@ -43,6 +48,8 @@ func updateShop(c *gin.Context) {
 }
 
 func deleteShop(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteShop", "request")
+	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 	dto, err := validations.DeleteShop(c)
@@ -50,18 +57,18 @@ func deleteShop(c *gin.Context) {
 		return
 	}
 	if dto.ProductBehave == "move" {
-		err = models.NewMainManager().MoveProducts(c, shopID, dto.NewShopID, userID)
+		err = models.NewMainManager().MoveProducts(c, ctx, shopID, dto.NewShopID, userID)
 		if err != nil {
 			return
 		}
 	} else if dto.ProductBehave == "delete_product" {
-		err = models.NewMainManager().DeleteProducts(c, shopID, userID)
+		err = models.NewMainManager().DeleteProducts(c, ctx, shopID, userID)
 		if err != nil {
 			return
 		}
 	}
 
-	err = models.NewMainManager().DeleteShop(c, shopID, userID)
+	err = models.NewMainManager().DeleteShop(c, ctx, shopID, userID)
 	if err != nil {
 		return
 	}
@@ -71,9 +78,11 @@ func deleteShop(c *gin.Context) {
 }
 
 func showShop(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showShop", "request")
+	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
-	shop, err := models.NewMainManager().FindShopByID(c, shopID, userID)
+	shop, err := models.NewMainManager().FindShopByID(c, ctx, shopID, userID)
 	if err != nil {
 		return
 	}
@@ -83,18 +92,20 @@ func showShop(c *gin.Context) {
 }
 
 func indexShop(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexShop", "request")
+	defer span.End()
 	dto, err := validations.IndexShop(c)
 	if err != nil {
 		return
 	}
 	var shops interface{}
 	if dto.WithoutPagination {
-		shops, err = models.NewMainManager().GetAllShop(c)
+		shops, err = models.NewMainManager().GetAllShop(c, ctx)
 		if err != nil {
 			return
 		}
 	} else {
-		shops, err = models.NewMainManager().GetAllShopWithPagination(c, dto)
+		shops, err = models.NewMainManager().GetAllShopWithPagination(c, ctx, dto)
 		if err != nil {
 			return
 		}
@@ -106,6 +117,8 @@ func indexShop(c *gin.Context) {
 }
 
 func checkSocial(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "checkSocial", "request")
+	defer span.End()
 	dto, err := validations.CheckSocial(c)
 	if err != nil {
 		return
@@ -114,7 +127,7 @@ func checkSocial(c *gin.Context) {
 	// TODO بررسی وضعیت تایید شبکه اجتماعی
 	var resultCheck bool
 	resultCheck = true
-	err = models.NewMainManager().UpdateShop(c, DTOs.UpdateShop{
+	err = models.NewMainManager().UpdateShop(c, ctx, DTOs.UpdateShop{
 		VerifySocial: true,
 	}, dto.ShopID, userID)
 	if err != nil {
@@ -132,13 +145,15 @@ func checkSocial(c *gin.Context) {
 }
 
 func sendPrice(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "sendPrice", "request")
+	defer span.End()
 	dto, err := validations.SendPrice(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
 
-	err = models.NewMainManager().UpdateShop(c, DTOs.UpdateShop{
+	err = models.NewMainManager().UpdateShop(c, ctx, DTOs.UpdateShop{
 		SendPrice: dto.SendPrice,
 	}, dto.ShopID, userID)
 	if err != nil {
@@ -150,6 +165,7 @@ func sendPrice(c *gin.Context) {
 }
 
 func getInstagramPost(c *gin.Context) {
-	//TODO
+	span, _ := apm.StartSpan(c.Request.Context(), "getInstagramPost", "request")
+	defer span.End()
 
 }

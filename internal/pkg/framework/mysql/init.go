@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
+	mysql "go.elastic.co/apm/module/apmgormv2/v2/driver/mysql"
 	"sync"
 	"time"
 
@@ -101,6 +101,7 @@ func Initialize(ctx context.Context) {
 					mysqlConnExpected[i].database,
 				)
 				db, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
+				db.WithContext(ctx)
 				if err != nil {
 					xlog.GetWithError(ctx, errors.New("connect to db failed to ")).Error(dns)
 					return err

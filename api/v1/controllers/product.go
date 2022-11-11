@@ -5,22 +5,25 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func indexProduct(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexProduct", "request")
+	defer span.End()
 	dto, err := validations.IndexProduct(c)
 	if err != nil {
 		return
 	}
 	var products interface{}
 	if dto.WithoutPagination {
-		products, err = models.NewMainManager().GetAllProduct(c, dto.ShopID)
+		products, err = models.NewMainManager().GetAllProduct(c, ctx, dto.ShopID)
 		if err != nil {
 			return
 		}
 	} else {
-		products, err = models.NewMainManager().GetAllProductWithPagination(c, dto)
+		products, err = models.NewMainManager().GetAllProductWithPagination(c, ctx, dto)
 		if err != nil {
 			return
 		}
@@ -32,6 +35,8 @@ func indexProduct(c *gin.Context) {
 }
 
 func createProduct(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createProduct", "request")
+	defer span.End()
 	userID := models.GetUser(c)
 
 	dto, err := validations.CreateProduct(c)
@@ -39,7 +44,7 @@ func createProduct(c *gin.Context) {
 		return
 	}
 
-	err = models.NewMainManager().CreateProduct(c, dto, userID)
+	err = models.NewMainManager().CreateProduct(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -51,6 +56,8 @@ func createProduct(c *gin.Context) {
 }
 
 func updateProduct(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "updateProduct", "request")
+	defer span.End()
 	userID := models.GetUser(c)
 
 	dto, err := validations.UpdateProduct(c)
@@ -59,12 +66,12 @@ func updateProduct(c *gin.Context) {
 	}
 	manager := models.NewMainManager()
 
-	err = manager.CheckAccessProduct(c, dto.ID, userID)
+	err = manager.CheckAccessProduct(c, ctx, dto.ID, userID)
 	if err != nil {
 		return
 	}
 
-	err = manager.UpdateProduct(c, dto)
+	err = manager.UpdateProduct(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -76,15 +83,17 @@ func updateProduct(c *gin.Context) {
 }
 
 func deleteProduct(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteProduct", "request")
+	defer span.End()
 	userID := models.GetUser(c)
 	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()
-	err := manager.CheckAccessProduct(c, id, userID)
+	err := manager.CheckAccessProduct(c, ctx, id, userID)
 	if err != nil {
 		return
 	}
-	err = manager.DeleteProduct(c, id)
+	err = manager.DeleteProduct(c, ctx, id)
 	if err != nil {
 		return
 	}
@@ -96,10 +105,12 @@ func deleteProduct(c *gin.Context) {
 }
 
 func showProduct(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showProduct", "request")
+	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()
-	product, err := manager.FindProductById(c, id)
+	product, err := manager.FindProductById(c, ctx, id)
 	if err != nil {
 		return
 	}

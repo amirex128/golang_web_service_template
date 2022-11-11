@@ -7,28 +7,31 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 	"strings"
 )
 
 // createOrder ثبت یک سفارش جدید
 func createOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createOrder", "request")
+	defer span.End()
 	dto, err := validations.CreateOrder(c)
 	if err != nil {
 		return
 	}
 
-	user, err := models.NewMainManager().FindUserByID(c, dto.UserID)
+	user, err := models.NewMainManager().FindUserByID(c, ctx, dto.UserID)
 	if err != nil {
 		return
 	}
 
-	shop, err := models.NewMainManager().FindShopByID(c, dto.ShopID, 0)
+	shop, err := models.NewMainManager().FindShopByID(c, ctx, dto.ShopID, 0)
 	if err != nil {
 		return
 	}
 
-	customer, err := models.NewMainManager().FindCustomerById(c, dto.CustomerID)
+	customer, err := models.NewMainManager().FindCustomerById(c, ctx, dto.CustomerID)
 	if err != nil {
 		return
 	}
@@ -38,7 +41,7 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, dto.DiscountCode, dto.UserID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.DiscountCode, dto.UserID)
 	if err != nil {
 		return
 	}
@@ -48,7 +51,7 @@ func createOrder(c *gin.Context) {
 		return
 	}
 
-	rawProducts, err := models.NewMainManager().FindProductByIds(c, extractProductIDs(dto))
+	rawProducts, err := models.NewMainManager().FindProductByIds(c, ctx, extractProductIDs(dto))
 	if err != nil {
 		return
 	}
@@ -130,12 +133,12 @@ func createOrder(c *gin.Context) {
 	order.LastUpdateStatusAt = utils.NowTime()
 	order.CreatedAt = utils.NowTime()
 
-	orderID, err := models.NewMainManager().CreateOrder(c, order)
+	orderID, err := models.NewMainManager().CreateOrder(c, ctx, order)
 	if err != nil {
 		return
 	}
 
-	err = models.NewMainManager().CreateOrderItem(c, dto.OrderItems, orderID)
+	err = models.NewMainManager().CreateOrderItem(c, ctx, dto.OrderItems, orderID)
 	if err != nil {
 		return
 	}
@@ -160,6 +163,8 @@ func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
 }
 
 func sadadPaymentVerify(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "sadadPaymentVerify", "request")
+	defer span.End()
 	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -177,16 +182,18 @@ func sadadPaymentVerify(c *gin.Context) {
 }
 
 func indexOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexOrder", "request")
+	defer span.End()
 	orderStatus := c.Query("order_status")
 	userID := models.GetUser(c)
 	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+		orders, err = models.NewMainManager().GetOrders(c, ctx, userID, []string{
 			constants.PendingAcceptOrderStatus,
 		})
 	} else if orderStatus == "processing" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+		orders, err = models.NewMainManager().GetOrders(c, ctx, userID, []string{
 			constants.AcceptedOrderStatus,
 			constants.PendingReceivePostOrderStatus,
 			constants.ReceivedPostOrderStatus,
@@ -196,13 +203,13 @@ func indexOrder(c *gin.Context) {
 			constants.ReceivedOwnerOrderStatus,
 		})
 	} else if orderStatus == "returned" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+		orders, err = models.NewMainManager().GetOrders(c, ctx, userID, []string{
 			constants.PendingReturnOrderStatus,
 			constants.AcceptedReturnOrderStatus,
 			constants.RejectedReturnOrderStatus,
 		})
 	} else if orderStatus == "completed" {
-		orders, err = models.NewMainManager().GetOrders(c, userID, []string{
+		orders, err = models.NewMainManager().GetOrders(c, nil, userID, []string{
 			constants.FinishedOrderStatus,
 		})
 	}
@@ -216,9 +223,11 @@ func indexOrder(c *gin.Context) {
 }
 
 func approveOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "approveOrder", "request")
+	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
-	order, err := models.NewMainManager().FindOrderByID(c, orderID)
+	order, err := models.NewMainManager().FindOrderByID(c, ctx, orderID)
 	if err != nil {
 		return
 	}
@@ -229,7 +238,7 @@ func approveOrder(c *gin.Context) {
 		return
 	}
 	order.Status = constants.AcceptedOrderStatus
-	err = models.NewMainManager().UpdateOrder(c, order)
+	err = models.NewMainManager().UpdateOrder(c, ctx, order)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در تایید سفارش",
@@ -239,9 +248,11 @@ func approveOrder(c *gin.Context) {
 }
 
 func cancelOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "cancelOrder", "request")
+	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
-	order, err := models.NewMainManager().FindOrderByID(c, orderID)
+	order, err := models.NewMainManager().FindOrderByID(c, ctx, orderID)
 	if err != nil {
 		return
 	}
@@ -252,7 +263,7 @@ func cancelOrder(c *gin.Context) {
 		return
 	}
 	order.Status = constants.CanceledOrderStatus
-	err = models.NewMainManager().UpdateOrder(c, order)
+	err = models.NewMainManager().UpdateOrder(c, ctx, order)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در تایید سفارش",
@@ -262,11 +273,13 @@ func cancelOrder(c *gin.Context) {
 }
 
 func sendOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "sendOrder", "request")
+	defer span.End()
 	dto, err := validations.SendOrder(c)
 	if err != nil {
 		return
 	}
-	order, err := models.NewMainManager().FindOrderByID(c, dto.OrderID)
+	order, err := models.NewMainManager().FindOrderByID(c, ctx, dto.OrderID)
 	if err != nil {
 		return
 	}
@@ -283,7 +296,7 @@ func sendOrder(c *gin.Context) {
 	order.PackageSize = dto.PackageSize
 	order.LastUpdateStatusAt = utils.NowTime()
 
-	err = models.NewMainManager().UpdateOrder(c, order)
+	err = models.NewMainManager().UpdateOrder(c, ctx, order)
 	if err != nil {
 		return
 	}
@@ -299,6 +312,8 @@ func sendOrder(c *gin.Context) {
 }
 
 func calculateSendPrice(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "calculateSendPrice", "request")
+	defer span.End()
 	dto, err := validations.CalculateOrder(c)
 	if err != nil {
 		return
@@ -312,18 +327,24 @@ func calculateSendPrice(c *gin.Context) {
 }
 
 func returnedOrder(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "returnedOrder", "request")
+	defer span.End()
 	//TODO
 
 }
 
 func acceptReturnedOrder(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "acceptReturnedOrder", "request")
+	defer span.End()
 	//TODO
 
 }
 
 func showOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showOrder", "request")
+	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
-	order, err := models.NewMainManager().FindOrderWithItemByID(c, orderID)
+	order, err := models.NewMainManager().FindOrderWithItemByID(c, ctx, orderID)
 	if err != nil {
 		return
 	}
@@ -333,20 +354,24 @@ func showOrder(c *gin.Context) {
 }
 
 func trackingOrder(c *gin.Context) {
+	span, _ := apm.StartSpan(c.Request.Context(), "trackingOrder", "request")
+	defer span.End()
 	trackingCode := c.Param("id")
 	utils.TrackingOrder(trackingCode)
 }
 
 func indexCustomerOrders(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexCustomerOrders", "request")
+	defer span.End()
 	dto, err := validations.IndexOrderCustomer(c)
 	if err != nil {
 		return
 	}
-	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, dto.Mobile, dto.VerifyCode)
+	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, ctx, dto.Mobile, dto.VerifyCode)
 	if err != nil {
 		return
 	}
-	orders, err := models.NewMainManager().FindOrdersByCustomerID(c, customer.ID)
+	orders, err := models.NewMainManager().FindOrdersByCustomerID(c, ctx, customer.ID)
 	if err != nil {
 		return
 	}

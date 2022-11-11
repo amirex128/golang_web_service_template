@@ -2,10 +2,12 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -25,6 +27,8 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطا در ارسال پیامک لطفا مجدد تلاش کنید",
+			"error":   err.Error(),
+			"type":    "utils",
 		})
 		return errors.New("sms faild")
 	} else {
@@ -34,7 +38,9 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 	return nil
 }
 
-func SendSMS(c *gin.Context, to string, text string, isFlash bool) error {
+func SendSMS(c *gin.Context, ctx context.Context, to string, text string, isFlash bool) error {
+	span, ctx := apm.StartSpan(ctx, "SendSMS", "request")
+	defer span.End()
 
 	jsonData := map[string]string{
 		"username": username,

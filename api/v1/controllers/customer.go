@@ -8,15 +8,18 @@ import (
 	"fmt"
 	"github.com/Squwid/go-randomizer"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func requestCreateLoginCustomer(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "requestCreateLoginCustomer", "request")
+	defer span.End()
 	dto, err := validations.RequestCreateLoginCustomer(c)
 	if err != nil {
 		return
 	}
-	customer, err := models.NewMainManager().FindCustomerByMobile(c, dto.Mobile)
+	customer, err := models.NewMainManager().FindCustomerByMobile(c, ctx, dto.Mobile)
 	if err != nil {
 		return
 	}
@@ -31,7 +34,7 @@ func requestCreateLoginCustomer(c *gin.Context) {
 		lastSendSMSAt = utils.NowTime()
 	}
 	if customer.ID > 0 {
-		_, err = models.NewMainManager().UpdateCustomer(c, DTOs.CreateUpdateCustomer{
+		_, err = models.NewMainManager().UpdateCustomer(c, nil, DTOs.CreateUpdateCustomer{
 			Mobile:        dto.Mobile,
 			VerifyCode:    randCode,
 			LastSendSMSAt: lastSendSMSAt,
@@ -40,17 +43,17 @@ func requestCreateLoginCustomer(c *gin.Context) {
 			return
 		}
 	} else {
-		err = models.NewMainManager().CreateCodeCustomer(c, dto, randCode)
+		err = models.NewMainManager().CreateCodeCustomer(c, ctx, dto, randCode)
 		if err != nil {
 			return
 		}
 	}
-	shop, err := models.NewMainManager().FindShopByID(c, dto.ShopID, 0)
+	shop, err := models.NewMainManager().FindShopByID(c, ctx, dto.ShopID, 0)
 	if err != nil {
 		return
 	}
 	text := fmt.Sprintf("%s %s : %s", "کد تایید", shop.Name, randCode)
-	err = utils.SendSMS(c, dto.Mobile, text, true)
+	err = utils.SendSMS(c, ctx, dto.Mobile, text, true)
 	if err != nil {
 		return
 	}
@@ -62,12 +65,14 @@ func requestCreateLoginCustomer(c *gin.Context) {
 }
 
 func verifyCreateLoginCustomer(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "verifyCreateLoginCustomer", "request")
+	defer span.End()
 	dto, err := validations.CreateUpdateCustomer(c)
 	if err != nil {
 		return
 	}
 
-	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, dto.Mobile, dto.VerifyCode)
+	customer, err := models.NewMainManager().FindCustomerByMobileAndVerifyCode(c, ctx, dto.Mobile, dto.VerifyCode)
 	if err != nil {
 		return
 	}
@@ -79,7 +84,7 @@ func verifyCreateLoginCustomer(c *gin.Context) {
 		Address:    dto.Address,
 		PostalCode: dto.PostalCode,
 	}
-	customerNew, err := models.NewMainManager().UpdateCustomer(c, updateDto)
+	customerNew, err := models.NewMainManager().UpdateCustomer(c, ctx, updateDto)
 	if err != nil {
 		return
 	}

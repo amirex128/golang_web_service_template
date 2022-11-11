@@ -2,7 +2,9 @@ package models
 
 import (
 	"backend/internal/app/DTOs"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 	"strconv"
 )
@@ -17,14 +19,16 @@ type Tag struct {
 func initTag(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Tag{})
 	for i := 0; i < 100; i++ {
-		manager.CreateTag(&gin.Context{}, DTOs.CreateTag{
+		manager.CreateTag(&gin.Context{}, nil, DTOs.CreateTag{
 			Name: "تگ شماره" + strconv.Itoa(i),
 			Slug: "tag" + strconv.Itoa(i),
 		})
 	}
 }
 
-func (m *MysqlManager) CreateTag(c *gin.Context, dto DTOs.CreateTag) (err error) {
+func (m *MysqlManager) CreateTag(c *gin.Context, ctx context.Context, dto DTOs.CreateTag) (err error) {
+	span, ctx := apm.StartSpan(ctx, "CreateTag", "model")
+	defer span.End()
 	tag := Tag{
 		Name: dto.Name,
 		Slug: dto.Slug,
@@ -41,7 +45,9 @@ func (m *MysqlManager) CreateTag(c *gin.Context, dto DTOs.CreateTag) (err error)
 	return
 }
 
-func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTag) (pagination *DTOs.Pagination, err error) {
+func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexTag) (pagination *DTOs.Pagination, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllTagsWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var tags []Tag
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -63,7 +69,9 @@ func (m *MysqlManager) GetAllTagsWithPagination(c *gin.Context, dto DTOs.IndexTa
 	return pagination, nil
 }
 
-func (m *MysqlManager) DeleteTag(c *gin.Context, id uint64) (err error) {
+func (m *MysqlManager) DeleteTag(c *gin.Context, ctx context.Context, id uint64) (err error) {
+	span, ctx := apm.StartSpan(ctx, "DeleteTag", "model")
+	defer span.End()
 	err = m.GetConn().Where("id = ?", id).Delete(&Tag{}).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -76,7 +84,9 @@ func (m *MysqlManager) DeleteTag(c *gin.Context, id uint64) (err error) {
 	return
 }
 
-func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
+func (m *MysqlManager) AddTag(c *gin.Context, ctx context.Context, dto DTOs.AddTag) (err error) {
+	span, ctx := apm.StartSpan(ctx, "AddTag", "model")
+	defer span.End()
 	err = m.GetConn().Model(&Post{ID: dto.PostID}).Association("Tags").Append(&Tag{ID: dto.TagID})
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -89,7 +99,9 @@ func (m *MysqlManager) AddTag(c *gin.Context, dto DTOs.AddTag) (err error) {
 	return
 }
 
-func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []*Tag, err error) {
+func (m *MysqlManager) RandomTags(c *gin.Context, ctx context.Context, count int) (tags []*Tag, err error) {
+	span, ctx := apm.StartSpan(ctx, "RandomTags", "model")
+	defer span.End()
 	err = m.GetConn().Order("RAND()").Limit(count).Find(&tags).Error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -102,7 +114,9 @@ func (m *MysqlManager) RandomTags(c *gin.Context, count int) (tags []*Tag, err e
 	return tags, nil
 }
 
-func (m *MysqlManager) GetAllTagPostWithPagination(c *gin.Context, dto DTOs.IndexPost, tagID uint64) (pagination *DTOs.Pagination, err error) {
+func (m *MysqlManager) GetAllTagPostWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexPost, tagID uint64) (pagination *DTOs.Pagination, err error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllTagPostWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var posts []Post
 	pagination = &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -124,7 +138,9 @@ func (m *MysqlManager) GetAllTagPostWithPagination(c *gin.Context, dto DTOs.Inde
 	return pagination, nil
 }
 
-func (m *MysqlManager) FindTagBySlug(c *gin.Context, slug string) (tag *Tag, err error) {
+func (m *MysqlManager) FindTagBySlug(c *gin.Context, ctx context.Context, slug string) (tag *Tag, err error) {
+	span, ctx := apm.StartSpan(ctx, "FindTagBySlug", "model")
+	defer span.End()
 	tag = &Tag{}
 	err = m.GetConn().Where("slug = ?", slug).First(tag).Error
 	if err != nil {

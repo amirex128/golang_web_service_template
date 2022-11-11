@@ -5,10 +5,13 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func updateProfile(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
+	defer span.End()
 	dto, err := validations.UpdateUser(c)
 	if err != nil {
 		return
@@ -45,7 +48,7 @@ func updateProfile(c *gin.Context) {
 	if dto.Password != "" {
 		user.Password = dto.Password
 	}
-	err = models.NewMainManager().UpdateUser(c, &user)
+	err = models.NewMainManager().UpdateUser(c, ctx, &user)
 	if err != nil {
 		return
 	}

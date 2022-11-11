@@ -5,15 +5,18 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 func createComment(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createComment", "request")
+	defer span.End()
 	dto, err := validations.CreateComment(c)
 	if err != nil {
 		return
 	}
-	err = models.NewMainManager().CreateComment(c, dto)
+	err = models.NewMainManager().CreateComment(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -23,8 +26,10 @@ func createComment(c *gin.Context) {
 }
 
 func approveCommentAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "approveCommentAdmin", "request")
+	defer span.End()
 	id := c.Param("id")
-	err := models.NewMainManager().ApproveComment(c, utils.StringToUint64(id))
+	err := models.NewMainManager().ApproveComment(c, ctx, utils.StringToUint64(id))
 	if err != nil {
 		return
 	}
@@ -34,8 +39,10 @@ func approveCommentAdmin(c *gin.Context) {
 }
 
 func deleteCommentAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCommentAdmin", "request")
+	defer span.End()
 	id := c.Param("id")
-	err := models.NewMainManager().DeleteComment(c, utils.StringToUint64(id))
+	err := models.NewMainManager().DeleteComment(c, ctx, utils.StringToUint64(id))
 	if err != nil {
 		return
 	}
@@ -45,11 +52,13 @@ func deleteCommentAdmin(c *gin.Context) {
 }
 
 func indexCommentAdmin(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexCommentAdmin", "request")
+	defer span.End()
 	dto, err := validations.IndexComment(c)
 	if err != nil {
 		return
 	}
-	pagination, err := models.NewMainManager().GetAllCommentWithPagination(c, dto)
+	pagination, err := models.NewMainManager().GetAllCommentWithPagination(c, ctx, dto)
 	if err != nil {
 		return
 	}

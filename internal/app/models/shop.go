@@ -3,9 +3,11 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -38,7 +40,7 @@ type Shop struct {
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
 	for i := 0; i < 20; i++ {
-		manager.CreateShop(&gin.Context{}, DTOs.CreateShop{
+		manager.CreateShop(&gin.Context{}, nil, DTOs.CreateShop{
 			Name:          "فروشگاه امیر",
 			Type:          "instagram",
 			EnglishName:   "instagram",
@@ -47,7 +49,9 @@ func initShop(manager *MysqlManager) {
 		}, 1)
 	}
 }
-func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID uint64) error {
+func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.CreateShop, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "CreateShop", "model")
+	defer span.End()
 	shop := &Shop{
 		Name:          dto.Name,
 		EnglishName:   slug.MakeLang(dto.EnglishName, "en"),
@@ -85,7 +89,9 @@ func (m *MysqlManager) CreateShop(c *gin.Context, dto DTOs.CreateShop, userID ui
 	return nil
 }
 
-func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64, userID uint64) (*Shop, error) {
+func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID uint64, userID uint64) (*Shop, error) {
+	span, ctx := apm.StartSpan(ctx, "FindShopByID", "model")
+	defer span.End()
 	res := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).Preload("Gallery").First(res).Error
 	if err != nil {
@@ -107,7 +113,9 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, shopID uint64, userID uint64
 	return res, nil
 }
 
-func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, userID uint64) error {
+func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.UpdateShop, shopID, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "UpdateShop", "model")
+	defer span.End()
 	shop := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).First(shop).Error
 	if err != nil {
@@ -179,7 +187,9 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, dto DTOs.UpdateShop, shopID, u
 	return nil
 }
 
-func (m *MysqlManager) DeleteShop(c *gin.Context, shopID uint64, userID uint64) error {
+func (m *MysqlManager) DeleteShop(c *gin.Context, ctx context.Context, shopID uint64, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "DeleteShop", "model")
+	defer span.End()
 	shop := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).First(shop).Error
 	if err != nil {
@@ -208,7 +218,9 @@ func (m *MysqlManager) DeleteShop(c *gin.Context, shopID uint64, userID uint64) 
 	return nil
 }
 
-func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexShop) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexShop) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllShopWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var shops []Shop
 	userID := GetUser(c)
@@ -231,7 +243,9 @@ func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, dto DTOs.IndexSh
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetAllShop(c *gin.Context) ([]Shop, error) {
+func (m *MysqlManager) GetAllShop(c *gin.Context, ctx context.Context) ([]Shop, error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllShop", "model")
+	defer span.End()
 	userID := GetUser(c)
 	var shops []Shop
 	err := m.GetConn().Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error

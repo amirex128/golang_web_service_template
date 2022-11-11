@@ -1,9 +1,11 @@
 package models
 
 import (
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -32,7 +34,9 @@ func initGallery(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) UploadImage(c *gin.Context, gallery *Gallery) (uint64, error) {
+func (m *MysqlManager) UploadImage(c *gin.Context, ctx context.Context, gallery *Gallery) (uint64, error) {
+	span, ctx := apm.StartSpan(ctx, "UploadImage", "model")
+	defer span.End()
 	gallery.FullPath = viper.GetString("server_url") + gallery.Path
 	err := m.GetConn().Create(gallery).Error
 	if err != nil {
@@ -46,7 +50,9 @@ func (m *MysqlManager) UploadImage(c *gin.Context, gallery *Gallery) (uint64, er
 	return gallery.ID, nil
 }
 
-func (m *MysqlManager) DeleteGallery(c *gin.Context, galleryID uint64) error {
+func (m *MysqlManager) DeleteGallery(c *gin.Context, ctx context.Context, galleryID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "DeleteGallery", "model")
+	defer span.End()
 	var err error
 	err = m.GetConn().Table("shops").Where("gallery_id=?", galleryID).Update("gallery_id", nil).Error
 	err = m.GetConn().Table("users").Where("gallery_id=?", galleryID).Update("gallery_id", nil).Error
@@ -72,7 +78,9 @@ func (m *MysqlManager) DeleteGallery(c *gin.Context, galleryID uint64) error {
 	return nil
 }
 
-func (m *MysqlManager) FindGalleryByID(c *gin.Context, galleryID uint64, userID uint64) (*Gallery, error) {
+func (m *MysqlManager) FindGalleryByID(c *gin.Context, ctx context.Context, galleryID uint64, userID uint64) (*Gallery, error) {
+	span, ctx := apm.StartSpan(ctx, "FindGalleryByID", "model")
+	defer span.End()
 	var gallery Gallery
 	err := m.GetConn().Where("id = ?", galleryID).First(&gallery).Error
 	if err != nil {

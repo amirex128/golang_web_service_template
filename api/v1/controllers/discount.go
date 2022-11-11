@@ -6,17 +6,20 @@ import (
 	"backend/internal/app/models"
 	"backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 	"strings"
 )
 
 func checkDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "checkDiscount", "request")
+	defer span.End()
 	dto, err := validations.CheckDiscount(c)
 	if err != nil {
 		return
 	}
 
-	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, dto.Code, dto.UserID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.Code, dto.UserID)
 	if err != nil {
 		return
 	}
@@ -31,7 +34,7 @@ func checkDiscount(c *gin.Context) {
 		pIDs = append(pIDs, dto.ProductIDs[i].ProductID)
 	}
 
-	products, err := models.NewMainManager().FindProductByIds(c, pIDs)
+	products, err := models.NewMainManager().FindProductByIds(c, ctx, pIDs)
 	if err != nil {
 		return
 	}
@@ -70,6 +73,8 @@ func checkDiscount(c *gin.Context) {
 }
 
 func createDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "createDiscount", "request")
+	defer span.End()
 	dto, err := validations.CreateDiscount(c)
 	if err != nil {
 		return
@@ -77,7 +82,7 @@ func createDiscount(c *gin.Context) {
 
 	userID := models.GetUser(c)
 
-	err = models.NewMainManager().CreateDiscount(c, dto, userID)
+	err = models.NewMainManager().CreateDiscount(c, ctx, dto, userID)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تخفیف با موفقیت ایجاد شد",
@@ -86,6 +91,8 @@ func createDiscount(c *gin.Context) {
 }
 
 func updateDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "updateDiscount", "request")
+	defer span.End()
 	dto, err := validations.UpdateDiscount(c)
 	if err != nil {
 		return
@@ -93,7 +100,7 @@ func updateDiscount(c *gin.Context) {
 	userID := models.GetUser(c)
 	discountID := c.Param("id")
 
-	err = models.NewMainManager().UpdateDiscount(c, dto, userID, discountID)
+	err = models.NewMainManager().UpdateDiscount(c, ctx, dto, userID, discountID)
 	if err != nil {
 		return
 	}
@@ -103,13 +110,15 @@ func updateDiscount(c *gin.Context) {
 }
 
 func indexDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexDiscount", "request")
+	defer span.End()
 	dto, err := validations.IndexDiscount(c)
 	if err != nil {
 		return
 	}
 	userID := models.GetUser(c)
 
-	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, dto, userID)
+	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, ctx, dto, userID)
 	if err != nil {
 		return
 	}
@@ -119,10 +128,12 @@ func indexDiscount(c *gin.Context) {
 }
 
 func deleteDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
+	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 
-	err := models.NewMainManager().DeleteDiscount(c, id, userID)
+	err := models.NewMainManager().DeleteDiscount(c, ctx, id, userID)
 	if err != nil {
 		return
 	}
@@ -132,10 +143,12 @@ func deleteDiscount(c *gin.Context) {
 }
 
 func showDiscount(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "showDiscount", "request")
+	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 
-	discount, err := models.NewMainManager().FindDiscountById(c, id)
+	discount, err := models.NewMainManager().FindDiscountById(c, ctx, id)
 	if err != nil {
 		return
 	}

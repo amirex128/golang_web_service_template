@@ -5,9 +5,18 @@ type IndexCategory struct {
 }
 
 type CreateCategory struct {
-	ParentID    uint32 `form:"parent_id" json:"parent_id" validate:"numeric"`
+	ParentID    uint64 `form:"parent_id" json:"parent_id" validate:"required,numeric"`
 	Type        string `form:"type" json:"type" validate:"required"`
 	Name        string `form:"name" json:"name" validate:"required"`
-	Equivalent  string `form:"equivalent" json:"equivalent" validate:"required"`
-	Description string `form:"description" json:"description" validate:"required"`
+	Equivalent  string `form:"equivalent" json:"equivalent" validate:"omitempty"`
+	Description string `form:"description" json:"description" validate:"omitempty"`
+}
+
+type UpdateCategory struct {
+	ID          uint64 `form:"id" json:"id" validate:"required,numeric"`
+	ParentID    uint64 `form:"parent_id" json:"parent_id" validate:"omitempty,numeric"`
+	Name        string `form:"name" json:"name" validate:"omitempty"`
+	Equivalent  string `form:"equivalent" json:"equivalent" validate:"omitempty"`
+	Description string `form:"description" json:"description" validate:"omitempty"`
+	Sort        uint32 `form:"sort" json:"sort" validate:"omitempty,numeric"`
 }

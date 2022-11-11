@@ -3,9 +3,11 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -39,7 +41,7 @@ func (c Product) GetID() uint64 {
 func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 	for i := 0; i < 100; i++ {
-		manager.CreateProduct(&gin.Context{}, DTOs.CreateProduct{
+		manager.CreateProduct(&gin.Context{}, nil, DTOs.CreateProduct{
 			ShopID:           1,
 			ManufacturerId:   1,
 			Description:      fmt.Sprintf("توضیحات محصول %d", i),
@@ -61,7 +63,9 @@ func InitProduct(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllProductWithPagination", "model")
+	defer span.End()
 	conn := m.GetConn()
 	var products []Product
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
@@ -82,7 +86,9 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, dto DTOs.Inde
 	pagination.Data = products
 	return pagination, nil
 }
-func (m *MysqlManager) GetAllProduct(c *gin.Context, shopID uint64) ([]Product, error) {
+func (m *MysqlManager) GetAllProduct(c *gin.Context, ctx context.Context, shopID uint64) ([]Product, error) {
+	span, ctx := apm.StartSpan(ctx, "GetAllProduct", "model")
+	defer span.End()
 	userID := GetUser(c)
 	var products []Product
 	err := m.GetConn().Where("user_id = ?", userID).Where("shop_id=?", shopID).Find(&products).Error
@@ -96,7 +102,9 @@ func (m *MysqlManager) GetAllProduct(c *gin.Context, shopID uint64) ([]Product, 
 	}
 	return products, nil
 }
-func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, userID uint64) error {
+func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DTOs.CreateProduct, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "CreateProduct", "model")
+	defer span.End()
 
 	var product = Product{
 		UserID:           userID,
@@ -140,8 +148,10 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, dto DTOs.CreateProduct, use
 	return nil
 }
 
-func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) error {
-	product, err := m.FindProductById(c, dto.ID)
+func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DTOs.UpdateProduct) error {
+	span, ctx := apm.StartSpan(ctx, "UpdateProduct", "model")
+	defer span.End()
+	product, err := m.FindProductById(c, nil, dto.ID)
 	if err != nil {
 		return err
 	}
@@ -189,7 +199,9 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, dto DTOs.UpdateProduct) err
 	return nil
 }
 
-func (m *MysqlManager) DeleteProduct(c *gin.Context, id uint64) error {
+func (m *MysqlManager) DeleteProduct(c *gin.Context, ctx context.Context, id uint64) error {
+	span, ctx := apm.StartSpan(ctx, "DeleteProduct", "model")
+	defer span.End()
 	err := m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -202,7 +214,9 @@ func (m *MysqlManager) DeleteProduct(c *gin.Context, id uint64) error {
 	return nil
 }
 
-func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, error) {
+func (m *MysqlManager) FindProductById(c *gin.Context, ctx context.Context, id uint64) (Product, error) {
+	span, ctx := apm.StartSpan(ctx, "FindProductById", "model")
+	defer span.End()
 	var product Product
 	err := m.GetConn().Where("id = ?", id).First(&product).Error
 	if err != nil {
@@ -216,7 +230,9 @@ func (m *MysqlManager) FindProductById(c *gin.Context, id uint64) (Product, erro
 	return product, nil
 }
 
-func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product, error) {
+func (m *MysqlManager) FindProductByIds(c *gin.Context, ctx context.Context, ids []uint64) ([]Product, error) {
+	span, ctx := apm.StartSpan(ctx, "FindProductByIds", "model")
+	defer span.End()
 	var products []Product
 	err := m.GetConn().Where("id IN (?)", ids).Find(&products).Error
 	if err != nil {
@@ -230,8 +246,10 @@ func (m *MysqlManager) FindProductByIds(c *gin.Context, ids []uint64) ([]Product
 	return products, nil
 }
 
-func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint64) error {
-	product, err := m.FindProductById(c, id)
+func (m *MysqlManager) CheckAccessProduct(c *gin.Context, ctx context.Context, id uint64, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "CheckAccessProduct", "model")
+	defer span.End()
+	product, err := m.FindProductById(c, nil, id)
 	if err != nil {
 		return err
 	}
@@ -248,7 +266,9 @@ func (m *MysqlManager) CheckAccessProduct(c *gin.Context, id uint64, userID uint
 	return nil
 }
 
-func (m *MysqlManager) MoveProducts(c *gin.Context, shopID, newShopID, userID uint64) error {
+func (m *MysqlManager) MoveProducts(c *gin.Context, ctx context.Context, shopID, newShopID, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "MoveProducts", "model")
+	defer span.End()
 	err := m.GetConn().Model(&Product{}).Where("shop_id = ? AND user_id = ?", shopID, userID).Update("shop_id", newShopID).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -261,7 +281,9 @@ func (m *MysqlManager) MoveProducts(c *gin.Context, shopID, newShopID, userID ui
 	return nil
 }
 
-func (m *MysqlManager) DeleteProducts(c *gin.Context, shopID, userID uint64) error {
+func (m *MysqlManager) DeleteProducts(c *gin.Context, ctx context.Context, shopID, userID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "DeleteProducts", "model")
+	defer span.End()
 	err := m.GetConn().Where("shop_id = ? AND user_id = ?", shopID, userID).Delete(&Product{}).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

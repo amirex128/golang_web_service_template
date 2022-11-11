@@ -3,8 +3,10 @@ package models
 import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
@@ -33,7 +35,7 @@ type User struct {
 
 func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
-	manager.CreateUser(&gin.Context{}, &User{
+	manager.CreateUser(&gin.Context{}, nil, &User{
 		ID:         1,
 		Gender:     "man",
 		Firstname:  "امیر",
@@ -53,7 +55,10 @@ func initUser(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
+func (m *MysqlManager) CreateUser(c *gin.Context, ctx context.Context, user *User) error {
+	span, ctx := apm.StartSpan(ctx, "CreateUser", "model")
+	defer span.End()
+
 	find := m.GetConn().Where("mobile = ?", user.Mobile).Find(&User{}).RowsAffected
 	if find > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -74,7 +79,9 @@ func (m *MysqlManager) CreateUser(c *gin.Context, user *User) error {
 	return nil
 }
 
-func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify) (*User, error) {
+func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify, ctx context.Context) (*User, error) {
+	span, ctx := apm.StartSpan(ctx, "FindUserByMobileAndCodeVerify", "model")
+	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("mobile = ? and verify_code = ?", user.Mobile, user.VerifyCode).First(res).Error
 	if err != nil {
@@ -82,7 +89,9 @@ func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify) (*User, e
 	}
 	return res, nil
 }
-func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify) (*User, error) {
+func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify, ctx context.Context) (*User, error) {
+	span, ctx := apm.StartSpan(ctx, "FindUserByMobileAndPassword", "model")
+	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, GeneratePasswordHash(user.Password)).First(res).Error
 	if err != nil {
@@ -90,7 +99,11 @@ func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify) (*User, err
 	}
 	return res, nil
 }
-func (m *MysqlManager) FindUserByMobile(mobile string) (*User, error) {
+func (m *MysqlManager) FindUserByMobile(ctx context.Context, mobile string) (*User, error) {
+
+	span, ctx := apm.StartSpan(ctx, "FindUserByMobile", "model")
+	defer span.End()
+
 	res := &User{}
 	err := m.GetConn().Where("mobile = ?", mobile).First(res).Error
 	if err != nil {
@@ -99,7 +112,9 @@ func (m *MysqlManager) FindUserByMobile(mobile string) (*User, error) {
 	return res, nil
 }
 
-func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error) {
+func (m *MysqlManager) FindUserByID(c *gin.Context, ctx context.Context, userID uint64) (*User, error) {
+	span, ctx := apm.StartSpan(ctx, "FindUserByID", "model")
+	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("id = ?", userID).First(res).Error
 	if err != nil {
@@ -113,7 +128,10 @@ func (m *MysqlManager) FindUserByID(c *gin.Context, userID uint64) (*User, error
 	return res, nil
 }
 
-func (m *MysqlManager) UpdateUser(c *gin.Context, user *User) error {
+func (m *MysqlManager) UpdateUser(c *gin.Context, ctx context.Context, user *User) error {
+	span, ctx := apm.StartSpan(ctx, "UpdateUser", "model")
+	defer span.End()
+
 	var newUser User
 	err := m.GetConn().Where("id = ?", user.ID).First(&newUser).Error
 	if err != nil {

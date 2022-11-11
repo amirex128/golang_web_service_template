@@ -1,7 +1,9 @@
 package models
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
@@ -38,7 +40,9 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (orderID uint64, err error) {
+func (m *MysqlManager) CreateOrder(c *gin.Context, ctx context.Context, order Order) (orderID uint64, err error) {
+	span, ctx := apm.StartSpan(ctx, "CreateOrder", "model")
+	defer span.End()
 	err = m.GetConn().Create(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -52,7 +56,9 @@ func (m *MysqlManager) CreateOrder(c *gin.Context, order Order) (orderID uint64,
 	return
 }
 
-func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []string) ([]*Order, error) {
+func (m *MysqlManager) GetOrders(c *gin.Context, ctx context.Context, userID uint64, orderStatus []string) ([]*Order, error) {
+	span, ctx := apm.StartSpan(ctx, "GetOrders", "model")
+	defer span.End()
 	var orders []*Order
 	err := m.GetConn().Where("user_id = ? AND status IN (?)", userID, orderStatus).Find(&orders).Error
 	if err != nil {
@@ -65,7 +71,9 @@ func (m *MysqlManager) GetOrders(c *gin.Context, userID uint64, orderStatus []st
 	}
 	return orders, err
 }
-func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, customerID uint64) ([]*Order, error) {
+func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, ctx context.Context, customerID uint64) ([]*Order, error) {
+	span, ctx := apm.StartSpan(ctx, "FindOrdersByCustomerID", "model")
+	defer span.End()
 	var orders []*Order
 	err := m.GetConn().Where("customer_id = ?", customerID).Find(&orders).Error
 	if err != nil {
@@ -79,7 +87,9 @@ func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, customerID uint64)
 	return orders, err
 }
 
-func (m *MysqlManager) FindOrderByID(c *gin.Context, orderID uint64) (order Order, err error) {
+func (m *MysqlManager) FindOrderByID(c *gin.Context, ctx context.Context, orderID uint64) (order Order, err error) {
+	span, ctx := apm.StartSpan(ctx, "FindOrderByID", "model")
+	defer span.End()
 	err = m.GetConn().Where("id = ?", orderID).First(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -92,7 +102,9 @@ func (m *MysqlManager) FindOrderByID(c *gin.Context, orderID uint64) (order Orde
 	return
 }
 
-func (m *MysqlManager) UpdateOrder(c *gin.Context, order Order) (err error) {
+func (m *MysqlManager) UpdateOrder(c *gin.Context, ctx context.Context, order Order) (err error) {
+	span, ctx := apm.StartSpan(ctx, "UpdateOrder", "model")
+	defer span.End()
 	err = m.GetConn().Save(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -105,7 +117,9 @@ func (m *MysqlManager) UpdateOrder(c *gin.Context, order Order) (err error) {
 	return
 }
 
-func (m *MysqlManager) FindOrderWithItemByID(c *gin.Context, orderID uint64) (order Order, err error) {
+func (m *MysqlManager) FindOrderWithItemByID(c *gin.Context, ctx context.Context, orderID uint64) (order Order, err error) {
+	span, ctx := apm.StartSpan(ctx, "FindOrderWithItemByID", "model")
+	defer span.End()
 	err = m.GetConn().Where("id = ?", orderID).Preload("OrderItems").Preload("Shop").Preload("Customer").First(&order).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
