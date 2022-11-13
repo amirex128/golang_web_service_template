@@ -14,11 +14,20 @@ const (
 )
 
 func IndexLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "indexLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "indexLanding", "request")
 	defer span.End()
-	c.Set("template", "index.html")
+
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "index.html"))
 	c.Set("data", map[string]interface{}{
-		"title": "صفحه اصلی" + siteName,
+		"theme":  theme,
+		"domain": domain,
+		"shop":   shop,
+		"title":  "صفحه اصلی" + siteName,
 	})
 }
 

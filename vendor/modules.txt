@@ -45,6 +45,9 @@ github.com/gin-contrib/cors
 # github.com/gin-contrib/sse v0.1.0
 ## explicit; go 1.12
 github.com/gin-contrib/sse
+# github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
+## explicit
+github.com/gin-gonic/contrib/static
 # github.com/gin-gonic/gin v1.8.1
 ## explicit; go 1.18
 github.com/gin-gonic/gin
@@ -143,6 +146,9 @@ github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
 github.com/mailru/easyjson/jwriter
+# github.com/mandrigin/gin-spa v0.0.0-20200212133200-790d0c0c7335
+## explicit
+github.com/mandrigin/gin-spa/spa
 # github.com/mattn/go-isatty v0.0.14
 ## explicit; go 1.12
 github.com/mattn/go-isatty

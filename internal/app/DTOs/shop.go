@@ -15,6 +15,7 @@ type CreateShop struct {
 	Email         string  `form:"email" json:"email" validate:"omitempty,email"`
 	Website       string  `form:"website" json:"website" validate:"omitempty"`
 	SendPrice     float32 `form:"send_price" json:"send_price" validate:"omitempty"`
+	ThemeID       uint64  `form:"theme_id" json:"theme_id" validate:"omitempty"`
 }
 
 type UpdateShop struct {

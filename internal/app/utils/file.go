@@ -36,7 +36,7 @@ func ReadCsvFile(filePath string) [][]string {
 	return records
 }
 func UploadMultiImage(c *gin.Context, images []*multipart.FileHeader, dest string) ([]string, error) {
-	abs, _ := filepath.Abs("../../assets")
+	abs, _ := filepath.Abs("./public")
 	var imagesPath []string
 	userDir := filepath.Join(abs, dest, "images")
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
@@ -63,7 +63,7 @@ func UploadMultiImage(c *gin.Context, images []*multipart.FileHeader, dest strin
 	return imagesPath, nil
 }
 func UploadImage(c *gin.Context, image *multipart.FileHeader, dest string) (string, error) {
-	abs, _ := filepath.Abs("../../assets")
+	abs, _ := filepath.Abs("./public")
 	userDir := filepath.Join(abs, dest, "images")
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
 

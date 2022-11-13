@@ -20,7 +20,7 @@ type ProductProvince struct {
 func initProvince(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Province{})
 	manager.GetConn().AutoMigrate(&ProductProvince{})
-	provinces := utils.ReadCsvFile("../../csv/provinces.csv")
+	provinces := utils.ReadCsvFile("./csv/provinces.csv")
 	manager.CreateAllProvinces(provinces)
 
 }

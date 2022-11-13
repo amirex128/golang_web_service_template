@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+{% include "components/header.html" with color="9" %}
+
+<!-- Start Page Name area-->
+<div class="page-title-area">
+    <div class="container">
+        <div class="content text-center">
+            <h1>تعرفه پلن ها</h1>
+            <ul class="list-unstyled">
+                <li class="d-inline"><a href="index">صفحه اصلی</a></li>
+                <li class="d-inline">/</li>
+                <li class="d-inline active">تعرفه</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- End Page Name area -->
+
+<!-- Start Pricing Area -->
+<div class="pricing-plan-area pricing-plan-5 pt-120 pb-90">
+    <div class="container">
+        <div class="section-top justify-content-center mb-20">
+            <div class="nav-tabs-navigation">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#monthly" type="button">برنامه ماهانه</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#yearly" type="button">برنامه سالانه</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="monthly">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-7.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">25،000 <small> تومان </small></span>
+                                <span class="type">/ ماهانه</span>
+                                <span class="label">اولیه</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="pricing" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-8.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">35،000 <small> تومان </small></span>
+                                <span class="type">/ ماهانه</span>
+                                <span class="label">استاندارد</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="pricing" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-9.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">45،000 <small> تومان </small></span>
+                                <span class="type">/ ماهانه</span>
+                                <span class="label">پیشرفته</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="pricing" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="yearly">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-7.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">25،000 <small> تومان </small></span>
+                                <span class="type">/ سالانه</span>
+                                <span class="label">اولیه</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="contact" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-8.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">35،000 <small> تومان </small></span>
+                                <span class="type">/ سالانه</span>
+                                <span class="label">استاندارد</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="contact" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="item-single mb-30">
+                            <div class="image">
+                                <img src="/public/themes/{{theme.ID}}/images/pricing-9.png" alt = "تصویر">
+                            </div>
+                            <div class="content">
+                                <span class="price">45،000 <small> تومان </small></span>
+                                <span class="type">/ سالانه</span>
+                                <span class="label">پیشرفته</span>
+                                <ul class="item-list list-unstyled p-0">
+                                    <li>افزایش قدرت و توان سرور</li>
+                                    <li> کیفیت و تجربه کاربری عالی</li>
+                                    <li>پشتیبانی 24 ساعته تلفنی و ایمیلی</li>
+                                </ul>
+                                <a href="contact" class="btn primary-btn primary-btn-6">الان بخر</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Pricing Area -->
+
+<!-- Start Newsletter Area -->
+<div id="newsLetterArea" class="newsletter-area newsletter-3 ptb-120">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-7">
+                <div class="content mb-50 text-center">
+                    <h2>برای دریافت آخرین بروز رسانی ها با ما در ارتباط باش</h2>
+                </div>
+                <form class="newsletter-form" id="newsletterForm">
+                    <div class="input-group">
+                        <input class="form-control" placeholder="لطفا پست الکترونیک خودت رو وارد کن" type="text" name="EMAIL" required=""
+                               autocomplete="off">
+                        <button class="btn primary-btn primary-btn-5" type="submit">
+                            عضویت
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Newsletter Area -->
+
+{% include "components/footer.html" with color="3" %}
+
+{% endblock %}

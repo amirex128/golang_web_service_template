@@ -27,6 +27,8 @@ type Shop struct {
 	WhatsappID    string     `json:"whatsapp_id"`
 	Email         string     `json:"email"`
 	Website       string     `json:"website"`
+	ThemeID       *uint64    `gorm:"default:null" json:"theme_id"`
+	Theme         *Theme     `gorm:"foreignKey:ThemeID" json:"theme"`
 	Products      []Product  `gorm:"foreignKey:shop_id" json:"products"`
 	UserID        uint64     `json:"user_id"`
 	User          User       `gorm:"foreignKey:user_id" json:"user"`
@@ -40,15 +42,17 @@ type Shop struct {
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
 	for i := 0; i < 20; i++ {
-		manager.CreateShop(&gin.Context{}, nil, DTOs.CreateShop{
+		manager.CreateShop(&gin.Context{}, context.Background(), DTOs.CreateShop{
 			Name:          "فروشگاه امیر",
 			Type:          "instagram",
 			EnglishName:   "instagram",
 			SocialAddress: "amirex_dev",
 			GalleryID:     1,
+			ThemeID:       1,
 		}, 1)
 	}
 }
+
 func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.CreateShop, userID uint64) error {
 	span, ctx := apm.StartSpan(ctx, "CreateShop", "model")
 	defer span.End()
@@ -74,6 +78,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.
 			}
 			return &dto.GalleryID
 		}(),
+		ThemeID:   &dto.ThemeID,
 		CreatedAt: utils.NowTime(),
 		UpdatedAt: utils.NowTime(),
 	}
@@ -89,7 +94,7 @@ func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	return nil
 }
 
-func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID uint64, userID uint64) (*Shop, error) {
+func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID uint64) (*Shop, error) {
 	span, ctx := apm.StartSpan(ctx, "FindShopByID", "model")
 	defer span.End()
 	res := &Shop{}
@@ -102,6 +107,7 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID 
 		})
 		return nil, err
 	}
+	userID := GetUser(c)
 	if res.UserID != userID && userID != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",
@@ -258,4 +264,22 @@ func (m *MysqlManager) GetAllShop(c *gin.Context, ctx context.Context) ([]Shop, 
 		return shops, err
 	}
 	return shops, nil
+}
+
+func (m *MysqlManager) FindShopByDomain(c *gin.Context, ctx context.Context, name string) (*Shop, *Domain, *Theme, error) {
+	span, ctx := apm.StartSpan(ctx, "FindShopByDomain", "model")
+	defer span.End()
+	domain, err := m.FindDomainByName(c, ctx, name)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	shop, err := m.FindShopByID(c, ctx, *domain.ShopID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	theme, err := m.FindThemeByID(c, ctx, *shop.ThemeID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return shop, domain, theme, nil
 }

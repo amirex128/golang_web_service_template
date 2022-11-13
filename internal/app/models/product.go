@@ -41,7 +41,7 @@ func (c Product) GetID() uint64 {
 func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 	for i := 0; i < 100; i++ {
-		manager.CreateProduct(&gin.Context{}, nil, DTOs.CreateProduct{
+		manager.CreateProduct(&gin.Context{}, context.Background(), DTOs.CreateProduct{
 			ShopID:           1,
 			ManufacturerId:   1,
 			Description:      fmt.Sprintf("توضیحات محصول %d", i),
@@ -151,7 +151,7 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DT
 func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DTOs.UpdateProduct) error {
 	span, ctx := apm.StartSpan(ctx, "UpdateProduct", "model")
 	defer span.End()
-	product, err := m.FindProductById(c, nil, dto.ID)
+	product, err := m.FindProductById(c, ctx, dto.ID)
 	if err != nil {
 		return err
 	}
@@ -249,7 +249,7 @@ func (m *MysqlManager) FindProductByIds(c *gin.Context, ctx context.Context, ids
 func (m *MysqlManager) CheckAccessProduct(c *gin.Context, ctx context.Context, id uint64, userID uint64) error {
 	span, ctx := apm.StartSpan(ctx, "CheckAccessProduct", "model")
 	defer span.End()
-	product, err := m.FindProductById(c, nil, id)
+	product, err := m.FindProductById(c, ctx, id)
 	if err != nil {
 		return err
 	}

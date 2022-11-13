@@ -20,4 +20,5 @@ type UpdatePost struct {
 
 type IndexPost struct {
 	Index
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required"`
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/mandrigin/gin-spa/spa"
 	"go.elastic.co/apm/module/apmgin"
 	"go.elastic.co/apm/v2"
 	"log"
@@ -21,13 +22,14 @@ func Runner(host string, port string) {
 	r.Use(apmgin.Middleware(r))
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://selloora.com", "http://localhost:9000"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTION"},
 		AllowHeaders:     []string{"Authorization", "type_auth", "content-type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
 	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
 			c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s", err))
@@ -35,7 +37,15 @@ func Runner(host string, port string) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
 
+	r.Static("/public", "./public")
+
+	r.NoRoute(func(c *gin.Context) {
+		c.Set("template", "404-error.html")
+	})
+
 	Routes(r, GetAuthMiddleware())
+
+	r.Use(spa.Middleware("/", "./frontend/dist/spa"))
 
 	err := r.Run(host + ":" + port)
 	if err != nil {
@@ -160,7 +170,7 @@ func Pongo2() gin.HandlerFunc {
 			return
 		}
 
-		template := pongo2.Must(pongo2.FromFile(fmt.Sprintf("%s/%s", "../../templates", name)))
+		template := pongo2.Must(pongo2.FromFile(fmt.Sprintf("%s/%s", "./templates", name)))
 		err := template.ExecuteWriter(convertContext(data), c.Writer)
 		if err != nil {
 

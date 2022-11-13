@@ -30,7 +30,7 @@ type Discount struct {
 
 func initDiscount(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Discount{})
-	manager.CreateDiscount(&gin.Context{}, nil, DTOs.CreateDiscount{
+	manager.CreateDiscount(&gin.Context{}, context.Background(), DTOs.CreateDiscount{
 		Code:       "test",
 		StartedAt:  "2021-01-01 00:00:00",
 		EndedAt:    "2024-01-01 00:00:00",
@@ -46,7 +46,7 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto D
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, nil, pId)
+		product, err := m.FindProductById(c, ctx, pId)
 		if err != nil {
 			return err
 		}
@@ -90,7 +90,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, nil, pId)
+		product, err := m.FindProductById(c, ctx, pId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "محصول یافت نشد",

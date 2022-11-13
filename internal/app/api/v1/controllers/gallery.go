@@ -67,7 +67,7 @@ func DeleteGallery(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	abs, _ := filepath.Abs("../../")
+	abs, _ := filepath.Abs("./")
 	path := filepath.Join(abs, gallery.Path)
 	if err := os.Remove(path); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -86,7 +86,7 @@ func DeleteGallery(c *gin.Context) {
 }
 
 func createDirectory(c *gin.Context, userID uint64) (string, string, error) {
-	abs, _ := filepath.Abs("../../assets")
+	abs, _ := filepath.Abs("./public")
 	galleryAddress := "gallery/user_" + utils.Uint64ToString(userID)
 	userDir := filepath.Join(abs, galleryAddress)
 	if err := os.MkdirAll(userDir, os.ModePerm); err != nil {
@@ -112,7 +112,7 @@ func uploadImage(c *gin.Context, userDir string, galleryAddress string, dto DTOs
 	imageType := strings.Split(contentType[0], "/")[1]
 	imageName := uuid.NewString() + "." + "webp"
 	fullPath := filepath.Join(userDir, imageName)
-	relativePath := filepath.Join("/assets", galleryAddress, imageName)
+	relativePath := filepath.Join("/public", galleryAddress, imageName)
 
 	open, err := dto.File.Open()
 	if err != nil {

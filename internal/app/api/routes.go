@@ -7,10 +7,6 @@ import (
 )
 
 func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
-	r.Static("/assets", "../../assets")
-	r.NoRoute(func(c *gin.Context) {
-		c.Set("template", "404-error.html")
-	})
 
 	root := r.Group("/")
 	{

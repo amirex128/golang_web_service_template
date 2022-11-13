@@ -22,7 +22,7 @@ type GuildProduct struct {
 func initGuild(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Guild{})
 	manager.GetConn().AutoMigrate(&GuildProduct{})
-	guilds := utils.ReadCsvFile("../../csv/guilds.csv")
+	guilds := utils.ReadCsvFile("./csv/guilds.csv")
 	manager.CreateAllGuilds(guilds)
 }
 

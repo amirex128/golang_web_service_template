@@ -26,7 +26,7 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	shop, err := models.NewMainManager().FindShopByID(c, ctx, dto.ShopID, 0)
+	shop, err := models.NewMainManager().FindShopByID(c, ctx, dto.ShopID)
 	if err != nil {
 		return
 	}

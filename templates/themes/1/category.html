@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+{% include "components/header.html" with color="9" %}
+
+<!-- Start Page Name area-->
+<div class="page-title-area">
+    <div class="container">
+        <div class="content text-center">
+            <h1>{{category.Name}}</h1>
+            <ul class="list-unstyled">
+                <li class="d-inline"><a href="/public">صفحه اصلی</a></li>
+                <li class="d-inline">/</li>
+                <li class="d-inline">دسته بندی ها</li>
+                <li class="d-inline">/</li>
+                <li class="d-inline active">{{category.Name}}</li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- End Page Name area -->
+
+<!-- Start Blog Area -->
+<div class="blog-area blog-with-sidebar pt-120 pb-90">
+    <div class="container">
+        <div class="row justify-content-center gx-xl-5">
+            <div class="col-lg-8">
+                {% for post in posts.Data %}
+                <article class="item-single mb-30">
+                    <div class="image">
+                        <a href="/blog/{{post.Slug}}" class="lazy-container aspect-ratio">
+                            <img class="lazyload lazy-image" src="/public/themes/{{theme.ID}}/images/placeholder.png"
+                                 data-src="{{post.Thumbnail}}" alt="{{post.Title}}">
+                        </a>
+                        <a href="/404-error" class="btn primary-btn primary-btn-2"><i class="fas fa-share-alt"></i>اشتراک
+                            گذاری</a>
+                    </div>
+                    <div class="content">
+                        <ul class="info-list">
+                            <li><i class="far fa-calendar-alt"></i>{{post.UpdatedAt}}</li>
+                            <li><i class="fas fa-user"></i>{{post.User.Firstname}} {{post.User.Lastname}}</li>
+                            <li><i class="fas fa-tag"></i>
+                                {% for category in post.Categories %}
+                                <span style="margin-right: 5px;">{{category.Name}}</span>
+                                {% endfor %}
+                            </li>
+                        </ul>
+                        <h3 class="title">
+                            <a href="blog-details">
+                                {{post.Title}}
+                            </a>
+                        </h3>
+                        <p>
+                            {{post.Body}}
+                        </p>
+                        <a href="/blog/{{post.Slug}}" class="btn primary-btn primary-btn-5">ادامه مطلب</a>
+                    </div>
+                </article>
+                {% empty %}
+                <p>مطلبی یافت نشد</p>
+                {% endfor %}
+                {% if posts.TotalPages > 0 %}
+                <div class="pagination mb-30 justify-content-center">
+                    {% if posts.Page != 1 %}
+                    <a href="/category/{{category.ID}}  ?page={{posts.Page-1}}" class="page-numbers"><i class="fas fa-angle-right"></i>قبلی</a>
+                    {% endif %}
+                    {% if posts.Page < posts.TotalPages %}
+                    <a href="/category/{{category.ID}}?page={{posts.Page+1}}" class="page-numbers"><i class="fas fa-angle-left"></i>بعدی</a>
+                    {% endif %}
+
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-4">
+                <aside class="sidebar-widget-area">
+                    <div class="widget widget-search mb-30">
+                        <h3 class="title">جستجوی پست ها</h3>
+                        <form class="search-form">
+                            <input type="search" class="search-input" placeholder="دنبال چی میگردی ... ؟!">
+                            <button class="btn-search" type="submit">
+                                <i class="far fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="widget widget-social-link mb-30">
+                        <h3 class="title">ما رو دنبال کنید</h3>
+                        <ul class="list-unstyled m-0">
+                            <li class="d-inline">
+                                <a href="https://www.facebook.com/" target="_blank" class="facebook"><i
+                                        class="fab fa-facebook-square"></i></a>
+                            </li>
+                            <li class="d-inline ms-1">
+                                <a href="https://www.twitter.com/" target="_blank" class="twitter"><i
+                                        class="fab fa-twitter-square"></i></a>
+                            </li>
+                            <li class="d-inline ms-1">
+                                <a href="https://www.google.com/" target="_blank" class="google"><i
+                                        class="fab fa-google-plus-square"></i></a>
+                            </li>
+                            <li class="d-inline ms-1">
+                                <a href="https://www.linkedin.com/" target="_blank" class="linkedin"><i
+                                        class="fab fa-linkedin"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="widget widget-post mb-30">
+                        <h3 class="title">پستهای اخیر</h3>
+                        {% for post in random_posts %}
+                        <article class="article-item mb-30">
+                            <div class="image">
+                                <a href="/blog/{{post.Slug}}" class="lazy-container aspect-ratio">
+                                    <img class="lazyload lazy-image" src="/public/themes/{{theme.ID}}/images/placeholder.png"
+                                         data-src="{{post.Thumbnail}}" alt="{{post.Title}}">
+                                </a>
+                            </div>
+                            <div class="content">
+                                <h6>
+                                    <a href="/blog/{{post.Slug}}">{{post.Title}}</a>
+                                </h6>
+                                <div class="time">
+                                    {{post.UpdatedAt}}
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <div class="widget widget-categories mb-30">
+                        <h3 class="title">دسته بندی ها</h3>
+                        <ul class="list-unstyled m-0">
+                            {% for category in categories %}
+                            <li class="d-flex align-items-center justify-content-between">
+                                <a href="/category/{{category.ID}}"><i class="fal fa-folder"></i>{{category.Name}}</a>
+                                <!--                                <span class="tqy">(11)</span>-->
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="widget widget-tag mb-30">
+                        <h3 class="title">برچسب ها</h3>
+                        <ul class="list-unstyled m-0">
+                            {% for tag in tags %}
+                            <li class="d-inline-block"><a href="/tag/{{tag.Slug}}">{{tag.Name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="widget widget-adds mb-30">
+                        <div class="content text-center">
+                            <h3>میتونی این قالب رو با 20٪ تخفیف بگیری !!</h3>
+                            <a href="404-error" class="btn secondary-btn text-uppercase">بزن بریم !</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Blog Area -->
+
+{% include "components/footer.html" with color="3" %}
+
+
+{% endblock %}

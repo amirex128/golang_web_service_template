@@ -16,7 +16,7 @@ type Event struct {
 
 func initEvent(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Event{})
-	events := utils.ReadCsvFile("../../csv/events.csv")
+	events := utils.ReadCsvFile("./csv/events.csv")
 	manager.CreateAllEvents(events)
 }
 func (m *MysqlManager) CreateAllEvents(files [][]string) {

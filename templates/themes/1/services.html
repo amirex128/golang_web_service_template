@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+{% include "components/header.html" with color="9" %}
+
+<!-- Start Page Name area-->
+<div class="page-title-area">
+    <div class="container">
+        <div class="content text-center">
+            <h1>خدمات ما</h1>
+            <ul class="list-unstyled">
+                <li class="d-inline"><a href="index">صفحه اصلی</a></li>
+                <li class="d-inline">/</li>
+                <li class="d-inline active">خدمات</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- End Page Name area -->
+
+<!-- Start Services Area -->
+<section class="services-area services-2 ptb-120">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-1.png" alt="آیکون">
+                    </div>
+                    <h3>طراحی بصری</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-2.png" alt="آیکون">
+                    </div>
+                    <h3>ابزار اشکال سفارشی</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-3.png" alt="آیکون">
+                    </div>
+                    <h3>ترازبندی عمودی</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-4.png" alt="آیکون">
+                    </div>
+                    <h3>طراحی رابط کاربری</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-5.png" alt="آیکون">
+                    </div>
+                    <h3>طراحی انعطاف پذیر</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="item-single text-center mb-30">
+                    <div class="icon">
+                        <img src="/public/themes/{{theme.ID}}/images/icon-6.png" alt="آیکون">
+                    </div>
+                    <h3>ابزار Pen Tool Stork</h3>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله لازم است</p>
+                </div>
+            </div>
+        </div>
+        <div class="pagination justify-content-center">
+            <a href="#" class="page-numbers"><i class="fas fa-angle-right"></i></a>
+            <span class="page-numbers current" aria-current="page">1</span>
+            <a href="#" class="page-numbers">2</a>
+            <a href="#" class="page-numbers"><i class="fas fa-angle-left"></i></a>
+        </div>
+    </div>
+</section>
+<!-- End Services Area -->
+{% include "components/footer.html" with color="3" %}
+
+{% endblock %}

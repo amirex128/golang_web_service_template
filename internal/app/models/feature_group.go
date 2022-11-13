@@ -17,7 +17,7 @@ type FeatureGroup struct {
 
 func initFeatureGroup(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureGroup{})
-	featureGroups := utils.ReadCsvFile("../../csv/feature_groups.csv")
+	featureGroups := utils.ReadCsvFile("./csv/feature_groups.csv")
 	manager.CreateAllFeatureGroups(featureGroups)
 }
 func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {

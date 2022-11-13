@@ -13,12 +13,14 @@ import (
 type Category struct {
 	ID          uint64    `gorm:"primary_key;auto_increment" json:"id"`
 	ParentID    uint64    `json:"parent_id"`
-	UserID      uint64    `gorm:"default:null" json:"user_id"`
+	UserID      *uint64   `gorm:"default:null" json:"user_id"`
 	Type        string    `json:"type" sql:"type:ENUM('post','product')"`
 	Name        string    `json:"name"`
 	Sort        uint32    `json:"sort"`
 	Equivalent  string    `json:"equivalent"`
 	Description string    `json:"description"`
+	GalleryID   *uint64   `gorm:"default:null" json:"gallery_id"`
+	Gallery     *Gallery  `json:"gallery"`
 	Products    []Product `gorm:"many2many:category_product;"`
 	Posts       []Post    `gorm:"many2many:category_post;"`
 	Options     []Option  `gorm:"many2many:category_option;"`
@@ -37,15 +39,16 @@ func initCategory(manager *MysqlManager) bool {
 		return false
 	}
 
-	categories := utils.ReadCsvFile("../../csv/categories.csv")
+	categories := utils.ReadCsvFile("./csv/categories.csv")
 	manager.CreateAllCategories(categories)
-	categoryRelated := utils.ReadCsvFile("../../csv/category_related.csv")
+	categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
 	manager.CreateAllCategoryRelated(categoryRelated)
 
 	for i := 0; i < 10; i++ {
 		manager.CreateCategory(&gin.Context{}, context.Background(), DTOs.CreateCategory{
 			Name:        "دسته بندی " + utils.IntToString(i),
 			Type:        "post",
+			GalleryID:   0,
 			Equivalent:  "کلمه مترادف" + utils.IntToString(i),
 			Description: "توضیحات دسته بندی " + utils.IntToString(i),
 		})
@@ -53,6 +56,7 @@ func initCategory(manager *MysqlManager) bool {
 	return true
 
 }
+
 func (m *MysqlManager) CreateCategory(c *gin.Context, ctx context.Context, dto DTOs.CreateCategory) error {
 	span, ctx := apm.StartSpan(ctx, "CreateCategory", "model")
 	defer span.End()
@@ -62,14 +66,20 @@ func (m *MysqlManager) CreateCategory(c *gin.Context, ctx context.Context, dto D
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "در دریافت دسته بندی ها مشکلی به وجود آمده است",
 		})
-		return nil
+		return err
 	}
 	userID := GetUser(c)
 	category := Category{
-		Name:        dto.Name,
-		ParentID:    0,
-		UserID:      userID,
-		Type:        dto.Type,
+		Name:     dto.Name,
+		ParentID: 0,
+		UserID:   &userID,
+		Type:     dto.Type,
+		GalleryID: func() *uint64 {
+			if dto.GalleryID == 0 {
+				return nil
+			}
+			return &dto.GalleryID
+		}(),
 		Sort:        lastCategory.Sort + 1,
 		Equivalent:  dto.Equivalent,
 		Description: dto.Description,
@@ -105,6 +115,8 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 		categories = append(categories, Category{
 			ID:          utils.StringToUint64(value[0]),
 			ParentID:    utils.StringToUint64(value[1]),
+			GalleryID:   nil,
+			UserID:      nil,
 			Name:        value[2],
 			Type:        "product",
 			Sort:        utils.StringToUint32(value[3]),
@@ -196,13 +208,13 @@ func (m *MysqlManager) GetAllCategoryPostWithPagination(c *gin.Context, ctx cont
 func (m *MysqlManager) UpdateCategory(c *gin.Context, ctx context.Context, dto DTOs.UpdateCategory) error {
 	span, ctx := apm.StartSpan(ctx, "UpdateCategory", "model")
 	defer span.End()
-	category, err := m.FindCategoryByID(c, nil, dto.ID)
+	category, err := m.FindCategoryByID(c, ctx, dto.ID)
 	if err != nil {
 		return nil
 	}
 
 	userID := GetUser(c)
-	if category.UserID != userID {
+	if *category.UserID != userID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه ویرایش این دسته بندی را ندارید",
 		})
@@ -224,6 +236,9 @@ func (m *MysqlManager) UpdateCategory(c *gin.Context, ctx context.Context, dto D
 	if category.Sort != dto.Sort {
 		category.Sort = dto.Sort
 	}
+	if *category.GalleryID != dto.GalleryID {
+		category.GalleryID = &dto.GalleryID
+	}
 	err = m.GetConn().Save(category).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -243,7 +258,7 @@ func (m *MysqlManager) DeleteCategory(c *gin.Context, ctx context.Context, id ui
 	}
 
 	userID := GetUser(c)
-	if category.UserID != userID {
+	if *category.UserID != userID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه حذف این دسته بندی را ندارید",
 		})

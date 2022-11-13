@@ -71,6 +71,7 @@ func ShowPost(c *gin.Context) {
 func IndexPost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexPost", "request")
 	defer span.End()
+
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return

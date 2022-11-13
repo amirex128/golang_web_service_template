@@ -10,6 +10,7 @@ type CreateCategory struct {
 	Name        string `form:"name" json:"name" validate:"required"`
 	Equivalent  string `form:"equivalent" json:"equivalent" validate:"omitempty"`
 	Description string `form:"description" json:"description" validate:"omitempty"`
+	GalleryID   uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty,numeric"`
 }
 
 type UpdateCategory struct {
@@ -19,4 +20,5 @@ type UpdateCategory struct {
 	Equivalent  string `form:"equivalent" json:"equivalent" validate:"omitempty"`
 	Description string `form:"description" json:"description" validate:"omitempty"`
 	Sort        uint32 `form:"sort" json:"sort" validate:"omitempty,numeric"`
+	GalleryID   uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty,numeric"`
 }

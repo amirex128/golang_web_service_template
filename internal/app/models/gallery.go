@@ -13,7 +13,7 @@ type Gallery struct {
 	ID       uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Path     string  `json:"path"`
 	FullPath string  `json:"full_path"`
-	UserID   uint64  `json:"user_id"`
+	UserID   uint64  `gorm:"default:null" json:"user_id"`
 	MimeType string  `json:"mime_type"`
 	Size     float64 `json:"size"`
 	Width    uint32  `json:"width"`

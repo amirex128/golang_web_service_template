@@ -13,7 +13,7 @@ type FeatureItemValue struct {
 
 func initFeatureItemValue(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItemValue{})
-	featureItemValues := utils.ReadCsvFile("../../csv/feature_item_values.csv")
+	featureItemValues := utils.ReadCsvFile("./csv/feature_item_values.csv")
 	manager.CreateAllFeatureItemValues(featureItemValues)
 }
 func (m *MysqlManager) CreateAllFeatureItemValues(files [][]string) {

@@ -81,8 +81,7 @@ func ShowShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showShop", "request")
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
-	userID := models.GetUser(c)
-	shop, err := models.NewMainManager().FindShopByID(c, ctx, shopID, userID)
+	shop, err := models.NewMainManager().FindShopByID(c, ctx, shopID)
 	if err != nil {
 		return
 	}

@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+
+<!-- Start Coming Soon Area -->
+<div class="coming-soon-area">
+    <div class="container">
+        <div class="coming-soon-box">
+            <div class="title-box">
+                <h2 class="title">صفحه به زودی</h2>
+                <p class="text">اتفاقای شگفت انگیری توی راهه ! به زودی برمیگردیم :)
+                </p>
+            </div>
+            <div id="timer" class="flex-wrap d-flex justify-content-center">
+                <div id="days" class="count align-items-center flex-column d-flex justify-content-center">
+                    <div class="h1"></div>
+                    <span>روز</span>
+                </div>
+                <div id="hours" class="count align-items-center flex-column d-flex justify-content-center">
+                    <div class="h1"></div>
+                    <span>ساعت</span>
+                </div>
+                <div id="minutes" class="count align-items-center flex-column d-flex justify-content-center">
+                    <div class="h1"></div>
+                    <span>دقیقه</span>
+                </div>
+                <div id="seconds" class="count align-items-center flex-column d-flex justify-content-center">
+                    <div class="h1"></div>
+                    <span>ثانیه</span>
+                </div>
+            </div>
+            <form class="newsletter-form" id="newsletterForm">
+                <div class="input-group">
+                    <input class="form-control" placeholder="لطفا پست الکترونیکت رو وارد کن" type="text" name="EMAIL" required="">
+                    <button class="btn primary-btn primary-btn-5" type="submit">
+                        عضویت
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Coming Soon Area -->
+
+{% endblock %}

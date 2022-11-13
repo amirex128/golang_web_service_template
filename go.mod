@@ -15,6 +15,7 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.13.0
+	github.com/mandrigin/gin-spa v0.0.0-20200212133200-790d0c0c7335
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/sirupsen/logrus v1.9.0
 	github.com/speps/go-hashids v2.0.0+incompatible
@@ -26,6 +27,7 @@ require (
 	go.elastic.co/apm/module/apmgin v1.15.0
 	go.elastic.co/apm/module/apmgormv2/v2 v2.2.0
 	go.elastic.co/apm/module/apmlogrus/v2 v2.2.0
+	go.elastic.co/apm/v2 v2.2.0
 	gorm.io/gorm v1.23.8
 )
 
@@ -37,6 +39,7 @@ require (
 	github.com/elastic/go-sysinfo v1.7.1 // indirect
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -70,7 +73,6 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.elastic.co/apm/module/apmhttp v1.15.0 // indirect
 	go.elastic.co/apm/module/apmsql/v2 v2.2.0 // indirect
-	go.elastic.co/apm/v2 v2.2.0 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect

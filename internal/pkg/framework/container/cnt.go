@@ -24,7 +24,7 @@ type service map[string][]map[string]string
 
 func RegisterServices(appName string) {
 	var res service
-	configStr, err := ioutil.ReadFile("services.json")
+	configStr, err := ioutil.ReadFile("./configs/services.json")
 	assert.Nil(err)
 	err = json.Unmarshal(configStr, &res)
 	assert.Nil(err)

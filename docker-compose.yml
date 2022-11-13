@@ -1,0 +1,125 @@
+version: '3.9'
+
+services:
+  backend:
+    depends_on:
+      - "redis"
+      - "mysql"
+      - "nginx"
+      - "elastic"
+      - "kibana"
+      - "apm-server"
+    networks:
+      - selloora
+    build:
+      context: .
+    ports:
+      - "8585:8585"
+    volumes:
+      - "./internal:/app/internal"
+      - "./public:/app/public"
+      - "./configs:/app/configs"
+      - "./templates:/app/templates"
+    environment:
+      - GO111MODULE=on
+      - CGO_ENABLED=1
+      - ELASTIC_APM_ENVIRONMENT=staging
+      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
+      - ELASTIC_APM_SERVICE_NAME=selloora_backend
+      - SELLOORA_MYSQL_MAIN_DB=selloora
+      - SELLOORA_MYSQL_MAIN_HOST=mysql
+      - SELLOORA_MYSQL_MAIN_PASSWORD=q6766581Amirex
+      - SELLOORA_MYSQL_MAIN_PORT=3306
+      - SELLOORA_MYSQL_MAIN_USER=selloora
+      - SELLOORA_REDIS_DB=1
+      - SELLOORA_REDIS_HOST=redis
+      - SELLOORA_REDIS_PORT=6379
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8585
+      - SERVER_URL=http://localhost:8585
+  frontend:
+    depends_on:
+      - "backend"
+    networks:
+      - selloora
+    build:
+      context: ./frontend
+    volumes:
+      - "./frontend:/app"
+      - "./frontend/dist/spa:/app/dist/spa"
+  mysql:
+    networks:
+      - selloora
+    image: mariadb:10.9.3
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=9xz3jrd8wf
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./volumes/mariadb/init:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
+      - '3372:3306'
+  nginx:
+    networks:
+      - selloora
+    image: nginx:1.23.2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - './volumes/nginx/conf.d:/etc/nginx/conf.d'
+  redis:
+    networks:
+      - selloora
+    image: redis:6.2.7
+    restart: always
+    ports:
+      - '6379:6379'
+      - '6399:6379'
+      - '6390:6379'
+  elastic:
+    networks:
+      - selloora
+    image: elasticsearch:7.4.2
+    restart: always
+    ports:
+      - 9213:9200
+      - 9313:9300
+      - 9204:9200
+      - 9305:9300
+    environment:
+      - cluster.name=elastic
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  kibana:
+    networks:
+      - selloora
+    depends_on:
+      - elastic
+    restart: always
+    image: kibana:7.4.2
+    ports:
+      - "5613:5601"
+    environment:
+      - SERVER_NAME=dev.search.snappfood.ir
+      - ELASTICSEARCH_HOSTS=http://elastic:9200
+  apm-server:
+    networks:
+      - selloora
+    depends_on:
+      - elastic
+      - kibana
+    restart: always
+    user: apm-server
+    image: docker.elastic.co/apm/apm-server:7.4.2
+    ports:
+      - 8200:8200
+    volumes:
+      - ./volumes/apm/apm-server.yml:/usr/share/apm-server/apm-server.yml
+
+networks:
+  selloora:
+    driver: bridge

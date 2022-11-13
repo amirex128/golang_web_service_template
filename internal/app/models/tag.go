@@ -19,7 +19,7 @@ type Tag struct {
 func initTag(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Tag{})
 	for i := 0; i < 100; i++ {
-		manager.CreateTag(&gin.Context{}, nil, DTOs.CreateTag{
+		manager.CreateTag(&gin.Context{}, context.Background(), DTOs.CreateTag{
 			Name: "تگ شماره" + strconv.Itoa(i),
 			Slug: "tag" + strconv.Itoa(i),
 		})

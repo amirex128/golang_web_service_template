@@ -18,8 +18,9 @@ type Post struct {
 	Slug       string     `json:"slug"`
 	GalleryID  *uint64    `gorm:"default:null" json:"gallery_id"`
 	Gallery    *Gallery   `gorm:"foreignKey:gallery_id" json:"gallery"`
-	UserID     uint64     `json:"user_id"`
-	User       User       `gorm:"foreignKey:user_id" json:"user"`
+	UserID     *uint64    `json:"user_id"`
+	User       *User      `gorm:"foreignKey:user_id" json:"user"`
+	ShopID     *uint64    `gorm:"default:null" json:"shop_id"`
 	Categories []Category `gorm:"many2many:category_post;" json:"categories"`
 	Tags       []Tag      `gorm:"many2many:post_tag;" json:"tags"`
 	Comments   []Comment  `gorm:"foreignKey:post_id" json:"comments"`
@@ -30,7 +31,7 @@ type Post struct {
 func InitPost(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Post{})
 	for i := 0; i < 10; i++ {
-		manager.CreatePost(&gin.Context{}, nil, DTOs.CreatePost{
+		manager.CreatePost(&gin.Context{}, context.Background(), DTOs.CreatePost{
 			Title:     "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
 			Body:      "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
 			Slug:      "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
@@ -66,7 +67,7 @@ func (m *MysqlManager) CreatePost(c *gin.Context, ctx context.Context, dto DTOs.
 			}
 			return nil
 		}(),
-		UserID:    userID,
+		UserID:    &userID,
 		CreatedAt: utils.NowTime(),
 		UpdatedAt: utils.NowTime(),
 	}
@@ -172,7 +173,7 @@ func (m *MysqlManager) GetAllPostWithPagination(c *gin.Context, ctx context.Cont
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err = conn.Find(&posts).Error
+	err = conn.Where("shop_id = ? ", dto.ShopID).Find(&posts).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در یافتن پست ها پیش آمده است",

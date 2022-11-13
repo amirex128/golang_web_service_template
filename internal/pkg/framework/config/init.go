@@ -10,11 +10,10 @@ import (
 
 // Initialize init config
 func Initialize(prefix string) {
-	viper.SetEnvPrefix(prefix)
 	viper.AutomaticEnv()
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	viper.AddConfigPath("../../configs")
+	viper.AddConfigPath("./configs")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))

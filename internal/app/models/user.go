@@ -35,7 +35,7 @@ type User struct {
 
 func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
-	manager.CreateUser(&gin.Context{}, nil, &User{
+	manager.CreateUser(&gin.Context{}, context.Background(), &User{
 		ID:         1,
 		Gender:     "man",
 		Firstname:  "امیر",

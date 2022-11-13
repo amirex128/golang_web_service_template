@@ -24,7 +24,7 @@ type Comment struct {
 func InitComment(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Comment{})
 	for i := 0; i < 10; i++ {
-		manager.CreateComment(&gin.Context{}, nil, DTOs.CreateComment{
+		manager.CreateComment(&gin.Context{}, context.Background(), DTOs.CreateComment{
 			PostID: 1,
 			Name:   "test test test",
 			Body:   "test test test",

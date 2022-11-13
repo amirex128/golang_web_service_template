@@ -5,17 +5,7 @@ export GOFLAGS=-mod=vendor
 export GO=$(shell which go)
 export BUILD=cd $(ROOT) && $(GO) install -v -ldflags "-s"
 
-export SELLOORA_MYSQL_MAIN_DB="selloora"
-export SELLOORA_MYSQL_MAIN_HOST="localhost"
-export SELLOORA_MYSQL_MAIN_PASSWORD="a6766581"
-export SELLOORA_MYSQL_MAIN_PORT="3306"
-export SELLOORA_MYSQL_MAIN_USER="selloora"
-export SELLOORA_REDIS_DB=1
-export SELLOORA_REDIS_HOST="localhost"
-export SELLOORA_REDIS_PORT=6379
-export SERVER_HOST="0.0.0.0"
-export SERVER_PORT="8585"
-export SERVER_URL="http://localhost:8585"
+#ELASTIC_APM_ENVIRONMENT=staging;ELASTIC_APM_SERVER_URL=http://localhost:8200;ELASTIC_APM_SERVICE_NAME=selloora_backend;SELLOORA_MYSQL_MAIN_DB= "selloora";SELLOORA_MYSQL_MAIN_HOST= "localhost";SELLOORA_MYSQL_MAIN_PASSWORD= "q6766581Amirex";SELLOORA_MYSQL_MAIN_PORT= "3306";SELLOORA_MYSQL_MAIN_USER=selloora;SELLOORA_REDIS_DB= 1;SELLOORA_REDIS_HOST= "localhost";SELLOORA_REDIS_PORT= 6379;SERVER_HOST= "0.0.0.0";SERVER_PORT= "8585";SERVER_URL=http://localhost:8585
 
 all:
 	$(BUILD) ./cmd/...
