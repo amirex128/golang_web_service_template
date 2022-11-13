@@ -35,10 +35,8 @@ func UpdateShop(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := models.GetUser(c)
-	shopID := utils.StringToUint64(c.Param("id"))
 
-	err = models.NewMainManager().UpdateShop(c, ctx, dto, shopID, userID)
+	err = models.NewMainManager().UpdateShop(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -118,17 +116,16 @@ func IndexShop(c *gin.Context) {
 func CheckSocial(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "checkSocial", "request")
 	defer span.End()
-	dto, err := validations.CheckSocial(c)
+	_, err := validations.CheckSocial(c)
 	if err != nil {
 		return
 	}
-	userID := models.GetUser(c)
 	// TODO بررسی وضعیت تایید شبکه اجتماعی
 	var resultCheck bool
 	resultCheck = true
 	err = models.NewMainManager().UpdateShop(c, ctx, DTOs.UpdateShop{
 		VerifySocial: true,
-	}, dto.ShopID, userID)
+	})
 	if err != nil {
 		return
 	}
@@ -150,11 +147,9 @@ func SendPrice(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := models.GetUser(c)
-
 	err = models.NewMainManager().UpdateShop(c, ctx, DTOs.UpdateShop{
 		SendPrice: dto.SendPrice,
-	}, dto.ShopID, userID)
+	})
 	if err != nil {
 		return
 	}

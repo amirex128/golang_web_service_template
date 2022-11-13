@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func CreateDomain(c *gin.Context) (DTOs.CreateDomain, error) {
-	var dto DTOs.CreateDomain
+func CreateTheme(c *gin.Context) (DTOs.CreateTheme, error) {
+	var dto DTOs.CreateTheme
 	tags := ValidationTags{
 		"title": {
 			"required": "عنوان الزامی است",
@@ -42,8 +42,8 @@ func CreateDomain(c *gin.Context) (DTOs.CreateDomain, error) {
 	return dto, nil
 }
 
-func IndexDomain(c *gin.Context) (DTOs.IndexDomain, error) {
-	var dto DTOs.IndexDomain
+func IndexTheme(c *gin.Context) (DTOs.IndexTheme, error) {
+	var dto DTOs.IndexTheme
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {
@@ -60,7 +60,6 @@ func IndexDomain(c *gin.Context) (DTOs.IndexDomain, error) {
 	if err != nil {
 		return dto, err
 	}
-	dto.ShopID = utils.StringToUint64(c.Query("shop_id"))
 	dto.WithoutPagination = c.Query("without_pagination") == "true"
 	dto.Page = utils.StringToUint32(c.Query("page"))
 	dto.PageSize = utils.StringToUint32(c.Query("page_size"))

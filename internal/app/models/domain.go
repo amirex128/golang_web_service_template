@@ -81,3 +81,51 @@ func (m *MysqlManager) FindDomainByName(c *gin.Context, ctx context.Context, nam
 	}
 	return domain, nil
 }
+func (m *MysqlManager) DeleteDomain(c *gin.Context, ctx context.Context, domainID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "showDomain", "model")
+	defer span.End()
+	domain := Domain{}
+	err := m.GetConn().Where("id = ?", domainID).First(&domain).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "دامنه یافت نشد",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return err
+	}
+
+	err = m.GetConn().Delete(&domain).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در حذف دامنه",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return err
+	}
+	return nil
+}
+func (m *MysqlManager) GetAllDomainWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexDomain) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "showDomain", "model")
+	defer span.End()
+	conn := m.GetConn()
+	var domains []Domain
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("domains", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+	}
+	err := conn.Find(&domains).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت دامنه ها",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return pagination, err
+	}
+	pagination.Data = domains
+	return pagination, nil
+}

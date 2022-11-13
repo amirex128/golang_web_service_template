@@ -34,6 +34,7 @@ func IndexLanding(c *gin.Context) {
 func BlogLanding(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "blogLanding", "request")
 	defer span.End()
+
 	dto, err := validations.IndexPost(c)
 	if err != nil {
 		return
@@ -78,8 +79,18 @@ func BlogLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	c.Set("template", "blog.html")
+
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "blog.html"))
+
 	c.Set("data", map[string]interface{}{
+		"theme":        theme,
+		"domain":       domain,
+		"shop":         shop,
 		"title":        "بلاگ" + siteName,
 		"posts":        posts,
 		"random_posts": randomPosts,
@@ -140,8 +151,17 @@ func CategoryLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	c.Set("template", "category.html")
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "category.html"))
+
 	c.Set("data", map[string]interface{}{
+		"theme":        theme,
+		"domain":       domain,
+		"shop":         shop,
 		"title":        category.Name + siteName,
 		"category":     category,
 		"posts":        posts,
@@ -203,8 +223,17 @@ func TagLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	c.Set("template", "tag.html")
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "tag.html"))
+
 	c.Set("data", map[string]interface{}{
+		"theme":        theme,
+		"domain":       domain,
+		"shop":         shop,
 		"title":        tag.Name + siteName,
 		"tag":          tag,
 		"posts":        posts,
@@ -273,8 +302,17 @@ func DetailsLanding(c *gin.Context) {
 	for i := range comments {
 		comments[i].EmailHash = utils.GetMD5Hash(comments[i].Email)
 	}
-	c.Set("template", "blog-details.html")
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "blog-details.html"))
+
 	c.Set("data", map[string]interface{}{
+		"theme":        theme,
+		"domain":       domain,
+		"shop":         shop,
 		"title":        post.Title + siteName,
 		"post":         post,
 		"last_posts":   lastPost,
@@ -285,6 +323,93 @@ func DetailsLanding(c *gin.Context) {
 	})
 }
 
+func SearchLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "SearchLanding", "request")
+	defer span.End()
+	dto, err := validations.IndexPost(c)
+	if err != nil {
+		return
+	}
+	posts, err := models.NewMainManager().GetAllPostWithPagination(c, ctx, dto)
+	if err != nil {
+		return
+	}
+	postArray := posts.Data.([]models.Post)
+	for i := range postArray {
+		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
+	}
+	posts.Data = postArray
+	tags, err := models.NewMainManager().RandomTags(c, ctx, 20)
+	if err != nil {
+		return
+	}
+
+	categories, err := models.NewMainManager().GetLevel1Categories(c, ctx)
+	if err != nil {
+		return
+	}
+
+	randomPosts, err := models.NewMainManager().RandomPost(c, ctx, 6)
+	if err != nil {
+		return
+	}
+	for i := range randomPosts {
+		randomPosts[i].CreatedAt = func() string {
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
+			if ago == 0 {
+				return "امروز"
+			}
+			return fmt.Sprintf("%d روز قبل", ago)
+		}()
+		randomPosts[i].UpdatedAt = func() string {
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
+			if ago == 0 {
+				return "امروز"
+			}
+			return fmt.Sprintf("%d روز قبل", ago)
+		}()
+	}
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "search.html"))
+
+	c.Set("data", map[string]interface{}{
+		"theme":        theme,
+		"domain":       domain,
+		"shop":         shop,
+		"title":        "بلاگ" + siteName,
+		"posts":        posts,
+		"random_posts": randomPosts,
+		"categories":   categories,
+		"tags":         tags,
+	})
+}
+
+func PageLanding(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "PageLanding", "request")
+	defer span.End()
+	shop, domain, theme, err := models.NewMainManager().FindShopByDomain(c, ctx, c.Request.Host)
+	if err != nil {
+		return
+	}
+
+	page, err := models.NewMainManager().FindPageBySlug(c, ctx, c.Param("slug"))
+	if err != nil {
+		return
+	}
+	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "page.html"))
+
+	c.Set("data", map[string]interface{}{
+		"theme":  theme,
+		"domain": domain,
+		"shop":   shop,
+		"page":   page,
+	})
+}
 func ContactLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "contactLanding", "request")
 	defer span.End()

@@ -119,11 +119,11 @@ func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID 
 	return res, nil
 }
 
-func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.UpdateShop, shopID, userID uint64) error {
+func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.UpdateShop) error {
 	span, ctx := apm.StartSpan(ctx, "UpdateShop", "model")
 	defer span.End()
 	shop := &Shop{}
-	err := m.GetConn().Where("id = ?", shopID).First(shop).Error
+	err := m.GetConn().Where("id = ?", dto.ID).First(shop).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "فروشگاه یافت نشد",
@@ -132,6 +132,7 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.
 		})
 		return err
 	}
+	userID := GetUser(c)
 	if shop.UserID != userID {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",

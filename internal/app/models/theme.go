@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/internal/app/DTOs"
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -55,4 +56,52 @@ func (m *MysqlManager) FindThemeByID(c *gin.Context, ctx context.Context, themeI
 		return nil, err
 	}
 	return theme, nil
+}
+func (m *MysqlManager) DeleteTheme(c *gin.Context, ctx context.Context, themeID uint64) error {
+	span, ctx := apm.StartSpan(ctx, "showTheme", "model")
+	defer span.End()
+	theme := Theme{}
+	err := m.GetConn().Where("id = ?", themeID).First(&theme).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "قالب یافت نشد",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return err
+	}
+
+	err = m.GetConn().Delete(&theme).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "خطا در حذف قالب",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return err
+	}
+	return nil
+}
+func (m *MysqlManager) GetAllThemeWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexTheme) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "showTheme", "model")
+	defer span.End()
+	conn := m.GetConn()
+	var themes []Theme
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("themes", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
+	}
+	err := conn.Find(&themes).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت قالب ها",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return pagination, err
+	}
+	pagination.Data = themes
+	return pagination, nil
 }

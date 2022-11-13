@@ -83,11 +83,11 @@ func (m *MysqlManager) CreatePost(c *gin.Context, ctx context.Context, dto DTOs.
 	return
 }
 
-func (m *MysqlManager) UpdatePost(c *gin.Context, ctx context.Context, dto DTOs.UpdatePost, postID uint64) (err error) {
+func (m *MysqlManager) UpdatePost(c *gin.Context, ctx context.Context, dto DTOs.UpdatePost) (err error) {
 	span, ctx := apm.StartSpan(ctx, "UpdatePost", "model")
 	defer span.End()
 	post := Post{}
-	err = m.GetConn().Where("id = ?", postID).First(&post).Error
+	err = m.GetConn().Where("id = ?", dto.ID).First(&post).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "مشکلی در ویرایش پست پیش آمده است",

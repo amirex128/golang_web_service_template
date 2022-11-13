@@ -40,11 +40,12 @@ func initDiscount(manager *MysqlManager) {
 		Percent:    20,
 		ProductIDs: []uint64{1, 2, 3},
 		Status:     1,
-	}, 1)
+	})
 }
-func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto DTOs.CreateDiscount, userID uint64) error {
+func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto DTOs.CreateDiscount) error {
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
+	userID := GetUser(c)
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(c, ctx, pId)
 		if err != nil {
@@ -86,9 +87,11 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto D
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto DTOs.UpdateDiscount, userID uint64, discountID string) error {
+func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto DTOs.UpdateDiscount) error {
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
+	userID := GetUser(c)
+
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(c, ctx, pId)
 		if err != nil {
@@ -110,7 +113,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 	}
 
 	discount := &Discount{}
-	err := m.GetConn().Where("id = ?", discountID).First(discount).Error
+	err := m.GetConn().Where("id = ?", dto.ID).First(discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "تخفیف یافت نشد",
@@ -165,7 +168,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 	}
 	return nil
 }
-func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, discountID uint64, userID uint64) error {
+func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, discountID uint64) error {
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
 	discount := Discount{}
@@ -178,6 +181,7 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, disco
 		})
 		return err
 	}
+	userID := GetUser(c)
 	if discount.UserID != userID {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه حذف این تخفیف را ندارید",
@@ -198,13 +202,13 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, disco
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexDiscount, userID uint64) (*DTOs.Pagination, error) {
+func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexDiscount) (*DTOs.Pagination, error) {
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var discounts []Discount
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
-
+	userID := GetUser(c)
 	conn = conn.Scopes(DTOs.Paginate("discounts", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
@@ -239,9 +243,10 @@ func (m *MysqlManager) FindDiscountById(c *gin.Context, ctx context.Context, dis
 	return discount, nil
 }
 
-func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, ctx context.Context, code string, userID uint64) (Discount, error) {
+func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, ctx context.Context, code string) (Discount, error) {
 	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
 	defer span.End()
+	userID := GetUser(c)
 	discount := Discount{}
 	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
 	if err != nil {

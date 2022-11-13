@@ -41,7 +41,7 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.DiscountCode, dto.UserID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.DiscountCode)
 	if err != nil {
 		return
 	}

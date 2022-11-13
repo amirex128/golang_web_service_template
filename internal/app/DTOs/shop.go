@@ -19,6 +19,7 @@ type CreateShop struct {
 }
 
 type UpdateShop struct {
+	ID            uint64  `form:"id" json:"id" validate:"required"`
 	Name          string  `form:"name" json:"name" validate:"omitempty"`
 	EnglishName   string  `form:"english_name" json:"english_name" validate:"omitempty"`
 	GalleryID     uint64  `form:"gallery_id" json:"gallery_id" validate:"omitempty"`

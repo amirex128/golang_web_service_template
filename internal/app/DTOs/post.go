@@ -11,6 +11,7 @@ type CreatePost struct {
 }
 
 type UpdatePost struct {
+	ID         uint64 `form:"id" json:"id" validate:"required"`
 	Title      string `form:"title" json:"title" validate:"omitempty"`
 	Body       string `form:"body" json:"body" validate:"omitempty"`
 	GalleryID  uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty"`

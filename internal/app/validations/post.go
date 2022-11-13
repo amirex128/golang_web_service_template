@@ -102,5 +102,8 @@ func IndexPost(c *gin.Context) (DTOs.IndexPost, error) {
 	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
 	dto.Search = c.Query("search")
 	dto.Sort = c.Query("sort")
+	if dto.Search == "" {
+		dto.Search = c.Param("search")
+	}
 	return dto, nil
 }

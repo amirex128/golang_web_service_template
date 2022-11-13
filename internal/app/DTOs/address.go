@@ -13,6 +13,7 @@ type CreateAddress struct {
 }
 
 type UpdateAddress struct {
+	ID         uint64 `form:"id" json:"id" validate:"required"`
 	Title      string `form:"title" json:"title" validate:"omitempty"`
 	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"omitempty,numeric"`
 	CityID     uint64 `form:"city_id" json:"city_id" validate:"omitempty,numeric"`

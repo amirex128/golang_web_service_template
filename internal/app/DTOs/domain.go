@@ -5,3 +5,8 @@ type CreateDomain struct {
 	Name   string `form:"name" json:"name" validate:"required"`
 	Type   string `form:"type" json:"type" validate:"required"`
 }
+
+type IndexDomain struct {
+	Index
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"omitempty,numeric"`
+}

@@ -19,7 +19,7 @@ func CheckDiscount(c *gin.Context) {
 		return
 	}
 
-	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.Code, dto.UserID)
+	discount, err := models.NewMainManager().FindDiscountByCodeAndUserID(c, ctx, dto.Code)
 	if err != nil {
 		return
 	}
@@ -79,10 +79,7 @@ func CreateDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-
-	userID := models.GetUser(c)
-
-	err = models.NewMainManager().CreateDiscount(c, ctx, dto, userID)
+	err = models.NewMainManager().CreateDiscount(c, ctx, dto)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تخفیف با موفقیت ایجاد شد",
@@ -97,10 +94,7 @@ func UpdateDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := models.GetUser(c)
-	discountID := c.Param("id")
-
-	err = models.NewMainManager().UpdateDiscount(c, ctx, dto, userID, discountID)
+	err = models.NewMainManager().UpdateDiscount(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -116,9 +110,8 @@ func IndexDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	userID := models.GetUser(c)
 
-	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, ctx, dto, userID)
+	discounts, err := models.NewMainManager().GetAllDiscountWithPagination(c, ctx, dto)
 	if err != nil {
 		return
 	}
@@ -131,9 +124,8 @@ func DeleteDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
-	userID := models.GetUser(c)
 
-	err := models.NewMainManager().DeleteDiscount(c, ctx, id, userID)
+	err := models.NewMainManager().DeleteDiscount(c, ctx, id)
 	if err != nil {
 		return
 	}

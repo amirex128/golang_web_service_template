@@ -40,7 +40,6 @@ func UpdatePost(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	postID := c.Param("id")
 	if dto.Slug != "" {
 		dto.Slug = slug.MakeLang(dto.Slug, "en")
 		err = models.NewMainManager().CheckSlug(c, ctx, dto.Slug)
@@ -49,7 +48,7 @@ func UpdatePost(c *gin.Context) {
 		}
 	}
 
-	err = models.NewMainManager().UpdatePost(c, ctx, dto, utils.StringToUint64(postID))
+	err = models.NewMainManager().UpdatePost(c, ctx, dto)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "مقاله با موفقیت ویرایش شد",
 	})

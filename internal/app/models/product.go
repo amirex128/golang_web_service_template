@@ -4,7 +4,6 @@ import (
 	"backend/internal/app/DTOs"
 	"backend/internal/app/utils"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -155,6 +154,17 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DT
 	if err != nil {
 		return err
 	}
+
+	userID := GetUser(c)
+	if product.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "خطای دسترسی",
+			"type":    "model",
+			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
+		})
+		return err
+	}
+
 	if dto.ShopID > 0 {
 		product.ShopID = dto.ShopID
 	}
@@ -202,7 +212,25 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DT
 func (m *MysqlManager) DeleteProduct(c *gin.Context, ctx context.Context, id uint64) error {
 	span, ctx := apm.StartSpan(ctx, "DeleteProduct", "model")
 	defer span.End()
-	err := m.GetConn().Delete(&Product{}, id).Error
+	userID := GetUser(c)
+	var product Product
+	err := m.GetConn().Where("id = ?", id).First(&product).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"type":    "model",
+			"message": "خطا در حذف محصول",
+		})
+	}
+	if product.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "خطای دسترسی",
+			"type":    "model",
+			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
+		})
+		return err
+	}
+	err = m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   err.Error(),
@@ -244,26 +272,6 @@ func (m *MysqlManager) FindProductByIds(c *gin.Context, ctx context.Context, ids
 		return products, err
 	}
 	return products, nil
-}
-
-func (m *MysqlManager) CheckAccessProduct(c *gin.Context, ctx context.Context, id uint64, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "CheckAccessProduct", "model")
-	defer span.End()
-	product, err := m.FindProductById(c, ctx, id)
-	if err != nil {
-		return err
-	}
-	if product.UserID != userID {
-		err = errors.New("access denied")
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
-		})
-		return err
-	}
-
-	return nil
 }
 
 func (m *MysqlManager) MoveProducts(c *gin.Context, ctx context.Context, shopID, newShopID, userID uint64) error {

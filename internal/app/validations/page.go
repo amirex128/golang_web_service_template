@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func CreateDomain(c *gin.Context) (DTOs.CreateDomain, error) {
-	var dto DTOs.CreateDomain
+func CreatePage(c *gin.Context) (DTOs.CreatePage, error) {
+	var dto DTOs.CreatePage
 	tags := ValidationTags{
 		"title": {
 			"required": "عنوان الزامی است",
@@ -41,9 +41,42 @@ func CreateDomain(c *gin.Context) (DTOs.CreateDomain, error) {
 	}
 	return dto, nil
 }
+func UpdatePage(c *gin.Context) (DTOs.UpdatePage, error) {
+	var dto DTOs.UpdatePage
+	tags := ValidationTags{
+		"Name": {
+			"required": "عنوان الزامی است",
+		},
+		"Body": {
+			"required": "متن الزامی است",
+		},
+		"Slug": {
+			"required": "نامک الزامی است",
+		},
+		"CategoryID": {
+			"required": "دسته بندی الزامی است",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
+			"error":   err.Error(),
+		})
+		return dto, errors.New("validation error")
+	}
 
-func IndexDomain(c *gin.Context) (DTOs.IndexDomain, error) {
-	var dto DTOs.IndexDomain
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+	return dto, nil
+}
+
+func IndexPage(c *gin.Context) (DTOs.IndexPage, error) {
+	var dto DTOs.IndexPage
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {

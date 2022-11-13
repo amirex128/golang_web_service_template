@@ -80,7 +80,12 @@ func (m *MysqlManager) CreateCategory(c *gin.Context, ctx context.Context, dto D
 			}
 			return &dto.GalleryID
 		}(),
-		Sort:        lastCategory.Sort + 1,
+		Sort: func() uint32 {
+			if lastCategory != nil {
+				return lastCategory.Sort + 1
+			}
+			return 1
+		}(),
 		Equivalent:  dto.Equivalent,
 		Description: dto.Description,
 	}

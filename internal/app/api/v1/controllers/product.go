@@ -58,18 +58,11 @@ func CreateProduct(c *gin.Context) {
 func UpdateProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateProduct", "request")
 	defer span.End()
-	userID := models.GetUser(c)
-
 	dto, err := validations.UpdateProduct(c)
 	if err != nil {
 		return
 	}
 	manager := models.NewMainManager()
-
-	err = manager.CheckAccessProduct(c, ctx, dto.ID, userID)
-	if err != nil {
-		return
-	}
 
 	err = manager.UpdateProduct(c, ctx, dto)
 	if err != nil {
@@ -85,15 +78,10 @@ func UpdateProduct(c *gin.Context) {
 func DeleteProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteProduct", "request")
 	defer span.End()
-	userID := models.GetUser(c)
 	id := utils.StringToUint64(c.Param("id"))
 
 	manager := models.NewMainManager()
-	err := manager.CheckAccessProduct(c, ctx, id, userID)
-	if err != nil {
-		return
-	}
-	err = manager.DeleteProduct(c, ctx, id)
+	err := manager.DeleteProduct(c, ctx, id)
 	if err != nil {
 		return
 	}

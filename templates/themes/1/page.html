@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+{{title}}
+{% endblock %}
+{% block content %}
+
+{% if page.type=="blank" %}
+
+{{page.body}}
+
+{% else %}
+
+{% include "components/header.html" with color="9" %}
+{{page.body}}
+{% include "components/footer.html" with color="3" %}
+
+{% endif %}
+
+{% endblock %}

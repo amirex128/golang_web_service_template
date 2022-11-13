@@ -23,6 +23,7 @@ type CreateDiscount struct {
 }
 
 type UpdateDiscount struct {
+	ID         uint64   `form:"id" json:"id" validate:"required,numeric"`
 	Code       string   `form:"code" json:"code" validate:"omitempty"`
 	StartedAt  string   `form:"started_at" json:"started_at" validate:"omitempty"`
 	EndedAt    string   `form:"ended_at" json:"ended_at" validate:"omitempty"`

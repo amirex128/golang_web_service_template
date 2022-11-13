@@ -29,9 +29,10 @@ func initAddress(manager *MysqlManager) {
 
 }
 
-func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DTOs.CreateAddress, userID uint64) error {
+func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DTOs.CreateAddress) error {
 	span, ctx := apm.StartSpan(ctx, "GetTicketWithChildren", "model")
 	defer span.End()
+	userID := GetUser(c)
 	address := Address{
 		UserID:     userID,
 		Title:      dto.Title,
@@ -56,11 +57,11 @@ func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DT
 	return err
 }
 
-func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DTOs.UpdateAddress, addressID uint64, userID uint64) error {
+func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DTOs.UpdateAddress) error {
 	span, ctx := apm.StartSpan(ctx, "UpdateAddress", "model")
 	defer span.End()
 	address := Address{}
-	err := m.GetConn().First(&address, addressID).Error
+	err := m.GetConn().First(&address, dto.ID).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در بروزرسانی آدرس رخ داده است",
@@ -69,6 +70,7 @@ func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DT
 		})
 		return err
 	}
+	userID := GetUser(c)
 	if address.UserID != userID {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": "شما اجازه دسترسی به این آدرس را ندارید",
