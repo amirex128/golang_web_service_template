@@ -7,28 +7,55 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
+	"os"
 )
 
 type Page struct {
-	ID        uint   `json:"id" gorm:"primary_key"`
+	ID        uint64 `json:"id" gorm:"primary_key"`
 	Title     string `json:"title"`
 	Body      string `json:"body"`
 	Slug      string `json:"slug"`
+	Type      string `json:"type" sql:"type:ENUM('blank','normal')"`
 	ShopID    *uint  `gorm:"default:null" json:"shop_id"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
 
 func initPage(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Shop{})
-	for i := 0; i < 20; i++ {
-		manager.CreatePage(&gin.Context{}, context.Background(), DTOs.CreatePage{
-			Title:  "dsfsdaf",
-			Body:   "afdsfds",
-			Slug:   "aaa",
-			ShopID: 1,
-		})
+	manager.GetConn().AutoMigrate(&Page{})
+	dirs, err := os.ReadDir("./csv/themes")
+	if err != nil {
+		panic(err)
 	}
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			files, err := os.ReadDir("./csv/themes/" + dir.Name())
+			if err != nil {
+				panic(err)
+			}
+			for _, file := range files {
+				if !file.IsDir() {
+					var body string
+					readFile, err := os.ReadFile("./csv/themes/" + dir.Name() + "/" + file.Name())
+					if err != nil {
+						panic(err)
+					}
+					body = string(readFile)
+					err = manager.CreatePage(&gin.Context{}, context.Background(), DTOs.CreatePage{
+						Title:  dir.Name(),
+						Body:   body,
+						Type:   "blank",
+						Slug:   dir.Name(),
+						ShopID: 1,
+					})
+					if err != nil {
+						panic(err)
+					}
+				}
+			}
+		}
+	}
+
 }
 
 func (m *MysqlManager) CreatePage(c *gin.Context, ctx context.Context, dto DTOs.CreatePage) error {
@@ -39,6 +66,7 @@ func (m *MysqlManager) CreatePage(c *gin.Context, ctx context.Context, dto DTOs.
 		Body:      dto.Body,
 		Slug:      dto.Slug,
 		ShopID:    &dto.ShopID,
+		Type:      dto.Type,
 		CreatedAt: utils.NowTime(),
 		UpdatedAt: utils.NowTime(),
 	}
@@ -76,6 +104,9 @@ func (m *MysqlManager) UpdatePage(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	if page.Slug != dto.Slug {
 		page.Slug = dto.Slug
+	}
+	if page.Type != dto.Type {
+		page.Type = dto.Type
 	}
 	page.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(page).Error

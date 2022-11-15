@@ -14,8 +14,8 @@ import (
 type Discount struct {
 	ID         uint64  `gorm:"primary_key;auto_increment" json:"id"`
 	Code       string  `json:"code"`
-	UserID     uint64  `json:"user_id"`
-	User       User    `gorm:"foreignKey:user_id" json:"user"`
+	UserID     *uint64 `gorm:"default:null" json:"user_id"`
+	User       *User   `gorm:"foreignKey:user_id" json:"user"`
 	StartedAt  string  `json:"started_at"`
 	Count      uint32  `json:"count"`
 	EndedAt    string  `json:"ended_at"`
@@ -38,7 +38,7 @@ func initDiscount(manager *MysqlManager) {
 		Type:       "percent",
 		Amount:     0,
 		Percent:    20,
-		ProductIDs: []uint64{1, 2, 3},
+		ProductIDs: []uint64{},
 		Status:     1,
 	})
 }
@@ -63,8 +63,13 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto D
 	}
 
 	discount := Discount{
-		Code:       dto.Code,
-		UserID:     userID,
+		Code: dto.Code,
+		UserID: func() *uint64 {
+			if userID != 0 {
+				return &userID
+			}
+			return nil
+		}(),
 		StartedAt:  utils.DateTimeConvert(dto.StartedAt),
 		EndedAt:    utils.DateTimeConvert(dto.EndedAt),
 		Count:      dto.Count,
@@ -123,7 +128,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 		return err
 	}
 
-	if discount.UserID != userID {
+	if *discount.UserID != userID {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه ویرایش این تخفیف را ندارید",
 			"error":   err.Error(),
@@ -182,7 +187,7 @@ func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, disco
 		return err
 	}
 	userID := GetUser(c)
-	if discount.UserID != userID {
+	if *discount.UserID != userID {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "شما اجازه حذف این تخفیف را ندارید",
 			"error":   err.Error(),

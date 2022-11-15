@@ -39,15 +39,10 @@ func (m *MysqlManager) CreateSlider(c *gin.Context, ctx context.Context, dto DTO
 	defer span.End()
 
 	// find last sort number
-	var lastSort *Slider
-	err := m.GetConn().Order("sort desc").First(lastSort).Error
+	var lastSort Slider
+	err := m.GetConn().Order("sort desc").First(&lastSort).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ایجاد اسلایدر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		lastSort.Sort = 0
 	}
 
 	slider := &Slider{
@@ -57,12 +52,7 @@ func (m *MysqlManager) CreateSlider(c *gin.Context, ctx context.Context, dto DTO
 		Link:        dto.Link,
 		ShopID:      &dto.ShopID,
 		Position:    dto.Position,
-		Sort: func() uint32 {
-			if lastSort != nil {
-				return lastSort.Sort + 1
-			}
-			return 1
-		}(),
+		Sort:        lastSort.Sort + 1,
 	}
 	err = m.GetConn().Create(&slider).Error
 	if err != nil {

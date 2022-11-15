@@ -60,13 +60,10 @@ func initCategory(manager *MysqlManager) bool {
 func (m *MysqlManager) CreateCategory(c *gin.Context, ctx context.Context, dto DTOs.CreateCategory) error {
 	span, ctx := apm.StartSpan(ctx, "CreateCategory", "model")
 	defer span.End()
-	lastCategory := &Category{}
-	err := m.GetConn().Where("type = ?", dto.Type).Order("id desc").Find(lastCategory).Error
+	var lastSort Category
+	err := m.GetConn().Where("type = ?", dto.Type).Order("sort desc").First(&lastSort).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "در دریافت دسته بندی ها مشکلی به وجود آمده است",
-		})
-		return err
+		lastSort.Sort = 0
 	}
 	userID := GetUser(c)
 	category := Category{
@@ -80,12 +77,7 @@ func (m *MysqlManager) CreateCategory(c *gin.Context, ctx context.Context, dto D
 			}
 			return &dto.GalleryID
 		}(),
-		Sort: func() uint32 {
-			if lastCategory != nil {
-				return lastCategory.Sort + 1
-			}
-			return 1
-		}(),
+		Sort:        lastSort.Sort + 1,
 		Equivalent:  dto.Equivalent,
 		Description: dto.Description,
 	}

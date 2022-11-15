@@ -36,15 +36,10 @@ func (m *MysqlManager) CreateMenu(c *gin.Context, ctx context.Context, dto DTOs.
 	defer span.End()
 
 	// find last sort number
-	var lastSort *Menu
-	err := m.GetConn().Order("sort desc").First(lastSort).Error
+	var lastSort Menu
+	err := m.GetConn().Order("sort desc").Where("shop_id = ?", dto.ShopID).First(&lastSort).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ایجاد منو",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		lastSort.Sort = 0
 	}
 
 	menu := &Menu{
@@ -53,12 +48,7 @@ func (m *MysqlManager) CreateMenu(c *gin.Context, ctx context.Context, dto DTOs.
 		ShopID:   &dto.ShopID,
 		ParentID: dto.ParentID,
 		Position: dto.Position,
-		Sort: func() uint32 {
-			if lastSort != nil {
-				return lastSort.Sort + 1
-			}
-			return 1
-		}(),
+		Sort:     lastSort.Sort + 1,
 	}
 	err = m.GetConn().Create(&menu).Error
 	if err != nil {

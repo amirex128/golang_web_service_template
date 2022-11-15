@@ -44,15 +44,15 @@ func Try(a func() error, max time.Duration, extra ...interface{}) {
 }
 
 func actual(a func() error, extra ...interface{}) (e error) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			stack := debug.Stack()
-			xlog.GetWithError(context.Background(), errors.New("actual failed")).Error(string(stack))
-			title := mkTitle(err)
-			call(errors.New(title), stack, extra...)
-		}
-	}()
+	//defer func() {
+	//	err := recover()
+	//	if err != nil {
+	//		stack := debug.Stack()
+	//		xlog.GetWithError(context.Background(), errors.New("actual failed")).Error(string(stack))
+	//		title := mkTitle(err)
+	//		call(errors.New(title), stack, extra...)
+	//	}
+	//}()
 	e = a()
 	return
 }

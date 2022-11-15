@@ -49,7 +49,6 @@ func Runner(host string, port string) {
 
 	err := r.Run(host + ":" + port)
 	if err != nil {
-		//
 		panic(err)
 	}
 

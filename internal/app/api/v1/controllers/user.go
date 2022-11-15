@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"backend/internal/app/models"
-	"backend/internal/app/utils"
 	"backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -17,10 +16,9 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	id := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 
-	if userID == id {
+	if userID == dto.ID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه دسترسی به این صفحه را ندارید",
 		})

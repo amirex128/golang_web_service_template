@@ -1,6 +1,7 @@
 package DTOs
 
 type UpdateUser struct {
+	ID            uint64 `json:"id" form:"id" binding:"required"`
 	Gender        string `form:"gender" json:"gender" validate:"omitempty,oneof=man woman"`
 	Firstname     string `form:"firstname" json:"firstname" validate:"omitempty"`
 	Lastname      string `form:"lastname" json:"lastname" validate:"omitempty"`

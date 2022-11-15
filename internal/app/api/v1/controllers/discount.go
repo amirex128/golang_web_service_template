@@ -144,7 +144,7 @@ func ShowDiscount(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	if discount.UserID != userID {
+	if *discount.UserID != userID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه مشاهده این تخفیف را ندارید",
 		})
