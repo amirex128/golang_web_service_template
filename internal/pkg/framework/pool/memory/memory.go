@@ -1,8 +1,8 @@
 package memory
 
 import (
-	"backend/internal/pkg/framework/kv"
-	"backend/internal/pkg/framework/pool"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/kv"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/pool"
 	"fmt"
 	"sync"
 	"time"

@@ -1,7 +1,7 @@
 package validations
 
 import (
-	"backend/internal/app/DTOs"
+	"github.com/amirex128/selloora_backend/internal/app/DTOs"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"

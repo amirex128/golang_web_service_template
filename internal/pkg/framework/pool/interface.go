@@ -1,7 +1,7 @@
 package pool
 
 import (
-	"backend/internal/pkg/framework/kv"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/kv"
 	"context"
 	"time"
 )

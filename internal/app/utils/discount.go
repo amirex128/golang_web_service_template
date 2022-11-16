@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"backend/internal/app/constants"
+	"github.com/amirex128/selloora_backend/internal/app/constants"
 )
 
 type ApplyDiscountType struct {

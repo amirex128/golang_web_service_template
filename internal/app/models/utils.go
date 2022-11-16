@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/pkg/framework/hash"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/hash"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )

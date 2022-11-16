@@ -1,14 +1,15 @@
 package api
 
 import (
-	"backend/internal/app/models"
-	"backend/internal/app/validations"
 	"fmt"
+	"github.com/amirex128/selloora_backend/internal/app/models"
+	"github.com/amirex128/selloora_backend/internal/app/validations"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/flosch/pongo2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/mandrigin/gin-spa/spa"
+	"go.elastic.co/apm"
 	"go.elastic.co/apm/module/apmgin"
 	"log"
 	"net/http"

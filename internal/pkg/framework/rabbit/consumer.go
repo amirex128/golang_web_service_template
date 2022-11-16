@@ -1,9 +1,9 @@
 package rabbit
 
 import (
-	"backend/internal/pkg/framework/assert"
-	"backend/internal/pkg/framework/random"
-	"backend/internal/pkg/framework/safe"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/random"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/safe"
 	"context"
 	"encoding/json"
 	"github.com/sirupsen/logrus"

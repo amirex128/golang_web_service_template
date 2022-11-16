@@ -1,7 +1,7 @@
 package config
 
 import (
-	"backend/internal/pkg/framework/assert"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"

@@ -1,11 +1,11 @@
 package container
 
 import (
-	"backend/internal/pkg/framework/assert"
-	"backend/internal/pkg/framework/bredis"
-	"backend/internal/pkg/framework/elastic"
-	"backend/internal/pkg/framework/mysql"
-	"backend/internal/pkg/framework/rabbit"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/bredis"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/elastic"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/mysql"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/rabbit"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

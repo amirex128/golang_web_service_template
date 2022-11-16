@@ -1,7 +1,7 @@
 package api
 
 import (
-	"backend/internal/app/api/v1/controllers"
+	"github.com/amirex128/selloora_backend/internal/app/api/v1/controllers"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )

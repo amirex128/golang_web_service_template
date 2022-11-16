@@ -1,7 +1,7 @@
 package safe
 
 import (
-	"backend/internal/pkg/framework/xlog"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/xlog"
 	"context"
 	"runtime/debug"
 	"sync"

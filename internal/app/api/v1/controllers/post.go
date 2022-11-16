@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"backend/internal/app/models"
-	"backend/internal/app/utils"
-	"backend/internal/app/validations"
+	"github.com/amirex128/selloora_backend/internal/app/models"
+	"github.com/amirex128/selloora_backend/internal/app/utils"
+	"github.com/amirex128/selloora_backend/internal/app/validations"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"go.elastic.co/apm/v2"

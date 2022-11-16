@@ -1,7 +1,7 @@
 package rabbit
 
 import (
-	"backend/internal/pkg/framework/random"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/random"
 	"errors"
 	"os"
 

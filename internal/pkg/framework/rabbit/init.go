@@ -1,7 +1,7 @@
 package rabbit
 
 import (
-	"backend/internal/pkg/framework/assert"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"container/ring"
 	"context"
 	"fmt"

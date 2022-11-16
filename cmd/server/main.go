@@ -1,17 +1,17 @@
 package main
 
 import (
-	"backend/internal/app/api"
-	"backend/internal/pkg/framework/bredis"
-	"backend/internal/pkg/framework/config"
-	"backend/internal/pkg/framework/container"
-	"backend/internal/pkg/framework/mysql"
-	"backend/internal/pkg/framework/signal"
-	"backend/internal/pkg/framework/xlog"
 	"context"
 	"fmt"
+	"github.com/amirex128/selloora_backend/internal/app/api"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/bredis"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/config"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/container"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/mysql"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/signal"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/xlog"
+	"github.com/spf13/viper"
 )
-import "github.com/spf13/viper"
 
 const (
 	appName = "selloora"

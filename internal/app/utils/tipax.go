@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"backend/internal/app/DTOs"
+	"github.com/amirex128/selloora_backend/internal/app/DTOs"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"

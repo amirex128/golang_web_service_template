@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/pkg/framework/mysql"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/mysql"
 )
 
 type MysqlManager struct {

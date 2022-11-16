@@ -1,7 +1,7 @@
 package models
 
 import (
-	"backend/internal/app/utils"
+	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"github.com/sirupsen/logrus"
 )
 

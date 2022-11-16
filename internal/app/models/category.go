@@ -1,12 +1,12 @@
 package models
 
 import (
-	"backend/internal/app/DTOs"
-	"backend/internal/app/utils"
 	"context"
+	"github.com/amirex128/selloora_backend/internal/app/DTOs"
+	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"go.elastic.co/apm/v2"
+	"go.elastic.co/apm"
 	"net/http"
 )
 

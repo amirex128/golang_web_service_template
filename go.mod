@@ -1,4 +1,4 @@
-module backend
+module github.com/amirex128/selloora_backend
 
 go 1.19
 

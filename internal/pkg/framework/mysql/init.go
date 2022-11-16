@@ -1,10 +1,10 @@
 package mysql
 
 import (
-	"backend/internal/pkg/framework/assert"
-	"backend/internal/pkg/framework/initializer"
-	"backend/internal/pkg/framework/safe"
-	"backend/internal/pkg/framework/xlog"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/initializer"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/safe"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/xlog"
 	"context"
 	"database/sql"
 	"errors"

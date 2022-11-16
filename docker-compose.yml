@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   backend:
+    image: amirex128/selloora-backend:latest
     depends_on:
       - "redis"
       - "mysql"
@@ -11,8 +12,6 @@ services:
       - "apm-server"
     networks:
       - selloora
-    build:
-      context: .
     ports:
       - "8585:8585"
     volumes:

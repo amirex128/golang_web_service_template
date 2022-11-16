@@ -1,7 +1,7 @@
 package global_loaders
 
 import (
-	"backend/internal/pkg/framework/pool"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/pool"
 )
 
 var (
