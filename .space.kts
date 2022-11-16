@@ -1,11 +1,5 @@
 job("build"){
-	startOn {
-        gitPush {
-            tagFilter {
-                +"release/*"
-            }
-        }
-    }
+
     git("backend") {
         cloneDir = "backend"
     }
