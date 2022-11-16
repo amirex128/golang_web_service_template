@@ -24,3 +24,7 @@ type UpdateAddress struct {
 	Lat        string `form:"lat" json:"lat"`
 	Long       string `form:"long" json:"long"`
 }
+
+type IndexAddress struct {
+	Index
+}

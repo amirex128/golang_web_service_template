@@ -162,3 +162,27 @@ func (m *MysqlManager) IndexAddress(c *gin.Context, ctx context.Context, userID 
 	}
 	return addresses, err
 }
+func (m *MysqlManager) GetAllAddressWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexAddress) (*DTOs.Pagination, error) {
+	span, ctx := apm.StartSpan(ctx, "showAddress", "model")
+	defer span.End()
+	conn := m.GetConn()
+	var addresses []Address
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	userID := GetUser(c)
+	conn = conn.Scopes(DTOs.Paginate("addresses", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
+	}
+	err := conn.Find(&addresses).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "خطا در دریافت آدرس ها",
+			"error":   err.Error(),
+			"type":    "model",
+		})
+		return pagination, err
+	}
+	pagination.Data = addresses
+	return pagination, nil
+}

@@ -99,3 +99,31 @@ func ChangePassword(c *gin.Context) (DTOs.ChangePassword, error) {
 	}
 	return login, nil
 }
+
+func ForgetPassword(c *gin.Context) (DTOs.ForgetPassword, error) {
+	var login DTOs.ForgetPassword
+	tags := ValidationTags{
+		"Mobile": {
+			"required":   "شماره موبایل الزامی میباشد",
+			"min":        "شماره موبایل باید 11 رقم باشد",
+			"max":        "شماره موبایل باید 11 رقم باشد",
+			"startswith": "شماره موبایل باید با 09 شروع شود",
+		},
+	}
+	err := c.Bind(&login)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "مقادیر ارسال شده نا درست میباشد",
+			"type":    "validation",
+			"error":   err.Error(),
+		})
+		return login, errors.New("validation error")
+	}
+
+	err = validate.Struct(login)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return login, err
+	}
+	return login, nil
+}

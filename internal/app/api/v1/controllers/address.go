@@ -58,8 +58,8 @@ func DeleteAddress(c *gin.Context) {
 func IndexAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexAddress", "request")
 	defer span.End()
-	userID := models.GetUser(c)
-	addresses, err := models.NewMainManager().IndexAddress(c, ctx, userID)
+	dto, err := validations.IndexAddress(c)
+	addresses, err := models.NewMainManager().GetAllAddressWithPagination(c, ctx, dto)
 	if err != nil {
 		return
 	}

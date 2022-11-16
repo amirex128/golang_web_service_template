@@ -13,3 +13,7 @@ type ChangePassword struct {
 	Password      string `form:"password" json:"password"  validate:"required,min=6,max=20"`
 	AgainPassword string `form:"again_password" json:"again_password"  validate:"required,min=6,max=20,eqfield=Password"`
 }
+
+type ForgetPassword struct {
+	Mobile string `form:"mobile" json:"mobile"  validate:"required,min=11,max=11,startswith=09"`
+}

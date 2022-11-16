@@ -33,7 +33,7 @@ func IndexTicket(c *gin.Context) (DTOs.IndexTicket, error) {
 	if err != nil {
 		return dto, err
 	}
-	dto.WithoutPagination = c.Query("without_pagination") == "true"
+
 	dto.Page = utils.StringToUint32(c.Query("page"))
 	dto.PageSize = utils.StringToUint32(c.Query("page_size"))
 	dto.Search = c.Query("search")

@@ -95,17 +95,10 @@ func IndexShop(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	var shops interface{}
-	if dto.WithoutPagination {
-		shops, err = models.NewMainManager().GetAllShop(c, ctx)
-		if err != nil {
-			return
-		}
-	} else {
-		shops, err = models.NewMainManager().GetAllShopWithPagination(c, ctx, dto)
-		if err != nil {
-			return
-		}
+
+	shops, err := models.NewMainManager().GetAllShopWithPagination(c, ctx, dto)
+	if err != nil {
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

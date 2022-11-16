@@ -250,23 +250,6 @@ func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, ctx context.Cont
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetAllShop(c *gin.Context, ctx context.Context) ([]Shop, error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllShop", "model")
-	defer span.End()
-	userID := GetUser(c)
-	var shops []Shop
-	err := m.GetConn().Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت فروشگاه ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return shops, err
-	}
-	return shops, nil
-}
-
 func (m *MysqlManager) FindShopByDomain(c *gin.Context, ctx context.Context, name string) (*Shop, *Domain, *Theme, error) {
 	span, ctx := apm.StartSpan(ctx, "FindShopByDomain", "model")
 	defer span.End()

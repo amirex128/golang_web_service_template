@@ -85,22 +85,7 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, ctx context.C
 	pagination.Data = products
 	return pagination, nil
 }
-func (m *MysqlManager) GetAllProduct(c *gin.Context, ctx context.Context, shopID uint64) ([]Product, error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllProduct", "model")
-	defer span.End()
-	userID := GetUser(c)
-	var products []Product
-	err := m.GetConn().Where("user_id = ?", userID).Where("shop_id=?", shopID).Find(&products).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت محصولات",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return products, err
-	}
-	return products, nil
-}
+
 func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DTOs.CreateProduct, userID uint64) error {
 	span, ctx := apm.StartSpan(ctx, "CreateProduct", "model")
 	defer span.End()

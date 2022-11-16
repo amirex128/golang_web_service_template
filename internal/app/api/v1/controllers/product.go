@@ -16,18 +16,11 @@ func IndexProduct(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	var products interface{}
-	if dto.WithoutPagination {
-		products, err = models.NewMainManager().GetAllProduct(c, ctx, dto.ShopID)
-		if err != nil {
-			return
-		}
-	} else {
-		products, err = models.NewMainManager().GetAllProductWithPagination(c, ctx, dto)
-		if err != nil {
-			return
-		}
+	products, err := models.NewMainManager().GetAllProductWithPagination(c, ctx, dto)
+	if err != nil {
+		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"products": products,
 	})
