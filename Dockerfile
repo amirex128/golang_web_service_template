@@ -9,5 +9,5 @@ COPY . ./
 RUN go build -o ./cmd/server/server ./cmd/server
 RUN go install github.com/cosmtrek/air@latest
 EXPOSE 8585
-#CMD ["/app/cmd/server/server"]
-CMD ["air"]
+CMD ["/app/cmd/server/server"]
+#CMD ["air"]
