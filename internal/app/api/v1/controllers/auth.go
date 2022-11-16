@@ -112,13 +112,13 @@ func ChangePassword(c *gin.Context) {
 	})
 }
 
-func ForgetPassword(c *gin.Context) {
-	//span, ctx := apm.StartSpan(c.Request.Context(), "ForgetPassword", "request")
-	//defer span.End()
-	//dto, err := validations.ForgetPassword(c)
-	//if err != nil {
-	//	return
-	//}
-	//user, err := models.NewMainManager().FindUserByMobile(ctx, dto.Mobile)
-
-}
+//func ForgetPassword(c *gin.Context) {
+//	span, ctx := apm.StartSpan(c.Request.Context(), "ForgetPassword", "request")
+//	defer span.End()
+//	dto, err := validations.ForgetPassword(c)
+//	if err != nil {
+//		return
+//	}
+//	user, err := models.NewMainManager().FindUserByMobile(ctx, dto.Mobile)
+//
+//}
