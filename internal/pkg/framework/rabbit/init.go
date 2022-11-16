@@ -1,10 +1,10 @@
 package rabbit
 
 import (
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"container/ring"
 	"context"
 	"fmt"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"sync"
 
 	"github.com/sirupsen/logrus"

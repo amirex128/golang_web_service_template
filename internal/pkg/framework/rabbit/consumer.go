@@ -1,11 +1,11 @@
 package rabbit
 
 import (
+	"context"
+	"encoding/json"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/random"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/safe"
-	"context"
-	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"

@@ -1,9 +1,9 @@
 package xlog
 
 import (
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"context"
 	"fmt"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.elastic.co/apm/module/apmlogrus/v2"

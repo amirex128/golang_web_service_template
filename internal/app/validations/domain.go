@@ -1,9 +1,9 @@
 package validations
 
 import (
+	"errors"
 	"github.com/amirex128/selloora_backend/internal/app/DTOs"
 	"github.com/amirex128/selloora_backend/internal/app/utils"
-	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

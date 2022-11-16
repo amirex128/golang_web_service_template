@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"fmt"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

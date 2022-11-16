@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"database/sql"
+	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"github.com/sirupsen/logrus"
 )
 

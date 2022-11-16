@@ -1,10 +1,10 @@
 package models
 
 import (
-	"github.com/amirex128/selloora_backend/internal/app/DTOs"
-	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"context"
 	"errors"
+	"github.com/amirex128/selloora_backend/internal/app/DTOs"
+	"github.com/amirex128/selloora_backend/internal/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"go.elastic.co/apm/v2"

@@ -1,13 +1,13 @@
 package container
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/assert"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/bredis"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/elastic"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/mysql"
 	"github.com/amirex128/selloora_backend/internal/pkg/framework/rabbit"
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/spf13/viper"

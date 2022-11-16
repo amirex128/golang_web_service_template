@@ -1,8 +1,8 @@
 package rabbit
 
 import (
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/random"
 	"errors"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/random"
 	"os"
 
 	"github.com/spf13/viper"

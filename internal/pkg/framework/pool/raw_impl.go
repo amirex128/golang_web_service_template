@@ -1,8 +1,8 @@
 package pool
 
 import (
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/safe"
 	"context"
+	"github.com/amirex128/selloora_backend/internal/pkg/framework/safe"
 	"sync/atomic"
 	"time"
 
