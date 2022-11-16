@@ -37,16 +37,6 @@ services:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8585
       - SERVER_URL=http://localhost:8585
-  frontend:
-    depends_on:
-      - "backend"
-    networks:
-      - selloora
-    build:
-      context: ./frontend
-    volumes:
-      - "./frontend:/app"
-      - "./frontend/dist/spa:/app/dist/spa"
   mysql:
     networks:
       - selloora

@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mandrigin/gin-spa/spa"
 	"go.elastic.co/apm/module/apmgin"
-	"go.elastic.co/apm/v2"
 	"log"
 	"net/http"
 	"time"
@@ -45,7 +44,7 @@ func Runner(host string, port string) {
 
 	Routes(r, GetAuthMiddleware())
 
-	r.Use(spa.Middleware("/", "./frontend/dist/spa"))
+	r.Use(spa.Middleware("/", "./frontend"))
 
 	err := r.Run(host + ":" + port)
 	if err != nil {
