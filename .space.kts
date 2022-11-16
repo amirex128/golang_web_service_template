@@ -6,10 +6,10 @@ job("build dockerfile"){
             }
         }
     }
-    git("https://git.jetbrains.space/amirex128/selloora-backend/backend.git") {
+    git("backend") {
         cloneDir = "backend"
     }
-    git("https://git.jetbrains.space/amirex128/selloora-frontend/frontend.git") {
+    git("frontend") {
         cloneDir = "frontend"
     }
     
