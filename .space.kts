@@ -1,4 +1,4 @@
-job("build dockerfile"){
+job("build"){
 	startOn {
         gitPush {
             tagFilter {
