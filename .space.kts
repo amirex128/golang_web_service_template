@@ -1,4 +1,4 @@
-job("Build and push Docker") {
+job("build backend and front selloora image") {
     container("openjdk:11") {
     kotlinScript { api ->
         api.space().projects.automation.deployments.start(

@@ -44,12 +44,14 @@ func UpdateAddress(c *gin.Context) {
 func DeleteAddress(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteAddress", "request")
 	defer span.End()
+
 	userID := models.GetUser(c)
 	addressID := utils.StringToUint64(c.Param("id"))
 	err := models.NewMainManager().DeleteAddress(c, ctx, addressID, userID)
 	if err != nil {
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "آدرس با موفقیت حذف شد",
 	})
