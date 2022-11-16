@@ -9,9 +9,7 @@ job("build"){
     git("backend") {
         cloneDir = "backend"
     }
-    git("frontend") {
-        cloneDir = "frontend"
-    }
+
     
     container(displayName = "Show dirs", image = "ubuntu:latest") {
         shellScript {
