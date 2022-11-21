@@ -2,8 +2,8 @@ name: ci
 
 on:
   push:
-    branches:
-      - "master"
+    tags:
+      - 'release-*'
 
 jobs:
   build:
@@ -29,19 +29,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-#      - name: update docker compose from latest image
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.SSH_HOST }}
-#          username: ${{ secrets.SSH_USERNAME }}
-#          password: ${{ secrets.SSH_PASSWORD }}
-#          port: ${{ secrets.SSH_PORT }}
-#          script_stop: true
-#          script: |
-#            cd /home/selloora/selloora-backend
-#            docker-compose pull
-#            docker-compose up -d
-#            docker image prune
+      - name: update docker compose from latest image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            cd /home/selloora/selloora-backend
+            cat /home/selloora//dockerpassword | docker login -u amirex128 --password-stdin
+            rm /etc/resolv.conf
+            echo -e "nameserver 178.22.122.100 \n nameserver 185.51.200.2 \n options edns0" >> /etc/resolv.conf
+            docker-compose pull
+            docker-compose up -d
+            docker image prune
+            rm /etc/resolv.conf
+            echo -e "nameserver 8.8.8.8 \n nameserver 8.8.4.4 \n options edns0" >> /etc/resolv.conf
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:

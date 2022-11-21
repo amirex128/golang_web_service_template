@@ -1,0 +1,248 @@
+basePath: /
+host: localhost:8585
+info:
+  contact:
+    email: amirex128@gmail.com
+    name: API Support
+    url: https://www.amirshirdel.ir
+  description: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74
+  title: Selloora Backend API
+  version: "1.0"
+paths:
+  /user/address:
+    get:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست آدرس
+      tags:
+      - address
+  /user/address/create:
+    post:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        type: string
+      - description: عنوان
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: شناسه استان
+        in: body
+        name: province_id
+        required: true
+        schema:
+          type: string
+      - description: شناسه شهر
+        in: body
+        name: city_id
+        required: true
+        schema:
+          type: string
+      - description: ادرس کامل
+        in: body
+        name: address
+        required: true
+        schema:
+          type: string
+      - description: کد پستی
+        in: body
+        name: postal_code
+        required: true
+        schema:
+          type: string
+      - description: موبایل
+        in: body
+        name: mobile
+        required: true
+        schema:
+          type: string
+      - description: نام گیرنده
+        in: body
+        name: full_name
+        required: true
+        schema:
+          type: string
+      - description: عرض جغذافیایی
+        in: body
+        name: lat
+        schema:
+          type: string
+      - description: طول جقرافیایی
+        in: body
+        name: long
+        schema:
+          type: string
+      responses: {}
+      summary: ایجاد آدرس جدید
+      tags:
+      - address
+  /user/address/delete/{id}:
+    post:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه آدرس
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف آدرس
+      tags:
+      - address
+  /user/address/update:
+    post:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه آدرس
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: عنوان
+        in: body
+        name: title
+        schema:
+          type: string
+      - description: شناسه استان
+        in: body
+        name: province_id
+        schema:
+          type: string
+      - description: شناسه شهر
+        in: body
+        name: city_id
+        schema:
+          type: string
+      - description: ادرس کامل
+        in: body
+        name: address
+        schema:
+          type: string
+      - description: کد پستی
+        in: body
+        name: postal_code
+        schema:
+          type: string
+      - description: موبایل
+        in: body
+        name: mobile
+        schema:
+          type: string
+      - description: نام گیرنده
+        in: body
+        name: full_name
+        schema:
+          type: string
+      - description: عرض جغذافیایی
+        in: body
+        name: lat
+        schema:
+          type: string
+      - description: طول جقرافیایی
+        in: body
+        name: long
+        schema:
+          type: string
+      responses: {}
+      summary: ویرایش آدرس
+      tags:
+      - address
+  /user/category:
+    get:
+      description: کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته
+        بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان
+        برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش
+        داده میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست دسته بندی ها
+      tags:
+      - category
+  /user/category/create:
+    post:
+      description: کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته
+        بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان
+        برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش
+        داده میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: body
+        name: search
+        required: true
+        schema:
+          type: string
+      responses: {}
+      summary: ایجاد دسته بندی
+      tags:
+      - category
+schemes:
+- http
+- https
+swagger: "2.0"

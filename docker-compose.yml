@@ -26,6 +26,8 @@ services:
       - ELASTIC_APM_SERVER_URL=http://apm-server:8200
       - ELASTIC_APM_SERVICE_NAME=selloora_backend
       - SELLOORA_MYSQL_MAIN_DB=selloora
+      - SELLOORA_ELASTIC_HOST=elastic
+      - SELLOORA_ELASTIC_PORT=9200
       - SELLOORA_MYSQL_MAIN_HOST=mysql
       - SELLOORA_MYSQL_MAIN_PASSWORD=q6766581Amirex
       - SELLOORA_MYSQL_MAIN_PORT=3306

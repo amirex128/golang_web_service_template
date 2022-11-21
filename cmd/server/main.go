@@ -3,32 +3,63 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/amirex128/selloora_backend/internal/app/api"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/bredis"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/config"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/container"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/mysql"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/signal"
-	"github.com/amirex128/selloora_backend/internal/pkg/framework/xlog"
+	"github.com/amirex128/selloora_backend/internal/api"
+	"github.com/amirex128/selloora_backend/internal/models"
+	"github.com/fsnotify/fsnotify"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.elastic.co/apm/module/apmlogrus"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 const (
 	appName = "selloora"
 )
 
+// @title Selloora Backend API
+// @version 1.0
+// @description eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74
+
+// @contact.name API Support
+// @contact.url https://www.amirshirdel.ir
+// @contact.email amirex128@gmail.com
+
+// @host localhost:8585
+// @BasePath /
+// @schemes http https
+
 func main() {
-	config.Initialize(appName)
-	xlog.Initialize(appName)
-	container.RegisterServices(appName)
 	ctx, _ := context.WithCancel(context.Background())
 
-	bredis.Initialize(ctx)
-	mysql.Initialize(ctx)
+	InitializeConfig(appName)
+	models.Initialize(ctx)
+
 	//global_loaders.Initializer(ctx)
+	api.Runner(viper.GetString("server_host"), viper.GetString("server_port"), ctx)
 
-	api.Runner(viper.GetString("server_host"), viper.GetString("server_port"))
-
-	sig := signal.WaitExitSignal()
+	sig := WaitExitSignal()
 	fmt.Println(sig.String())
+}
+func WaitExitSignal() os.Signal {
+	quit := make(chan os.Signal, 6)
+	signal.Notify(quit, syscall.SIGABRT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+	return <-quit
+}
+
+func InitializeConfig(prefix string) {
+	logrus.AddHook(&apmlogrus.Hook{})
+
+	viper.AutomaticEnv()
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath("./configs")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		logrus.Debug("Config file changed:", e.Name)
+	})
 }

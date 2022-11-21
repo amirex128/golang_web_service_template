@@ -50,7 +50,7 @@
 <!-- End Page Name area -->
 
 <!-- Start Contact Area -->
-<div id="contact" class="contact-area contact-6 pt-120 pb-90">
+<div class="contact-area contact-6 pt-120 pb-90" id="contact">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-4 col-sm-6">
@@ -93,44 +93,44 @@
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <form id="contactForm" method="post" action="/internal/app/api/v1/user/ticket/create"
+                <form action="/internal/api/v1/user/ticket/create" id="contactForm" method="post"
                       onsubmit="event.preventDefault(); userAction()">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-30">
-                                <input type="text" name="guest_name" class="form-control" id="guest_name" required
-                                       data-error="لطفا نام خودتون رو وارد کنید" placeholder="نام شما"/>
+                                <input class="form-control" data-error="لطفا نام خودتون رو وارد کنید" id="guest_name" name="guest_name" placeholder="نام شما"
+                                       required type="text"/>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group mb-30">
-                                <input minlength="11" maxlength="11" type="number" name="guest_mobile"
-                                       class="form-control" id="guest_mobile" required
-                                       data-error="لطفا شمراه همراه خودتون رو وارد کنید" placeholder="شماره هماره"/>
+                                <input class="form-control" data-error="لطفا شمراه همراه خودتون رو وارد کنید" id="guest_mobile" maxlength="11"
+                                       minlength="11" name="guest_mobile" placeholder="شماره هماره"
+                                       required type="number"/>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="form-group mb-30">
-                                <input type="text" name="title" class="form-control" id="title" required
-                                       data-error="عنوان درخواست خود را وارد نمایید" placeholder="عنوان پیام"/>
+                                <input class="form-control" data-error="عنوان درخواست خود را وارد نمایید" id="title" name="title" placeholder="عنوان پیام"
+                                       required type="text"/>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group mb-30">
-                                <textarea name="body" id="body" class="form-control" cols="30" rows="8" required
-                                          data-error="لطفا پیام خودتون رو وارد کنید"
-                                          placeholder="پیامی بنویس ..."></textarea>
+                                <textarea class="form-control" cols="30" data-error="لطفا پیام خودتون رو وارد کنید" id="body" name="body" placeholder="پیامی بنویس ..."
+                                          required
+                                          rows="8"></textarea>
                                 <div class="help-block with-errors"></div>
                             </div>
                         </div>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" class="btn primary-btn" title="ارسال پیام">ارسال</button>
+                            <button class="btn primary-btn" title="ارسال پیام" type="submit">ارسال</button>
                             <div id="msgSubmit"></div>
 
                         </div>
