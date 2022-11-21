@@ -1,4 +1,510 @@
 basePath: /
+definitions:
+  DTOs.CalculateOrder:
+    properties:
+      address_id:
+        type: integer
+      package_size:
+        type: string
+      value:
+        type: integer
+      weight:
+        type: integer
+    required:
+    - address_id
+    - package_size
+    - value
+    - weight
+    type: object
+  DTOs.CheckDiscount:
+    properties:
+      code:
+        description: کد تخفیف
+        example: asdf
+        type: string
+      product_ids:
+        description: لیست محصولات موجود در سبد خرید
+        items:
+          $ref: '#/definitions/DTOs.ProductListDiscount'
+        type: array
+      user_id:
+        description: شناسه مالک فروشگاه
+        example: 1
+        type: integer
+    required:
+    - code
+    - product_ids
+    - user_id
+    type: object
+  DTOs.CreateAddress:
+    properties:
+      address:
+        description: ادرس کامل
+        example: ادرس کامل
+        type: string
+      city_id:
+        description: شناسه شهر
+        example: 1
+        type: integer
+      full_name:
+        description: نام گیرنده
+        example: نام گیرنده
+        type: string
+      lat:
+        description: عرض جغذافیایی
+        example: ""
+        type: string
+      long:
+        description: طول جقرافیایی
+        example: ""
+        type: string
+      mobile:
+        description: موبایل
+        example: "09024809750"
+        type: string
+      postal_code:
+        description: کد پستی
+        example: "1111111111"
+        maxLength: 10
+        minLength: 10
+        type: string
+      province_id:
+        description: شناسه استان
+        example: 1
+        type: integer
+      title:
+        description: عنوان
+        example: عنوان
+        type: string
+    required:
+    - address
+    - city_id
+    - full_name
+    - mobile
+    - postal_code
+    - province_id
+    - title
+    type: object
+  DTOs.CreateCategory:
+    properties:
+      description:
+        description: توضیحات دسته بندی
+        example: توضیحات دسته بندی
+        type: string
+      equivalent:
+        description: کلمات مترادف که با کاما از هم جدا شده اند
+        example: آموزش,یادگیری
+        type: string
+      gallery_id:
+        description: شناسه تصویر آپلود شده
+        example: 1
+        type: integer
+      name:
+        description: نام دسته بندی
+        example: نام دسته بندی
+        type: string
+      parent_id:
+        description: شناسه دسته بندی پدر
+        example: 0
+        type: integer
+      type:
+        description: نوع دسته بندی
+        enum:
+        - product
+        - post
+        example: product
+        type: string
+    required:
+    - name
+    - parent_id
+    - type
+    type: object
+  DTOs.CreateComment:
+    properties:
+      body:
+        description: متن نظر
+        example: متن نظر
+        type: string
+      email:
+        description: ایمیل
+        example: amirex128@gmail.com
+        type: string
+      name:
+        description: نام کاربر
+        example: نام
+        type: string
+      post_id:
+        description: شناسه پست
+        example: 1
+        type: integer
+    required:
+    - body
+    - email
+    - name
+    - post_id
+    type: object
+  DTOs.CreateDiscount:
+    properties:
+      amount:
+        description: مقدار تخفیف
+        example: 0
+        type: number
+      code:
+        description: کد تخفیف
+        example: asdf
+        type: string
+      count:
+        description: تعداد تخفیف
+        example: 10
+        type: integer
+      ended_at:
+        description: تاریخ پایان تخفیف
+        example: "2025-01-01 00:00:00"
+        type: string
+      percent:
+        description: درصد تخفیف
+        example: 50
+        type: number
+      product_ids:
+        description: شناسه محصولات
+        items:
+          type: integer
+        type: array
+      started_at:
+        description: تاریخ شروع تخفیف
+        example: "2021-01-01 00:00:00"
+        type: string
+      status:
+        description: وضعیت تخفیف
+        example: true
+        type: boolean
+      type:
+        description: نوع تخفیف
+        enum:
+        - percent
+        - amount
+        example: percent
+        type: string
+    required:
+    - code
+    - count
+    - ended_at
+    - started_at
+    - status
+    - type
+    type: object
+  DTOs.CreateDomain:
+    properties:
+      name:
+        type: string
+      shop_id:
+        type: integer
+      type:
+        type: string
+    required:
+    - name
+    - shop_id
+    - type
+    type: object
+  DTOs.CreateGallery:
+    properties:
+      height:
+        type: integer
+      width:
+        type: integer
+    required:
+    - height
+    - width
+    type: object
+  DTOs.CreateMenu:
+    properties:
+      link:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: integer
+      position:
+        type: string
+      shop_id:
+        type: integer
+    type: object
+  DTOs.CreateOrder:
+    properties:
+      customer_id:
+        type: integer
+      description:
+        type: string
+      discount_code:
+        type: string
+      order_items:
+        items:
+          $ref: '#/definitions/DTOs.OrderItem'
+        type: array
+      shop_id:
+        type: integer
+      user_id:
+        type: integer
+      verify_code:
+        maxLength: 20
+        minLength: 2
+        type: string
+    required:
+    - customer_id
+    - order_items
+    - shop_id
+    - user_id
+    - verify_code
+    type: object
+  DTOs.CreateUpdateCustomer:
+    properties:
+      address:
+        description: آدرس
+        example: آدرس
+        type: string
+      city_id:
+        description: شناسه شهر
+        example: 1
+        type: integer
+      full_name:
+        description: نام کامل
+        example: نام
+        type: string
+      mobile:
+        description: شماره همراه
+        example: "09024809750"
+        maxLength: 11
+        minLength: 11
+        type: string
+      postal_code:
+        description: کد پستی
+        example: 1111111111
+        type: integer
+      province_id:
+        description: شناسه استان
+        example: 1
+        type: integer
+      shop_id:
+        description: شناسه فروشگاه
+        example: 1
+        type: integer
+      verify_code:
+        description: کد تائید
+        example: "1234"
+        maxLength: 4
+        minLength: 4
+        type: string
+    required:
+    - shop_id
+    type: object
+  DTOs.OrderItem:
+    properties:
+      count:
+        type: integer
+      option_id:
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - count
+    - product_id
+    type: object
+  DTOs.ProductListDiscount:
+    properties:
+      count:
+        description: تعداد محصول
+        example: 10
+        type: integer
+      product_id:
+        description: شناسه محصول
+        example: 1
+        type: integer
+    type: object
+  DTOs.RequestCreateLoginCustomer:
+    properties:
+      mobile:
+        description: شماره همراه
+        example: "09024809750"
+        maxLength: 11
+        minLength: 11
+        type: string
+      shop_id:
+        description: شناسه فروشگاه
+        example: 1
+        type: integer
+    required:
+    - mobile
+    - shop_id
+    type: object
+  DTOs.SendOrder:
+    properties:
+      address_id:
+        type: integer
+      courier:
+        enum:
+        - tipax
+        - post
+        type: string
+      order_id:
+        type: integer
+      package_size:
+        type: string
+      value:
+        type: integer
+      weight:
+        type: integer
+    required:
+    - address_id
+    - courier
+    - order_id
+    - package_size
+    - value
+    - weight
+    type: object
+  DTOs.UpdateAddress:
+    properties:
+      address:
+        description: ادرس کامل
+        example: ادرس کامل
+        type: string
+      city_id:
+        description: شناسه شهر
+        example: 1
+        type: integer
+      full_name:
+        description: نام گیرنده
+        example: نام گیرنده
+        type: string
+      id:
+        description: شناسه آدرس
+        example: 1
+        type: integer
+      lat:
+        description: عرض جغذافیایی
+        example: "35.123456"
+        type: string
+      long:
+        description: طول جقرافیایی
+        example: "35.123456"
+        type: string
+      mobile:
+        description: موبایل
+        example: "09024809750"
+        type: string
+      postal_code:
+        description: کد پستی
+        example: "1111111111"
+        maxLength: 10
+        minLength: 10
+        type: string
+      province_id:
+        description: شناسه استان
+        example: 1
+        type: integer
+      title:
+        description: عنوان
+        example: عنوان
+        type: string
+    required:
+    - id
+    type: object
+  DTOs.UpdateCategory:
+    properties:
+      description:
+        description: توضیحات دسته بندی
+        example: توضیحات دسته بندی
+        type: string
+      equivalent:
+        description: کلمات مترادف که با کاما از هم جدا شده اند
+        example: آموزش,یادگیری
+        type: string
+      gallery_id:
+        description: شناسه تصویر آپلود شده
+        example: 1
+        type: integer
+      id:
+        description: شناسه دسته بندی برای ویرایش
+        example: 1
+        type: integer
+      name:
+        description: نام دسته بندی
+        example: نام دسته بندی
+        type: string
+      parent_id:
+        description: شناسه دسته بندی پدر
+        example: 0
+        type: integer
+      sort:
+        description: ترتیب مرتب سازی دسته بندی
+        example: 1
+        type: integer
+    required:
+    - id
+    type: object
+  DTOs.UpdateDiscount:
+    properties:
+      amount:
+        description: مقدار تخفیف
+        example: 0
+        type: number
+      code:
+        description: کد تخفیف
+        example: asdf
+        type: string
+      count:
+        description: تعداد تخفیف
+        example: 10
+        type: integer
+      ended_at:
+        description: تاریخ پایان تخفیف
+        example: "2025-01-01 00:00:00"
+        type: string
+      id:
+        description: شناسه تخفیف برای ویرایش
+        example: 1
+        type: integer
+      percent:
+        description: درصد تخفیف
+        example: 40
+        type: number
+      product_ids:
+        description: شناسه محصولات
+        items:
+          type: integer
+        type: array
+      started_at:
+        description: تاریخ شروع تخفیف
+        example: "2021-01-01 00:00:00"
+        type: string
+      status:
+        description: وضعیت تخفیف
+        example: true
+        type: boolean
+      type:
+        description: نوع تخفیف
+        enum:
+        - percent
+        - amount
+        example: percent
+        type: string
+    required:
+    - id
+    type: object
+  DTOs.UpdateMenu:
+    properties:
+      id:
+        type: integer
+      link:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: integer
+      position:
+        type: string
+      sort:
+        type: integer
+    type: object
 host: localhost:8585
 info:
   contact:
@@ -9,7 +515,45 @@ info:
   title: Selloora Backend API
   version: "1.0"
 paths:
-  /user/address:
+  /user/address/create:
+    post:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateAddress'
+      responses: {}
+      summary: ایجاد آدرس جدید
+      tags:
+      - address
+  /user/address/delete/{id}:
+    post:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه آدرس
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف آدرس
+      tags:
+      - address
+  /user/address/list:
     get:
       description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
         هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
@@ -39,90 +583,6 @@ paths:
       summary: لیست آدرس
       tags:
       - address
-  /user/address/create:
-    post:
-      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
-        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
-      parameters:
-      - description: Authentication
-        in: header
-        name: Authorization
-        type: string
-      - description: عنوان
-        in: body
-        name: title
-        required: true
-        schema:
-          type: string
-      - description: شناسه استان
-        in: body
-        name: province_id
-        required: true
-        schema:
-          type: string
-      - description: شناسه شهر
-        in: body
-        name: city_id
-        required: true
-        schema:
-          type: string
-      - description: ادرس کامل
-        in: body
-        name: address
-        required: true
-        schema:
-          type: string
-      - description: کد پستی
-        in: body
-        name: postal_code
-        required: true
-        schema:
-          type: string
-      - description: موبایل
-        in: body
-        name: mobile
-        required: true
-        schema:
-          type: string
-      - description: نام گیرنده
-        in: body
-        name: full_name
-        required: true
-        schema:
-          type: string
-      - description: عرض جغذافیایی
-        in: body
-        name: lat
-        schema:
-          type: string
-      - description: طول جقرافیایی
-        in: body
-        name: long
-        schema:
-          type: string
-      responses: {}
-      summary: ایجاد آدرس جدید
-      tags:
-      - address
-  /user/address/delete/{id}:
-    post:
-      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
-        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
-      parameters:
-      - description: Authentication
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: شناسه آدرس
-        in: path
-        name: id
-        required: true
-        type: string
-      responses: {}
-      summary: حذف آدرس
-      tags:
-      - address
   /user/address/update:
     post:
       description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
@@ -133,57 +593,12 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: شناسه آدرس
+      - description: ورودی
         in: body
-        name: id
+        name: message
         required: true
         schema:
-          type: string
-      - description: عنوان
-        in: body
-        name: title
-        schema:
-          type: string
-      - description: شناسه استان
-        in: body
-        name: province_id
-        schema:
-          type: string
-      - description: شناسه شهر
-        in: body
-        name: city_id
-        schema:
-          type: string
-      - description: ادرس کامل
-        in: body
-        name: address
-        schema:
-          type: string
-      - description: کد پستی
-        in: body
-        name: postal_code
-        schema:
-          type: string
-      - description: موبایل
-        in: body
-        name: mobile
-        schema:
-          type: string
-      - description: نام گیرنده
-        in: body
-        name: full_name
-        schema:
-          type: string
-      - description: عرض جغذافیایی
-        in: body
-        name: lat
-        schema:
-          type: string
-      - description: طول جقرافیایی
-        in: body
-        name: long
-        schema:
-          type: string
+          $ref: '#/definitions/DTOs.UpdateAddress'
       responses: {}
       summary: ویرایش آدرس
       tags:
@@ -232,16 +647,658 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: متن جستجو
+      - description: ورودی
         in: body
-        name: search
+        name: message
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/DTOs.CreateCategory'
       responses: {}
       summary: ایجاد دسته بندی
       tags:
       - category
+  /user/category/update:
+    post:
+      description: کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته
+        بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان
+        برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش
+        داده میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.UpdateCategory'
+      responses: {}
+      summary: ویرایش دسته بندی ها
+      tags:
+      - category
+  /user/comment:
+    get:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست دیدگاه ها
+      tags:
+      - comment
+  /user/comment/approve/{id}:
+    post:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه دیدگاه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: تائید دیدگاه
+      tags:
+      - comment
+  /user/comment/create:
+    post:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: ورودی
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateComment'
+      responses: {}
+      summary: ایجاد دیدگاه
+      tags:
+      - comment
+  /user/comment/delete/{id}:
+    post:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه دیدگاه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف دیدگاه
+      tags:
+      - comment
+  /user/customer:
+    get:
+      description: مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد
+      parameters:
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: نمایش لیست سفارشات مشتری
+      tags:
+      - order
+  /user/customer/discount/check:
+    post:
+      description: کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود
+        را وارد نمایید تا بر روی محصولات اش اعمال شوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CheckDiscount'
+      responses: {}
+      summary: بررسی تخفیف
+      tags:
+      - discount
+  /user/customer/login/register:
+    post:
+      description: مشتریان میتوانند با ارسال شماره موبایل و کد تایید به سیستم وارد
+        شوند یا اگر کاربری با این شماره موبایل وجود نداشته باشد ثبت نام کنند
+      parameters:
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.RequestCreateLoginCustomer'
+      responses: {}
+      summary: ثبت نام یا ورود کاربر با ارسال کد
+      tags:
+      - customer
+  /user/customer/verify:
+    post:
+      description: مشتریان با دریافت کد تایید میتوانند اطلاعات خود را وارد کنند و
+        یا بروزرسانی نماییند همچنین دریافت کنند اطلاعات قبلی را
+      parameters:
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateUpdateCustomer'
+      responses: {}
+      summary: دریافت اطلاعات مشتری و ویرایش و ثبت اطلاعات جدید در سبد خرید
+      tags:
+      - customer
+  /user/discount:
+    get:
+      description: لیست تخفیفات
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست تخفیف
+      tags:
+      - discount
+  /user/discount/create:
+    post:
+      description: ایجاد یک تخفیف بر روی یک محصصول یا چند محصول
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateDiscount'
+      responses: {}
+      summary: ایجاد تخفیف
+      tags:
+      - discount
+  /user/discount/delete/{id}:
+    post:
+      description: حذف تخفیف
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه تخفیف
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف تخفیف
+      tags:
+      - discount
+  /user/discount/show/{id}:
+    get:
+      description: نمایش تخفیف
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه تخفیف
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش تخفیف
+      tags:
+      - discount
+  /user/discount/update:
+    post:
+      description: ویرایش تخفیف
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.UpdateDiscount'
+      responses: {}
+      summary: ویرایش تخفیف
+      tags:
+      - discount
+  /user/domain:
+    get:
+      description: لیست دامنه ها
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست دامنه ها
+      tags:
+      - domain
+  /user/domain/create:
+    post:
+      description: یک دامنه یا یک ساب دامنه کاربر میتواند اضافه نمایید تا سایت ایجاد
+        شده خود را بر بستر آن دامنه مشاهده نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateDomain'
+      responses: {}
+      summary: ایجاد دامنه
+      tags:
+      - domain
+  /user/domain/delete/{id}:
+    post:
+      description: باحذف دامنه امکان دسترسی از این دامنه بر روی سایت کاربر گرفته میشود
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه دامنه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف دامنه
+      tags:
+      - domain
+  /user/gallery/create:
+    post:
+      description: با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده
+        نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر
+        به فرمت وب پی تبدیل میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateGallery'
+      responses: {}
+      summary: آپلود تصویر
+      tags:
+      - gallery
+  /user/gallery/delete/{id}:
+    post:
+      description: حذف یک تصویر از گالری
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه گالری
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف گالری
+      tags:
+      - gallery
+  /user/menu:
+    get:
+      description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست منو ها
+      tags:
+      - menu
+  /user/menu/create:
+    post:
+      description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateMenu'
+      responses: {}
+      summary: ایجاد منو
+      tags:
+      - menu
+  /user/menu/delete/{id}:
+    post:
+      description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه منو
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف منو
+      tags:
+      - menu
+  /user/menu/update:
+    post:
+      description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.UpdateMenu'
+      responses: {}
+      summary: ویرایش منو
+      tags:
+      - menu
+  /user/order:
+    get:
+      description: لیست سفارشات بر اساس حالت های مختلف قابلیت فیلتر شدن داد
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: new,processing,returned,completed وضعیت سفارش
+        example: new
+        in: query
+        name: order_status
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست سفارشات
+      tags:
+      - order
+  /user/order/approve/{id}:
+    post:
+      description: سفارشات بعد از ثبت شدن باید توسط ادمین تائید شوند و سپس به مرحله
+        انتخاب سرویس ارسال کنند بروند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه سفارش
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: تائید سفارش
+      tags:
+      - order
+  /user/order/calculate:
+    post:
+      description: بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه
+        ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CalculateOrder'
+      responses: {}
+      summary: دریافت اطلاعات ارسال و انتخاب ارسال کننده
+      tags:
+      - order
+  /user/order/cancel/{id}:
+    post:
+      description: سفارشات میتوانند بعد از ثبت شدن یا تائید شوند یا کنسل و به مرحله
+        انتخاب ارسال کنند روند و در انجا هم نیز امکان کنسل شدن داشته باشند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه سفارش
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: کنسل کردن سفارش
+      tags:
+      - order
+  /user/order/create:
+    post:
+      description: از این سرویس برای ایجاد سفارش در بخش ادمین و کاربر استفاده میشود
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateOrder'
+      responses: {}
+      summary: ایجاد سفارش جدید
+      tags:
+      - order
+  /user/order/returned:
+    post:
+      description: مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند
+      responses: {}
+      summary: ثبت درخواست مرجوعی توسط مشتری
+      tags:
+      - order
+  /user/order/returned/accept:
+    post:
+      description: بعد از درخواست مرجوعی با این درخواست توسط ادمین بررسی شود و در
+        صورت تائید سفارش مرجوع شود و سرویس دهنده قبلی جهت جمع آوری ارسال شود
+      responses: {}
+      summary: تائید درخواست مرجوعی توسط مدیر
+      tags:
+      - order
+  /user/order/send:
+    post:
+      description: بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه
+        ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.SendOrder'
+      responses: {}
+      summary: دریافت اطلاعات ارسال و انتخاب ارسال کننده
+      tags:
+      - order
+  /user/order/show/{id}:
+    get:
+      description: مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش
+        در چه مرحله ای به سر میبرد
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه سفارش
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: پیگیری وضعیت ارسال سفارش
+      tags:
+      - order
 schemes:
 - http
 - https

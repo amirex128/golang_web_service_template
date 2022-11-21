@@ -19,6 +19,13 @@ import (
 	"strings"
 )
 
+// CreateGallery
+// @Summary آپلود تصویر
+// @description با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر به فرمت وب پی تبدیل میشوند
+// @Tags gallery
+// @Router       /user/gallery/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreateGallery  	true "ورودی"
 func CreateGallery(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createGallery", "request")
 	defer span.End()
@@ -58,6 +65,13 @@ func CreateGallery(c *gin.Context) {
 	})
 }
 
+// DeleteGallery
+// @Summary حذف گالری
+// @description حذف یک تصویر از گالری
+// @Tags gallery
+// @Router       /user/gallery/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه گالری" SchemaExample(1)
 func DeleteGallery(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteGallery", "request")
 	defer span.End()

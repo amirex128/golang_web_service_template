@@ -12,7 +12,13 @@ import (
 	"strings"
 )
 
-// CreateOrder ثبت یک سفارش جدید
+// CreateOrder
+// @Summary ایجاد سفارش جدید
+// @description از این سرویس برای ایجاد سفارش در بخش ادمین و کاربر استفاده میشود
+// @Tags order
+// @Router       /user/order/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreateOrder  	true "ورودی"
 func CreateOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createOrder", "request")
 	defer span.End()
@@ -181,6 +187,17 @@ func SadadPaymentVerify(c *gin.Context) {
 	//}
 }
 
+// IndexOrder
+// @Summary لیست سفارشات
+// @description لیست سفارشات بر اساس حالت های مختلف قابلیت فیلتر شدن داد
+// @Tags order
+// @Router       /user/order [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	order_status	 query   string	false "new,processing,returned,completed وضعیت سفارش" example(new)
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexOrder", "request")
 	defer span.End()
@@ -222,6 +239,13 @@ func IndexOrder(c *gin.Context) {
 
 }
 
+// ApproveOrder
+// @Summary تائید سفارش
+// @description سفارشات بعد از ثبت شدن باید توسط ادمین تائید شوند و سپس به مرحله انتخاب سرویس ارسال کنند بروند
+// @Tags order
+// @Router       /user/order/approve/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func ApproveOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "approveOrder", "request")
 	defer span.End()
@@ -247,6 +271,13 @@ func ApproveOrder(c *gin.Context) {
 	}
 }
 
+// CancelOrder
+// @Summary کنسل کردن سفارش
+// @description سفارشات میتوانند بعد از ثبت شدن یا تائید شوند یا کنسل و به مرحله انتخاب ارسال کنند روند و در انجا هم نیز امکان کنسل شدن داشته باشند
+// @Tags order
+// @Router       /user/order/cancel/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func CancelOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "cancelOrder", "request")
 	defer span.End()
@@ -272,6 +303,13 @@ func CancelOrder(c *gin.Context) {
 	}
 }
 
+// SendOrder
+// @Summary دریافت اطلاعات ارسال و انتخاب ارسال کننده
+// @description بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
+// @Tags order
+// @Router       /user/order/send [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.SendOrder  	true "ورودی"
 func SendOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "sendOrder", "request")
 	defer span.End()
@@ -311,6 +349,13 @@ func SendOrder(c *gin.Context) {
 	})
 }
 
+// CalculateSendPrice
+// @Summary دریافت اطلاعات ارسال و انتخاب ارسال کننده
+// @description بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
+// @Tags order
+// @Router       /user/order/calculate [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CalculateOrder  	true "ورودی"
 func CalculateSendPrice(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "calculateSendPrice", "request")
 	defer span.End()
@@ -326,6 +371,11 @@ func CalculateSendPrice(c *gin.Context) {
 	})
 }
 
+// ReturnedOrder
+// @Summary ثبت درخواست مرجوعی توسط مشتری
+// @description مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند
+// @Tags order
+// @Router       /user/order/returned [post]
 func ReturnedOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "returnedOrder", "request")
 	defer span.End()
@@ -333,6 +383,11 @@ func ReturnedOrder(c *gin.Context) {
 
 }
 
+// AcceptReturnedOrder
+// @Summary تائید درخواست مرجوعی توسط مدیر
+// @description بعد از درخواست مرجوعی با این درخواست توسط ادمین بررسی شود و در صورت تائید سفارش مرجوع شود و سرویس دهنده قبلی جهت جمع آوری ارسال شود
+// @Tags order
+// @Router       /user/order/returned/accept [post]
 func AcceptReturnedOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "acceptReturnedOrder", "request")
 	defer span.End()
@@ -340,6 +395,13 @@ func AcceptReturnedOrder(c *gin.Context) {
 
 }
 
+// ShowOrder
+// @Summary نمایش جزئیات سفارش
+// @description مشتری نیاز دارد سفارش خود را از طریق پنل مشتری مشاهده نماید
+// @Tags order
+// @Router       /user/order/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func ShowOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showOrder", "request")
 	defer span.End()
@@ -353,6 +415,13 @@ func ShowOrder(c *gin.Context) {
 	})
 }
 
+// TrackingOrder
+// @Summary پیگیری وضعیت ارسال سفارش
+// @description مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش در چه مرحله ای به سر میبرد
+// @Tags order
+// @Router       /user/order/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func TrackingOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "trackingOrder", "request")
 	defer span.End()
@@ -360,6 +429,15 @@ func TrackingOrder(c *gin.Context) {
 	utils2.TrackingOrder(trackingCode)
 }
 
+// IndexCustomerOrders
+// @Summary نمایش لیست سفارشات مشتری
+// @description مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد
+// @Tags order
+// @Router       /user/customer [get]
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexCustomerOrders(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexCustomerOrders", "request")
 	defer span.End()

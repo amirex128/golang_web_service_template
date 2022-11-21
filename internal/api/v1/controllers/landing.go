@@ -410,6 +410,7 @@ func PageLanding(c *gin.Context) {
 		"page":   page,
 	})
 }
+
 func ContactLanding(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "contactLanding", "request")
 	defer span.End()

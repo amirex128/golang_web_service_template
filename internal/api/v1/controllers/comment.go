@@ -9,6 +9,12 @@ import (
 	"net/http"
 )
 
+// CreateComment
+// @Summary ایجاد دیدگاه
+// @description مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند
+// @Tags comment
+// @Router       /user/comment/create [post]
+// @Param comment body DTOs.CreateComment true "ورودی"
 func CreateComment(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createComment", "request")
 	defer span.End()
@@ -25,6 +31,13 @@ func CreateComment(c *gin.Context) {
 	})
 }
 
+// ApproveCommentAdmin
+// @Summary تائید دیدگاه
+// @description مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند
+// @Tags comment
+// @Router       /user/comment/approve/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه دیدگاه" SchemaExample(1)
 func ApproveCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "approveCommentAdmin", "request")
 	defer span.End()
@@ -38,6 +51,13 @@ func ApproveCommentAdmin(c *gin.Context) {
 	})
 }
 
+// DeleteCommentAdmin
+// @Summary حذف دیدگاه
+// @description مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند
+// @Tags comment
+// @Router       /user/comment/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه دیدگاه" SchemaExample(1)
 func DeleteCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCommentAdmin", "request")
 	defer span.End()
@@ -51,6 +71,16 @@ func DeleteCommentAdmin(c *gin.Context) {
 	})
 }
 
+// IndexCommentAdmin
+// @Summary لیست دیدگاه ها
+// @description مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند
+// @Tags comment
+// @Router       /user/comment [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexCommentAdmin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexCommentAdmin", "request")
 	defer span.End()

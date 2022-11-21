@@ -1,28 +1,47 @@
 package DTOs
 
 type CreateAddress struct {
-	Title      string `form:"title" json:"title" validate:"required" fake:"{street_name}"`
-	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"required,numeric" fake:"{number:1,1}"`
-	CityID     uint64 `form:"city_id" json:"city_id" validate:"required,numeric" fake:"{number:1,1}"`
-	Address    string `form:"address" json:"address" validate:"required" fake:"{address}"`
-	PostalCode string `form:"postal_code" json:"postal_code" validate:"required,numeric,min=10,max=10" fake:"{zip}"`
-	Mobile     string `form:"mobile" json:"mobile" validate:"required,numeric,startswith" fake:"{phone}"`
-	FullName   string `form:"full_name" json:"full_name" validate:"required" fake:"{name}"`
-	Lat        string `form:"lat" json:"lat" fake:"{latitude}"`
-	Long       string `form:"long" json:"long" fake:"{longitude}"`
+	//عنوان
+	Title string `form:"title" json:"title" validate:"required" example:"عنوان" fake:"{street_name}"`
+	//شناسه استان
+	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"required,numeric" example:"1" fake:"{number:1,1}"`
+	//شناسه شهر
+	CityID uint64 `form:"city_id" json:"city_id" validate:"required,numeric" example:"1" fake:"{number:1,1}"`
+	//ادرس کامل
+	Address string `form:"address" json:"address" validate:"required" example:"ادرس کامل" fake:"{address}"`
+	//کد پستی
+	PostalCode string `form:"postal_code" json:"postal_code" validate:"required,numeric,min=10,max=10" example:"1111111111" fake:"{zip}"`
+	//موبایل
+	Mobile string `form:"mobile" json:"mobile" validate:"required,numeric,startswith" example:"09024809750" fake:"{phone}"`
+	//نام گیرنده
+	FullName string `form:"full_name" json:"full_name" validate:"required" example:"نام گیرنده" fake:"{name}"`
+	//عرض جغذافیایی
+	Lat string `form:"lat" json:"lat" example:"" example:"35.123456" fake:"{latitude}"`
+	//طول جقرافیایی
+	Long string `form:"long" json:"long" example:"" example:"35.123456" fake:"{longitude}"`
 }
 
 type UpdateAddress struct {
-	ID         uint64 `form:"id" json:"id" validate:"required"`
-	Title      string `form:"title" json:"title" validate:"omitempty"`
-	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"omitempty,numeric"`
-	CityID     uint64 `form:"city_id" json:"city_id" validate:"omitempty,numeric"`
-	Address    string `form:"address" json:"address" validate:"omitempty"`
-	PostalCode string `form:"postal_code" json:"postal_code" validate:"omitempty,numeric,min=10,max=10"`
-	Mobile     string `form:"mobile" json:"mobile" validate:"omitempty,numeric,startswith"`
-	FullName   string `form:"full_name" json:"full_name" validate:"omitempty"`
-	Lat        string `form:"lat" json:"lat"`
-	Long       string `form:"long" json:"long"`
+	//شناسه آدرس
+	ID uint64 `form:"id" json:"id" validate:"required" example:"1"`
+	//عنوان
+	Title string `form:"title" json:"title" validate:"omitempty" example:"عنوان"`
+	//شناسه استان
+	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"omitempty,numeric" example:"1"`
+	//شناسه شهر
+	CityID uint64 `form:"city_id" json:"city_id" validate:"omitempty,numeric" example:"1"`
+	//ادرس کامل
+	Address string `form:"address" json:"address" validate:"omitempty" example:"ادرس کامل"`
+	//کد پستی
+	PostalCode string `form:"postal_code" json:"postal_code" validate:"omitempty,numeric,min=10,max=10" example:"1111111111"`
+	//موبایل
+	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,numeric,startswith" example:"09024809750"`
+	//نام گیرنده
+	FullName string `form:"full_name" json:"full_name" validate:"omitempty" example:"نام گیرنده"`
+	//عرض جغذافیایی
+	Lat string `form:"lat" json:"lat" example:"35.123456"`
+	//طول جقرافیایی
+	Long string `form:"long" json:"long" example:"35.123456"`
 }
 
 type IndexAddress struct {

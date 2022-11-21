@@ -11,6 +11,13 @@ import (
 	"strings"
 )
 
+// CheckDiscount
+// @Summary بررسی تخفیف
+// @description کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود را وارد نمایید تا بر روی محصولات اش اعمال شوند
+// @Tags discount
+// @Router       /user/customer/discount/check [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CheckDiscount  	true "ورودی"
 func CheckDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "checkDiscount", "request")
 	defer span.End()
@@ -72,6 +79,13 @@ func CheckDiscount(c *gin.Context) {
 	})
 }
 
+// CreateDiscount
+// @Summary ایجاد تخفیف
+// @description ایجاد یک تخفیف بر روی یک محصصول یا چند محصول
+// @Tags discount
+// @Router       /user/discount/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreateDiscount  	true "ورودی"
 func CreateDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createDiscount", "request")
 	defer span.End()
@@ -87,6 +101,13 @@ func CreateDiscount(c *gin.Context) {
 
 }
 
+// UpdateDiscount
+// @Summary ویرایش تخفیف
+// @description ویرایش تخفیف
+// @Tags discount
+// @Router       /user/discount/update [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.UpdateDiscount  	true "ورودی"
 func UpdateDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateDiscount", "request")
 	defer span.End()
@@ -103,6 +124,16 @@ func UpdateDiscount(c *gin.Context) {
 	})
 }
 
+// IndexDiscount
+// @Summary لیست تخفیف
+// @description لیست تخفیفات
+// @Tags discount
+// @Router       /user/discount [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexDiscount", "request")
 	defer span.End()
@@ -120,6 +151,13 @@ func IndexDiscount(c *gin.Context) {
 	})
 }
 
+// DeleteDiscount
+// @Summary حذف تخفیف
+// @description حذف تخفیف
+// @Tags discount
+// @Router       /user/discount/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه تخفیف" SchemaExample(1)
 func DeleteDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
 	defer span.End()
@@ -134,6 +172,13 @@ func DeleteDiscount(c *gin.Context) {
 	})
 }
 
+// ShowDiscount
+// @Summary نمایش تخفیف
+// @description نمایش تخفیف
+// @Tags discount
+// @Router       /user/discount/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه تخفیف" SchemaExample(1)
 func ShowDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showDiscount", "request")
 	defer span.End()

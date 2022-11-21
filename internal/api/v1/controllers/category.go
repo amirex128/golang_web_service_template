@@ -42,7 +42,7 @@ func IndexCategory(c *gin.Context) {
 // @Tags category
 // @Router       /user/category/create [post]
 // @Param	Authorization	 header string	true "Authentication"
-// @Param	search			 body   string	true "متن جستجو"
+// @Param message body DTOs.CreateCategory true "ورودی"
 func CreateCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createCategory", "request")
 	defer span.End()
@@ -59,6 +59,13 @@ func CreateCategory(c *gin.Context) {
 	})
 }
 
+// UpdateCategory
+// @Summary ویرایش دسته بندی ها
+// @description کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند
+// @Tags category
+// @Router       /user/category/update [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param message body DTOs.UpdateCategory true "ورودی"
 func UpdateCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateCategory", "request")
 	defer span.End()
@@ -75,6 +82,13 @@ func UpdateCategory(c *gin.Context) {
 	})
 }
 
+// DeleteCategory
+// @Summary حذف آدرس
+// @description کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+// @Tags address
+// @Router       /user/address/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه آدرس" SchemaExample(1)
 func DeleteCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCategory", "request")
 	defer span.End()

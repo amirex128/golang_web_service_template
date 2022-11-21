@@ -20,7 +20,60 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user/address": {
+        "/user/address/create": {
+            "post": {
+                "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
+                "tags": [
+                    "address"
+                ],
+                "summary": "ایجاد آدرس جدید",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateAddress"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/address/delete/{id}": {
+            "post": {
+                "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
+                "tags": [
+                    "address"
+                ],
+                "summary": "حذف آدرس",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه آدرس",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/address/list": {
             "get": {
                 "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
                 "tags": [
@@ -63,129 +116,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/address/create": {
-            "post": {
-                "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
-                "tags": [
-                    "address"
-                ],
-                "summary": "ایجاد آدرس جدید",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Authentication",
-                        "name": "Authorization",
-                        "in": "header"
-                    },
-                    {
-                        "description": "عنوان",
-                        "name": "title",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "شناسه استان",
-                        "name": "province_id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "شناسه شهر",
-                        "name": "city_id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "ادرس کامل",
-                        "name": "address",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "کد پستی",
-                        "name": "postal_code",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "موبایل",
-                        "name": "mobile",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "نام گیرنده",
-                        "name": "full_name",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "عرض جغذافیایی",
-                        "name": "lat",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "طول جقرافیایی",
-                        "name": "long",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/user/address/delete/{id}": {
-            "post": {
-                "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
-                "tags": [
-                    "address"
-                ],
-                "summary": "حذف آدرس",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Authentication",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "شناسه آدرس",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/user/address/update": {
             "post": {
                 "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
@@ -202,84 +132,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "شناسه آدرس",
-                        "name": "id",
+                        "description": "ورودی",
+                        "name": "message",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "عنوان",
-                        "name": "title",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "شناسه استان",
-                        "name": "province_id",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "شناسه شهر",
-                        "name": "city_id",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "ادرس کامل",
-                        "name": "address",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "کد پستی",
-                        "name": "postal_code",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "موبایل",
-                        "name": "mobile",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "نام گیرنده",
-                        "name": "full_name",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "عرض جغذافیایی",
-                        "name": "lat",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "طول جقرافیایی",
-                        "name": "long",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/DTOs.UpdateAddress"
                         }
                     }
                 ],
@@ -345,16 +203,1600 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "متن جستجو",
-                        "name": "search",
+                        "description": "ورودی",
+                        "name": "message",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/DTOs.CreateCategory"
                         }
                     }
                 ],
                 "responses": {}
+            }
+        },
+        "/user/category/update": {
+            "post": {
+                "description": "کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند",
+                "tags": [
+                    "category"
+                ],
+                "summary": "ویرایش دسته بندی ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateCategory"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/comment": {
+            "get": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "لیست دیدگاه ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/comment/approve/{id}": {
+            "post": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "تائید دیدگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه دیدگاه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/comment/create": {
+            "post": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "ایجاد دیدگاه",
+                "parameters": [
+                    {
+                        "description": "ورودی",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateComment"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/comment/delete/{id}": {
+            "post": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "حذف دیدگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه دیدگاه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/customer": {
+            "get": {
+                "description": "مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد",
+                "tags": [
+                    "order"
+                ],
+                "summary": "نمایش لیست سفارشات مشتری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/customer/discount/check": {
+            "post": {
+                "description": "کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود را وارد نمایید تا بر روی محصولات اش اعمال شوند",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "بررسی تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CheckDiscount"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/customer/login/register": {
+            "post": {
+                "description": "مشتریان میتوانند با ارسال شماره موبایل و کد تایید به سیستم وارد شوند یا اگر کاربری با این شماره موبایل وجود نداشته باشد ثبت نام کنند",
+                "tags": [
+                    "customer"
+                ],
+                "summary": "ثبت نام یا ورود کاربر با ارسال کد",
+                "parameters": [
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.RequestCreateLoginCustomer"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/customer/verify": {
+            "post": {
+                "description": "مشتریان با دریافت کد تایید میتوانند اطلاعات خود را وارد کنند و یا بروزرسانی نماییند همچنین دریافت کنند اطلاعات قبلی را",
+                "tags": [
+                    "customer"
+                ],
+                "summary": "دریافت اطلاعات مشتری و ویرایش و ثبت اطلاعات جدید در سبد خرید",
+                "parameters": [
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateUpdateCustomer"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/discount": {
+            "get": {
+                "description": "لیست تخفیفات",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "لیست تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/discount/create": {
+            "post": {
+                "description": "ایجاد یک تخفیف بر روی یک محصصول یا چند محصول",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "ایجاد تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateDiscount"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/discount/delete/{id}": {
+            "post": {
+                "description": "حذف تخفیف",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "حذف تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه تخفیف",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/discount/show/{id}": {
+            "get": {
+                "description": "نمایش تخفیف",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "نمایش تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه تخفیف",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/discount/update": {
+            "post": {
+                "description": "ویرایش تخفیف",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "ویرایش تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateDiscount"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/domain": {
+            "get": {
+                "description": "لیست دامنه ها",
+                "tags": [
+                    "domain"
+                ],
+                "summary": "لیست دامنه ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/domain/create": {
+            "post": {
+                "description": "یک دامنه یا یک ساب دامنه کاربر میتواند اضافه نمایید تا سایت ایجاد شده خود را بر بستر آن دامنه مشاهده نماید",
+                "tags": [
+                    "domain"
+                ],
+                "summary": "ایجاد دامنه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateDomain"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/domain/delete/{id}": {
+            "post": {
+                "description": "باحذف دامنه امکان دسترسی از این دامنه بر روی سایت کاربر گرفته میشود",
+                "tags": [
+                    "domain"
+                ],
+                "summary": "حذف دامنه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه دامنه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/gallery/create": {
+            "post": {
+                "description": "با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر به فرمت وب پی تبدیل میشوند",
+                "tags": [
+                    "gallery"
+                ],
+                "summary": "آپلود تصویر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateGallery"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/gallery/delete/{id}": {
+            "post": {
+                "description": "حذف یک تصویر از گالری",
+                "tags": [
+                    "gallery"
+                ],
+                "summary": "حذف گالری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه گالری",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/menu": {
+            "get": {
+                "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "لیست منو ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/menu/create": {
+            "post": {
+                "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "ایجاد منو",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateMenu"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/menu/delete/{id}": {
+            "post": {
+                "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "حذف منو",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه منو",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/menu/update": {
+            "post": {
+                "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
+                "tags": [
+                    "menu"
+                ],
+                "summary": "ویرایش منو",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateMenu"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order": {
+            "get": {
+                "description": "لیست سفارشات بر اساس حالت های مختلف قابلیت فیلتر شدن داد",
+                "tags": [
+                    "order"
+                ],
+                "summary": "لیست سفارشات",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "new",
+                        "description": "new,processing,returned,completed وضعیت سفارش",
+                        "name": "order_status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/approve/{id}": {
+            "post": {
+                "description": "سفارشات بعد از ثبت شدن باید توسط ادمین تائید شوند و سپس به مرحله انتخاب سرویس ارسال کنند بروند",
+                "tags": [
+                    "order"
+                ],
+                "summary": "تائید سفارش",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه سفارش",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/calculate": {
+            "post": {
+                "description": "بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال",
+                "tags": [
+                    "order"
+                ],
+                "summary": "دریافت اطلاعات ارسال و انتخاب ارسال کننده",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CalculateOrder"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/cancel/{id}": {
+            "post": {
+                "description": "سفارشات میتوانند بعد از ثبت شدن یا تائید شوند یا کنسل و به مرحله انتخاب ارسال کنند روند و در انجا هم نیز امکان کنسل شدن داشته باشند",
+                "tags": [
+                    "order"
+                ],
+                "summary": "کنسل کردن سفارش",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه سفارش",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/create": {
+            "post": {
+                "description": "از این سرویس برای ایجاد سفارش در بخش ادمین و کاربر استفاده میشود",
+                "tags": [
+                    "order"
+                ],
+                "summary": "ایجاد سفارش جدید",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateOrder"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/returned": {
+            "post": {
+                "description": "مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند",
+                "tags": [
+                    "order"
+                ],
+                "summary": "ثبت درخواست مرجوعی توسط مشتری",
+                "responses": {}
+            }
+        },
+        "/user/order/returned/accept": {
+            "post": {
+                "description": "بعد از درخواست مرجوعی با این درخواست توسط ادمین بررسی شود و در صورت تائید سفارش مرجوع شود و سرویس دهنده قبلی جهت جمع آوری ارسال شود",
+                "tags": [
+                    "order"
+                ],
+                "summary": "تائید درخواست مرجوعی توسط مدیر",
+                "responses": {}
+            }
+        },
+        "/user/order/send": {
+            "post": {
+                "description": "بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال",
+                "tags": [
+                    "order"
+                ],
+                "summary": "دریافت اطلاعات ارسال و انتخاب ارسال کننده",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.SendOrder"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/show/{id}": {
+            "get": {
+                "description": "مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش در چه مرحله ای به سر میبرد",
+                "tags": [
+                    "order"
+                ],
+                "summary": "پیگیری وضعیت ارسال سفارش",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه سفارش",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "DTOs.CalculateOrder": {
+            "type": "object",
+            "required": [
+                "address_id",
+                "package_size",
+                "value",
+                "weight"
+            ],
+            "properties": {
+                "address_id": {
+                    "type": "integer"
+                },
+                "package_size": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
+        "DTOs.CheckDiscount": {
+            "type": "object",
+            "required": [
+                "code",
+                "product_ids",
+                "user_id"
+            ],
+            "properties": {
+                "code": {
+                    "description": "کد تخفیف",
+                    "type": "string",
+                    "example": "asdf"
+                },
+                "product_ids": {
+                    "description": "لیست محصولات موجود در سبد خرید",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DTOs.ProductListDiscount"
+                    }
+                },
+                "user_id": {
+                    "description": "شناسه مالک فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.CreateAddress": {
+            "type": "object",
+            "required": [
+                "address",
+                "city_id",
+                "full_name",
+                "mobile",
+                "postal_code",
+                "province_id",
+                "title"
+            ],
+            "properties": {
+                "address": {
+                    "description": "ادرس کامل",
+                    "type": "string",
+                    "example": "ادرس کامل"
+                },
+                "city_id": {
+                    "description": "شناسه شهر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "full_name": {
+                    "description": "نام گیرنده",
+                    "type": "string",
+                    "example": "نام گیرنده"
+                },
+                "lat": {
+                    "description": "عرض جغذافیایی",
+                    "type": "string",
+                    "example": ""
+                },
+                "long": {
+                    "description": "طول جقرافیایی",
+                    "type": "string",
+                    "example": ""
+                },
+                "mobile": {
+                    "description": "موبایل",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "postal_code": {
+                    "description": "کد پستی",
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10,
+                    "example": "1111111111"
+                },
+                "province_id": {
+                    "description": "شناسه استان",
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "description": "عنوان",
+                    "type": "string",
+                    "example": "عنوان"
+                }
+            }
+        },
+        "DTOs.CreateCategory": {
+            "type": "object",
+            "required": [
+                "name",
+                "parent_id",
+                "type"
+            ],
+            "properties": {
+                "description": {
+                    "description": "توضیحات دسته بندی",
+                    "type": "string",
+                    "example": "توضیحات دسته بندی"
+                },
+                "equivalent": {
+                    "description": "کلمات مترادف که با کاما از هم جدا شده اند",
+                    "type": "string",
+                    "example": "آموزش,یادگیری"
+                },
+                "gallery_id": {
+                    "description": "شناسه تصویر آپلود شده",
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "description": "نام دسته بندی",
+                    "type": "string",
+                    "example": "نام دسته بندی"
+                },
+                "parent_id": {
+                    "description": "شناسه دسته بندی پدر",
+                    "type": "integer",
+                    "example": 0
+                },
+                "type": {
+                    "description": "نوع دسته بندی",
+                    "type": "string",
+                    "enum": [
+                        "product",
+                        "post"
+                    ],
+                    "example": "product"
+                }
+            }
+        },
+        "DTOs.CreateComment": {
+            "type": "object",
+            "required": [
+                "body",
+                "email",
+                "name",
+                "post_id"
+            ],
+            "properties": {
+                "body": {
+                    "description": "متن نظر",
+                    "type": "string",
+                    "example": "متن نظر"
+                },
+                "email": {
+                    "description": "ایمیل",
+                    "type": "string",
+                    "example": "amirex128@gmail.com"
+                },
+                "name": {
+                    "description": "نام کاربر",
+                    "type": "string",
+                    "example": "نام"
+                },
+                "post_id": {
+                    "description": "شناسه پست",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.CreateDiscount": {
+            "type": "object",
+            "required": [
+                "code",
+                "count",
+                "ended_at",
+                "started_at",
+                "status",
+                "type"
+            ],
+            "properties": {
+                "amount": {
+                    "description": "مقدار تخفیف",
+                    "type": "number",
+                    "example": 0
+                },
+                "code": {
+                    "description": "کد تخفیف",
+                    "type": "string",
+                    "example": "asdf"
+                },
+                "count": {
+                    "description": "تعداد تخفیف",
+                    "type": "integer",
+                    "example": 10
+                },
+                "ended_at": {
+                    "description": "تاریخ پایان تخفیف",
+                    "type": "string",
+                    "example": "2025-01-01 00:00:00"
+                },
+                "percent": {
+                    "description": "درصد تخفیف",
+                    "type": "number",
+                    "example": 50
+                },
+                "product_ids": {
+                    "description": "شناسه محصولات",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "started_at": {
+                    "description": "تاریخ شروع تخفیف",
+                    "type": "string",
+                    "example": "2021-01-01 00:00:00"
+                },
+                "status": {
+                    "description": "وضعیت تخفیف",
+                    "type": "boolean",
+                    "example": true
+                },
+                "type": {
+                    "description": "نوع تخفیف",
+                    "type": "string",
+                    "enum": [
+                        "percent",
+                        "amount"
+                    ],
+                    "example": "percent"
+                }
+            }
+        },
+        "DTOs.CreateDomain": {
+            "type": "object",
+            "required": [
+                "name",
+                "shop_id",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "shop_id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "DTOs.CreateGallery": {
+            "type": "object",
+            "required": [
+                "height",
+                "width"
+            ],
+            "properties": {
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "DTOs.CreateMenu": {
+            "type": "object",
+            "properties": {
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "shop_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "DTOs.CreateOrder": {
+            "type": "object",
+            "required": [
+                "customer_id",
+                "order_items",
+                "shop_id",
+                "user_id",
+                "verify_code"
+            ],
+            "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount_code": {
+                    "type": "string"
+                },
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DTOs.OrderItem"
+                    }
+                },
+                "shop_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "verify_code": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 2
+                }
+            }
+        },
+        "DTOs.CreateUpdateCustomer": {
+            "type": "object",
+            "required": [
+                "shop_id"
+            ],
+            "properties": {
+                "address": {
+                    "description": "آدرس",
+                    "type": "string",
+                    "example": "آدرس"
+                },
+                "city_id": {
+                    "description": "شناسه شهر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "full_name": {
+                    "description": "نام کامل",
+                    "type": "string",
+                    "example": "نام"
+                },
+                "mobile": {
+                    "description": "شماره همراه",
+                    "type": "string",
+                    "maxLength": 11,
+                    "minLength": 11,
+                    "example": "09024809750"
+                },
+                "postal_code": {
+                    "description": "کد پستی",
+                    "type": "integer",
+                    "example": 1111111111
+                },
+                "province_id": {
+                    "description": "شناسه استان",
+                    "type": "integer",
+                    "example": 1
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "verify_code": {
+                    "description": "کد تائید",
+                    "type": "string",
+                    "maxLength": 4,
+                    "minLength": 4,
+                    "example": "1234"
+                }
+            }
+        },
+        "DTOs.OrderItem": {
+            "type": "object",
+            "required": [
+                "count",
+                "product_id"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "option_id": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "DTOs.ProductListDiscount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "تعداد محصول",
+                    "type": "integer",
+                    "example": 10
+                },
+                "product_id": {
+                    "description": "شناسه محصول",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.RequestCreateLoginCustomer": {
+            "type": "object",
+            "required": [
+                "mobile",
+                "shop_id"
+            ],
+            "properties": {
+                "mobile": {
+                    "description": "شماره همراه",
+                    "type": "string",
+                    "maxLength": 11,
+                    "minLength": 11,
+                    "example": "09024809750"
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.SendOrder": {
+            "type": "object",
+            "required": [
+                "address_id",
+                "courier",
+                "order_id",
+                "package_size",
+                "value",
+                "weight"
+            ],
+            "properties": {
+                "address_id": {
+                    "type": "integer"
+                },
+                "courier": {
+                    "type": "string",
+                    "enum": [
+                        "tipax",
+                        "post"
+                    ]
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "package_size": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
+        "DTOs.UpdateAddress": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "address": {
+                    "description": "ادرس کامل",
+                    "type": "string",
+                    "example": "ادرس کامل"
+                },
+                "city_id": {
+                    "description": "شناسه شهر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "full_name": {
+                    "description": "نام گیرنده",
+                    "type": "string",
+                    "example": "نام گیرنده"
+                },
+                "id": {
+                    "description": "شناسه آدرس",
+                    "type": "integer",
+                    "example": 1
+                },
+                "lat": {
+                    "description": "عرض جغذافیایی",
+                    "type": "string",
+                    "example": "35.123456"
+                },
+                "long": {
+                    "description": "طول جقرافیایی",
+                    "type": "string",
+                    "example": "35.123456"
+                },
+                "mobile": {
+                    "description": "موبایل",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "postal_code": {
+                    "description": "کد پستی",
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10,
+                    "example": "1111111111"
+                },
+                "province_id": {
+                    "description": "شناسه استان",
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "description": "عنوان",
+                    "type": "string",
+                    "example": "عنوان"
+                }
+            }
+        },
+        "DTOs.UpdateCategory": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "description": "توضیحات دسته بندی",
+                    "type": "string",
+                    "example": "توضیحات دسته بندی"
+                },
+                "equivalent": {
+                    "description": "کلمات مترادف که با کاما از هم جدا شده اند",
+                    "type": "string",
+                    "example": "آموزش,یادگیری"
+                },
+                "gallery_id": {
+                    "description": "شناسه تصویر آپلود شده",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "description": "شناسه دسته بندی برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "description": "نام دسته بندی",
+                    "type": "string",
+                    "example": "نام دسته بندی"
+                },
+                "parent_id": {
+                    "description": "شناسه دسته بندی پدر",
+                    "type": "integer",
+                    "example": 0
+                },
+                "sort": {
+                    "description": "ترتیب مرتب سازی دسته بندی",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.UpdateDiscount": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "amount": {
+                    "description": "مقدار تخفیف",
+                    "type": "number",
+                    "example": 0
+                },
+                "code": {
+                    "description": "کد تخفیف",
+                    "type": "string",
+                    "example": "asdf"
+                },
+                "count": {
+                    "description": "تعداد تخفیف",
+                    "type": "integer",
+                    "example": 10
+                },
+                "ended_at": {
+                    "description": "تاریخ پایان تخفیف",
+                    "type": "string",
+                    "example": "2025-01-01 00:00:00"
+                },
+                "id": {
+                    "description": "شناسه تخفیف برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "percent": {
+                    "description": "درصد تخفیف",
+                    "type": "number",
+                    "example": 40
+                },
+                "product_ids": {
+                    "description": "شناسه محصولات",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "started_at": {
+                    "description": "تاریخ شروع تخفیف",
+                    "type": "string",
+                    "example": "2021-01-01 00:00:00"
+                },
+                "status": {
+                    "description": "وضعیت تخفیف",
+                    "type": "boolean",
+                    "example": true
+                },
+                "type": {
+                    "description": "نوع تخفیف",
+                    "type": "string",
+                    "enum": [
+                        "percent",
+                        "amount"
+                    ],
+                    "example": "percent"
+                }
+            }
+        },
+        "DTOs.UpdateMenu": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
+                }
             }
         }
     }

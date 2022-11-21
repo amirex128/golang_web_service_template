@@ -1,10 +1,14 @@
 package DTOs
 
 type CreateComment struct {
-	PostID uint64 `form:"post_id" json:"post_id" validate:"required,numeric"`
-	Name   string `form:"name" json:"name" validate:"required,min=3,max=255"`
-	Body   string `form:"body" json:"body" validate:"required,min=3"`
-	Email  string `form:"email" json:"email" validate:"required,email"`
+	//شناسه پست
+	PostID uint64 `form:"post_id" json:"post_id" validate:"required,numeric" example:"1"`
+	//نام کاربر
+	Name string `form:"name" json:"name" validate:"required" example:"نام"`
+	//متن نظر
+	Body string `form:"body" json:"body" validate:"required" example:"متن نظر"`
+	//ایمیل
+	Email string `form:"email" json:"email" validate:"required" example:"amirex128@gmail.com"`
 }
 
 type IndexComment struct {

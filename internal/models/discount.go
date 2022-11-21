@@ -23,7 +23,7 @@ type Discount struct {
 	Amount     float32 `json:"value"`
 	Percent    float32 `json:"percent"`
 	ProductIDs string  `json:"product_ids"`
-	Status     byte    `json:"status"`
+	Status     bool    `json:"status"`
 	CreatedAt  string  `json:"created_at"`
 	UpdatedAt  string  `json:"updated_at"`
 }
@@ -39,7 +39,7 @@ func initDiscount(manager *MysqlManager) {
 		Amount:     0,
 		Percent:    20,
 		ProductIDs: []uint64{},
-		Status:     1,
+		Status:     true,
 	})
 }
 func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto DTOs.CreateDiscount) error {
@@ -156,9 +156,7 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 	if dto.ProductIDs != nil {
 		discount.ProductIDs = strings.Join(utils2.Uint64ToStringArray(dto.ProductIDs), ",")
 	}
-	if dto.Status != 0 {
-		discount.Status = dto.Status
-	}
+	discount.Status = dto.Status
 	discount.UpdatedAt = utils2.NowTime()
 	err = m.GetConn().Save(discount).Error
 	if err != nil {

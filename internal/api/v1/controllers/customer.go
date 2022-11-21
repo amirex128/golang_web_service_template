@@ -12,6 +12,12 @@ import (
 	"net/http"
 )
 
+// RequestCreateLoginCustomer
+// @Summary ثبت نام یا ورود کاربر با ارسال کد
+// @description مشتریان میتوانند با ارسال شماره موبایل و کد تایید به سیستم وارد شوند یا اگر کاربری با این شماره موبایل وجود نداشته باشد ثبت نام کنند
+// @Tags customer
+// @Router       /user/customer/login/register [post]
+// @Param message body DTOs.RequestCreateLoginCustomer true "ورودی"
 func RequestCreateLoginCustomer(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "requestCreateLoginCustomer", "request")
 	defer span.End()
@@ -64,6 +70,12 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 	return
 }
 
+// VerifyCreateLoginCustomer
+// @Summary دریافت اطلاعات مشتری و ویرایش و ثبت اطلاعات جدید در سبد خرید
+// @description مشتریان با دریافت کد تایید میتوانند اطلاعات خود را وارد کنند و یا بروزرسانی نماییند همچنین دریافت کنند اطلاعات قبلی را
+// @Tags customer
+// @Router       /user/customer/verify [post]
+// @Param message body DTOs.CreateUpdateCustomer true "ورودی"
 func VerifyCreateLoginCustomer(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "verifyCreateLoginCustomer", "request")
 	defer span.End()
