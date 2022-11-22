@@ -1,11 +1,9 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm"
-	"net/http"
 )
 
 type Slider struct {
@@ -23,7 +21,7 @@ type Slider struct {
 func initSlider(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Slider{})
 	for i := 0; i < 20; i++ {
-		manager.CreateSlider(&gin.Context{}, context.Background(), DTOs.CreateSlider{
+		manager.CreateSlider(DTOs.CreateSlider{
 			Title:       "ِسشیبش",
 			GalleryID:   1,
 			Description: "fdfsdf",
@@ -34,8 +32,8 @@ func initSlider(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateSlider(c *gin.Context, ctx context.Context, dto DTOs.CreateSlider) error {
-	span, ctx := apm.StartSpan(ctx, "showSlider", "model")
+func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")
 	defer span.End()
 
 	// find last sort number
@@ -56,27 +54,17 @@ func (m *MysqlManager) CreateSlider(c *gin.Context, ctx context.Context, dto DTO
 	}
 	err = m.GetConn().Create(&slider).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ایجاد کد اسلایدر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ایجاد کد اسلایدر", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateSlider(c *gin.Context, ctx context.Context, dto DTOs.UpdateSlider) error {
-	span, ctx := apm.StartSpan(ctx, "showSlider", "model")
+func (m *MysqlManager) UpdateSlider(dto DTOs.UpdateSlider) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")
 	defer span.End()
 	slider := &Slider{}
 	err := m.GetConn().Where("id = ?", dto.ID).First(slider).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "اسلایدر یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("اسلایدر یافت نشد", "model", err)
 	}
 
 	if dto.Title != "" {
@@ -99,39 +87,27 @@ func (m *MysqlManager) UpdateSlider(c *gin.Context, ctx context.Context, dto DTO
 	}
 	err = m.GetConn().Save(slider).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ویرایش اسلایدر"})
-		return err
+		return errorx.New("خطا در ویرایش اسلایدر", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) DeleteSlider(c *gin.Context, ctx context.Context, sliderID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "showSlider", "model")
+func (m *MysqlManager) DeleteSlider(sliderID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")
 	defer span.End()
 	slider := Slider{}
 	err := m.GetConn().Where("id = ?", sliderID).First(&slider).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "اسلایدر یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("اسلایدر یافت نشد", "model", err)
 	}
 
 	err = m.GetConn().Delete(&slider).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف اسلایدر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف اسلایدر", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllSliderWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexSlider) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "showSlider", "model")
+func (m *MysqlManager) GetAllSliderWithPagination(dto DTOs.IndexSlider) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var sliders []Slider
@@ -143,13 +119,19 @@ func (m *MysqlManager) GetAllSliderWithPagination(c *gin.Context, ctx context.Co
 	}
 	err := conn.Find(&sliders).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت اسلایدر ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت اسلایدر ها", "model", err)
 	}
 	pagination.Data = sliders
 	return pagination, nil
+}
+
+func (m *MysqlManager) FindSliderByID(sliderID uint64) (*Slider, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindSliderByID", "model")
+	defer span.End()
+	slider := &Slider{}
+	err := m.GetConn().Where("id = ?", sliderID).First(slider).Error
+	if err != nil {
+		return nil, errorx.New("مشکلی در یافتن اسلایدر پیش آمده است", "model", err)
+	}
+	return slider, nil
 }

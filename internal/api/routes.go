@@ -103,6 +103,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			slider.GET("/list", controllers.IndexSlider)
 			slider.POST("/create", controllers.CreateSlider)
+			slider.GET("/show/:id", controllers.ShowSlider)
 			slider.POST("/update", controllers.UpdateSlider)
 			slider.POST("/delete/:id", controllers.DeleteSlider)
 		}
@@ -114,6 +115,22 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			post.POST("/create", controllers.CreatePost)
 			post.POST("/update", controllers.UpdatePost)
 			post.POST("/delete/:id", controllers.DeletePost)
+		}
+		page := user.Group("page")
+		{
+			page.GET("/list", controllers.IndexPage)
+			page.GET("/show/:id", controllers.ShowPage)
+			page.POST("/create", controllers.CreatePage)
+			page.POST("/update", controllers.UpdatePage)
+			page.POST("/delete/:id", controllers.DeletePage)
+		}
+		menu := user.Group("menu")
+		{
+			menu.GET("/list", controllers.IndexMenu)
+			menu.GET("/show/:id", controllers.ShowMenu)
+			menu.POST("/create", controllers.CreateMenu)
+			menu.POST("/update", controllers.UpdateMenu)
+			menu.POST("/delete/:id", controllers.DeleteMenu)
 		}
 		theme := user.Group("theme")
 		{

@@ -1,11 +1,10 @@
 package validations
 
 import (
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
@@ -33,16 +32,13 @@ func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
 			"required":   "شماره موبایل الزامی میباشد",
 			"numeric":    "شماره موبایل باید عددی باشد",
 			"startswith": "شماره موبایل باید با 09 شروع شود",
+			"min":        "شماره موبایل باید 11 رقم باشد",
+			"max":        "شماره موبایل باید 11 رقم باشد",
 		},
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -82,12 +78,7 @@ func UpdateAddress(c *gin.Context) (DTOs.UpdateAddress, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -102,12 +93,7 @@ func IndexAddress(c *gin.Context) (DTOs.IndexAddress, error) {
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)

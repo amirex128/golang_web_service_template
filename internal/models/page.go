@@ -1,12 +1,10 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 	"os"
 )
 
@@ -41,7 +39,7 @@ func initPage(manager *MysqlManager) {
 						panic(err)
 					}
 					body = string(readFile)
-					err = manager.CreatePage(&gin.Context{}, context.Background(), DTOs.CreatePage{
+					err = manager.CreatePage(DTOs.CreatePage{
 						Title:  dir.Name(),
 						Body:   body,
 						Type:   "blank",
@@ -58,8 +56,8 @@ func initPage(manager *MysqlManager) {
 
 }
 
-func (m *MysqlManager) CreatePage(c *gin.Context, ctx context.Context, dto DTOs.CreatePage) error {
-	span, ctx := apm.StartSpan(ctx, "CreatePage", "model")
+func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePage", "model")
 	defer span.End()
 	page := &Page{
 		Title:     dto.Title,
@@ -72,29 +70,19 @@ func (m *MysqlManager) CreatePage(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	err := m.GetConn().Create(page).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در ایجاد صفحه رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در ایجاد صفحه رخ داده است", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) UpdatePage(c *gin.Context, ctx context.Context, dto DTOs.UpdatePage) error {
-	span, ctx := apm.StartSpan(ctx, "UpdatePage", "model")
+func (m *MysqlManager) UpdatePage(dto DTOs.UpdatePage) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdatePage", "model")
 	defer span.End()
 
 	page := &Page{}
 	err := m.GetConn().Where("id = ?", dto.ID).First(page).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "صفحه مورد نظر یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("صفحه مورد نظر یافت نشد", "model", err)
 	}
 	if page.Title != dto.Title {
 		page.Title = dto.Title
@@ -113,50 +101,46 @@ func (m *MysqlManager) UpdatePage(c *gin.Context, ctx context.Context, dto DTOs.
 	return err
 }
 
-func (m *MysqlManager) FindPageBySlug(c *gin.Context, ctx context.Context, slug string) (*Page, error) {
-	span, ctx := apm.StartSpan(ctx, "FindPageBySlug", "model")
+func (m *MysqlManager) FindPageBySlug(slug string) (*Page, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindPageBySlug", "model")
 	defer span.End()
 	page := &Page{}
 	err := m.GetConn().Where("slug = ?", slug).First(page).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "صفحه مورد نظر یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return page, err
+		return nil, errorx.New("صفحه مورد نظر یافت نشد", "model", err)
 	}
 	return page, nil
 }
 
-func (m *MysqlManager) DeletePage(c *gin.Context, ctx context.Context, pageID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "showPage", "model")
+func (m *MysqlManager) FindPageByID(id uint64) (*Page, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindPageByID", "model")
+	defer span.End()
+	page := &Page{}
+	err := m.GetConn().Where("id = ?", id).First(page).Error
+	if err != nil {
+		return nil, errorx.New("صفحه مورد نظر یافت نشد", "model", err)
+	}
+	return page, nil
+}
+
+func (m *MysqlManager) DeletePage(pageID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showPage", "model")
 	defer span.End()
 	page := Page{}
 	err := m.GetConn().Where("id = ?", pageID).First(&page).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "صفحه یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("صفحه یافت نشد", "model", err)
 	}
 
 	err = m.GetConn().Delete(&page).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف صفحه",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف صفحه", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) GetAllPageWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexPage) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "showPage", "model")
+func (m *MysqlManager) GetAllPageWithPagination(dto DTOs.IndexPage) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showPage", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var pages []Page
@@ -168,12 +152,7 @@ func (m *MysqlManager) GetAllPageWithPagination(c *gin.Context, ctx context.Cont
 	}
 	err := conn.Find(&pages).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت صفحه ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت صفحه ها", "model", err)
 	}
 	pagination.Data = pages
 	return pagination, nil

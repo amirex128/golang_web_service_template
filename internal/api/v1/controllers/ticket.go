@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -17,18 +18,21 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateTicket  	true "ورودی"
 func CreateTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createTicket", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateTicket(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	var userID uint64
 	if dto.GuestMobile == "" {
 		userID = *models.GetUser(c)
 	}
-	err = models.NewMysqlManager(ctx).CreateTicket(c, ctx, dto, userID)
+	err = models.NewMysqlManager(c).CreateTicket(dto, userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -43,12 +47,14 @@ func CreateTicket(c *gin.Context) {
 // @Router       /user/ticket [get]
 // @Param	Authorization	 header string	true "Authentication"
 func IndexTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicket", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexTicket", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	userID := models.GetUser(c)
 	dto, err := validations.IndexTicket(c)
-	shops, err := models.NewMysqlManager(ctx).GetAllTicketWithPagination(c, ctx, dto, *userID)
+	shops, err := models.NewMysqlManager(c).GetAllTicketWithPagination(dto, *userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -64,11 +70,13 @@ func IndexTicket(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه تیکت های یک موضوع" SchemaExample(1)
 func ShowTicket(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showTicket", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showTicket", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	ticketID := utils.StringToUint64(c.Param("ticketID"))
-	ticket, err := models.NewMysqlManager(ctx).GetTicketWithChildren(c, ctx, ticketID)
+	ticket, err := models.NewMysqlManager(c).GetTicketWithChildren(ticketID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

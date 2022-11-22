@@ -45,7 +45,7 @@ func mSha512(s string) []byte {
 
 func IsAdmin(c *gin.Context) bool {
 	userID := GetUser(c)
-	user, err := NewMysqlManager(c.Request.Context()).FindUserByID(c, nil, *userID)
+	user, err := NewMysqlManager(c).FindUserByID(*userID)
 	if err != nil {
 		return false
 	}

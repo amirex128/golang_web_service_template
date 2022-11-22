@@ -1,10 +1,9 @@
 package validations
 
 import (
-	"errors"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
 )
 
 var (
@@ -21,12 +20,7 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "مقادیر ارسال شده نا درست میباشد",
-				"type":    "validation",
-				"error":   err.Error(),
-			})
-			return errors.New("validation error")
+			return errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 		}
 		var validationErrors = make(map[string]map[string]string)
 		for _, err := range err.(validator.ValidationErrors) {
@@ -44,12 +38,7 @@ func validateTags(items ValidationTags, err error, c *gin.Context) error {
 		}
 
 		if len(validationErrors) > 0 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "مقادیر ارسال شده نا درست میباشد",
-				"type":    "validation",
-				"errors":  validationErrors,
-			})
-			return err
+			return errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", nil, validationErrors)
 		}
 	}
 	return nil

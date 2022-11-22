@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -17,14 +18,17 @@ import (
 // @Param	Authorization	 header string	false "Authentication"
 // @Param message body DTOs.CreateAddress true "ورودی"
 func CreateAddress(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createAddress", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createAddress", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateAddress(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	_, err = models.NewMysqlManager(ctx).CreateAddress(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateAddress(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -40,14 +44,18 @@ func CreateAddress(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param message body DTOs.UpdateAddress true "ورودی"
 func UpdateAddress(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updateAddress", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateAddress", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
+
 	dto, err := validations.UpdateAddress(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).UpdateAddress(c, ctx, dto)
+	err = models.NewMysqlManager(c).UpdateAddress(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -63,12 +71,14 @@ func UpdateAddress(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه آدرس" SchemaExample(1)
 func DeleteAddress(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteAddress", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteAddress", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 
 	addressID := utils.StringToUint64(c.Param("id"))
-	err := models.NewMysqlManager(ctx).DeleteAddress(c, ctx, addressID)
+	err := models.NewMysqlManager(c).DeleteAddress(addressID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -88,12 +98,14 @@ func DeleteAddress(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexAddress(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexAddress", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexAddress", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 
 	dto, err := validations.IndexAddress(c)
-	addresses, err := models.NewMysqlManager(ctx).GetAllAddressWithPagination(c, ctx, dto)
+	addresses, err := models.NewMysqlManager(c).GetAllAddressWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

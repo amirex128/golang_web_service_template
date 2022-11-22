@@ -1,12 +1,10 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Address struct {
@@ -29,13 +27,13 @@ func initAddress(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Address{})
 	address := new(DTOs.CreateAddress)
 	gofakeit.Struct(address)
-	manager.CreateAddress(&gin.Context{}, context.Background(), *address)
+	manager.CreateAddress(*address)
 }
 
-func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DTOs.CreateAddress) (*Address, error) {
-	span, ctx := apm.StartSpan(m.Ctx, "GetTicketWithChildren", "model")
+func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetTicketWithChildren", "model")
 	defer span.End()
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	address := &Address{
 		UserID:     userID,
 		Title:      dto.Title,
@@ -50,35 +48,18 @@ func (m *MysqlManager) CreateAddress(c *gin.Context, ctx context.Context, dto DT
 	}
 	err := m.GetConn().Create(address).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در ایجاد آدرس رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return address, err
+		return errorx.New("خطایی در ثبت آدرس رخ داده است", "model", err)
 	}
-	return address, err
+	return nil
 }
 
-func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DTOs.UpdateAddress) error {
-	span, ctx := apm.StartSpan(ctx, "UpdateAddress", "model")
+func (m *MysqlManager) UpdateAddress(dto DTOs.UpdateAddress) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateAddress", "model")
 	defer span.End()
 	address := Address{}
 	err := m.GetConn().First(&address, dto.ID).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در بروزرسانی آدرس رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
-	}
-	userID := GetUser(c)
-	if *address.UserID != *userID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "شما اجازه دسترسی به این آدرس را ندارید",
-		})
-		return err
+		return errorx.New("خطایی در بروزرسانی آدرس رخ داده است", "model", err)
 	}
 	if dto.FullName != "" {
 		address.FullName = dto.FullName
@@ -109,83 +90,51 @@ func (m *MysqlManager) UpdateAddress(c *gin.Context, ctx context.Context, dto DT
 	}
 	err = m.GetConn().Save(&address).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در بروزرسانی آدرس رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در بروزرسانی آدرس رخ داده است", "model", err)
 	}
 	return err
 }
 
-func (m *MysqlManager) DeleteAddress(c *gin.Context, ctx context.Context, addressID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "DeleteAddress", "model")
+func (m *MysqlManager) DeleteAddress(addressID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteAddress", "model")
 	defer span.End()
 	address := Address{}
 	err := m.GetConn().First(&address, addressID).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در حذف آدرس رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
-	}
-	userID := GetUser(c)
-	if *address.UserID != *userID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "شما اجازه دسترسی به این آدرس را ندارید",
-		})
-		return err
+		return errorx.New("خطایی در حذف آدرس رخ داده است", "model", err)
 	}
 	err = m.GetConn().Delete(&address).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در حذف آدرس رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در حذف آدرس رخ داده است", "model", err)
 	}
 	return err
 }
 
-func (m *MysqlManager) IndexAddress(c *gin.Context, ctx context.Context, userID uint64) ([]*Address, error) {
-	span, ctx := apm.StartSpan(ctx, "IndexAddress", "model")
+func (m *MysqlManager) IndexAddress(userID uint64) ([]*Address, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:IndexAddress", "model")
 	defer span.End()
 	var addresses []*Address
 	err := m.GetConn().Where("user_id = ?", userID).Find(&addresses).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در دریافت آدرس ها رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return addresses, err
+		return nil, errorx.New("خطایی در دریافت آدرس ها رخ داده است", "model", err)
 	}
-	return addresses, err
+	return addresses, nil
 }
-func (m *MysqlManager) GetAllAddressWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexAddress) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "IndexAddress", "model")
+func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:IndexAddress", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var addresses []Address
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("addresses", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
 	}
 	err := conn.Find(&addresses).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت آدرس ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطایی در دریافت آدرس ها رخ داده است", "model", err)
 	}
 	pagination.Data = addresses
 	return pagination, nil

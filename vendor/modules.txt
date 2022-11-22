@@ -449,6 +449,9 @@ google.golang.org/protobuf/runtime/protoiface
 # gopkg.in/ini.v1 v1.66.4
 ## explicit
 gopkg.in/ini.v1
+# gopkg.in/sohlich/elogrus.v7 v7.0.0
+## explicit; go 1.12
+gopkg.in/sohlich/elogrus.v7
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2

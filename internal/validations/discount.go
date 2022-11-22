@@ -1,11 +1,10 @@
 package validations
 
 import (
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CheckDiscount(c *gin.Context) (DTOs.CheckDiscount, error) {
@@ -20,12 +19,7 @@ func CheckDiscount(c *gin.Context) (DTOs.CheckDiscount, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -73,12 +67,7 @@ func CreateDiscount(c *gin.Context) (DTOs.CreateDiscount, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -129,12 +118,7 @@ func UpdateDiscount(c *gin.Context) (DTOs.UpdateDiscount, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -153,12 +137,7 @@ func IndexDiscount(c *gin.Context) (DTOs.IndexDiscount, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)

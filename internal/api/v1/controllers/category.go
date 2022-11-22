@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -20,14 +21,17 @@ import (
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexCategory(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexCategory", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexCategory", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexCategory(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	categories, err := models.NewMysqlManager(ctx).GetAllCategoryWithPagination(c, ctx, dto)
+	categories, err := models.NewMysqlManager(c).GetAllCategoryWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -44,14 +48,17 @@ func IndexCategory(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param message body DTOs.CreateCategory true "ورودی"
 func CreateCategory(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createCategory", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createCategory", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateCategory(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).CreateCategory(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateCategory(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -67,14 +74,17 @@ func CreateCategory(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param message body DTOs.UpdateCategory true "ورودی"
 func UpdateCategory(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updateCategory", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateCategory", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.UpdateCategory(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).UpdateCategory(c, ctx, dto)
+	err = models.NewMysqlManager(c).UpdateCategory(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -90,11 +100,13 @@ func UpdateCategory(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه آدرس" SchemaExample(1)
 func DeleteCategory(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCategory", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteCategory", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
-	err := models.NewMysqlManager(ctx).DeleteCategory(c, ctx, id)
+	err := models.NewMysqlManager(c).DeleteCategory(id)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

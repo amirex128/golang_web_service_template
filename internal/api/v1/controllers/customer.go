@@ -6,6 +6,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -19,14 +20,17 @@ import (
 // @Router       /user/customer/login/register [post]
 // @Param message body DTOs.RequestCreateLoginCustomer true "ورودی"
 func RequestCreateLoginCustomer(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "requestCreateLoginCustomer", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:requestCreateLoginCustomer", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.RequestCreateLoginCustomer(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	customer, err := models.NewMysqlManager(ctx).FindCustomerByMobile(c, ctx, dto.Mobile)
+	customer, err := models.NewMysqlManager(c).FindCustomerByMobile(dto.Mobile)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	dif := utils.DifferentWithNow(customer.LastSendSMSAt)
@@ -40,7 +44,7 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 		lastSendSMSAt = utils.NowTime()
 	}
 	if customer.ID > 0 {
-		_, err = models.NewMysqlManager(ctx).UpdateCustomer(c, nil, DTOs.CreateUpdateCustomer{
+		_, err = models.NewMysqlManager(c).UpdateCustomer(DTOs.CreateUpdateCustomer{
 			Mobile:        dto.Mobile,
 			VerifyCode:    randCode,
 			LastSendSMSAt: lastSendSMSAt,
@@ -49,18 +53,20 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 			return
 		}
 	} else {
-		err = models.NewMysqlManager(ctx).CreateCodeCustomer(c, ctx, dto, randCode)
+		err = models.NewMysqlManager(c).CreateCodeCustomer(dto, randCode)
 		if err != nil {
 			return
 		}
 	}
-	shop, err := models.NewMysqlManager(ctx).FindShopByID(c, ctx, dto.ShopID)
+	shop, err := models.NewMysqlManager(c).FindShopByID(dto.ShopID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	text := fmt.Sprintf("%s %s : %s", "کد تایید", shop.Name, randCode)
 	err = utils.SendSMS(c, ctx, dto.Mobile, text, true)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -77,15 +83,18 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 // @Router       /user/customer/verify [post]
 // @Param message body DTOs.CreateUpdateCustomer true "ورودی"
 func VerifyCreateLoginCustomer(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "verifyCreateLoginCustomer", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:verifyCreateLoginCustomer", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateUpdateCustomer(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	customer, err := models.NewMysqlManager(ctx).FindCustomerByMobileAndVerifyCode(c, ctx, dto.Mobile, dto.VerifyCode)
+	customer, err := models.NewMysqlManager(c).FindCustomerByMobileAndVerifyCode(dto.Mobile, dto.VerifyCode)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	updateDto := DTOs.CreateUpdateCustomer{
@@ -96,8 +105,9 @@ func VerifyCreateLoginCustomer(c *gin.Context) {
 		Address:    dto.Address,
 		PostalCode: dto.PostalCode,
 	}
-	customerNew, err := models.NewMysqlManager(ctx).UpdateCustomer(c, ctx, updateDto)
+	customerNew, err := models.NewMysqlManager(c).UpdateCustomer(updateDto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

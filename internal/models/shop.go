@@ -1,13 +1,10 @@
 package models
 
 import (
-	"context"
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Shop struct {
@@ -39,7 +36,7 @@ type Shop struct {
 func initShop(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Shop{})
 	for i := 0; i < 20; i++ {
-		manager.CreateShop(&gin.Context{}, context.Background(), DTOs.CreateShop{
+		manager.CreateShop(DTOs.CreateShop{
 			Name:          "فروشگاه امیر",
 			Type:          "instagram",
 			SocialAddress: "amirex_dev",
@@ -49,8 +46,8 @@ func initShop(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.CreateShop, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "CreateShop", "model")
+func (m *MysqlManager) CreateShop(dto DTOs.CreateShop, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateShop", "model")
 	defer span.End()
 	shop := &Shop{
 		Name:          dto.Name,
@@ -78,60 +75,33 @@ func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	err := m.GetConn().Create(shop).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در ایجاد فروشگاه رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در ایجاد فروشگاه رخ داده است", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) FindShopByID(c *gin.Context, ctx context.Context, shopID uint64) (*Shop, error) {
-	span, ctx := apm.StartSpan(ctx, "FindShopByID", "model")
+func (m *MysqlManager) FindShopByID(shopID uint64) (*Shop, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindShopByID", "model")
 	defer span.End()
 	res := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).Preload("Gallery").First(res).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "فروشگاه یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
-	}
-	userID := GetUser(c)
-	if res.UserID != *userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",
-			"error":   errors.New("شما اجازه دسترسی به این فروشگاه را ندارید"),
-			"type":    "permission",
-		})
-		return nil, err
+		return nil, errorx.New("فروشگاه یافت نشد", "model", err)
 	}
 	return res, nil
 }
 
-func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.UpdateShop) error {
-	span, ctx := apm.StartSpan(ctx, "UpdateShop", "model")
+func (m *MysqlManager) UpdateShop(dto DTOs.UpdateShop) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateShop", "model")
 	defer span.End()
 	shop := &Shop{}
 	err := m.GetConn().Where("id = ?", dto.ID).First(shop).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "فروشگاه یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("فروشگاه یافت نشد", "model", err)
 	}
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	if shop.UserID != *userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",
-		})
-		return err
+		return errorx.New("شما اجازه دسترسی به این فروشگاه را ندارید", "model", err)
 	}
 	if dto.Name != "" {
 		shop.Name = dto.Name
@@ -174,53 +144,35 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	err = m.GetConn().Save(shop).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در ویرایش فروشگاه رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در ویرایش فروشگاه رخ داده است", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) DeleteShop(c *gin.Context, ctx context.Context, shopID uint64, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "DeleteShop", "model")
+func (m *MysqlManager) DeleteShop(shopID uint64, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteShop", "model")
 	defer span.End()
 	shop := &Shop{}
 	err := m.GetConn().Where("id = ?", shopID).First(shop).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "فروشگاه یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("فروشگاه یافت نشد", "model", err)
 	}
 	if shop.UserID != userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه دسترسی به این فروشگاه را ندارید",
-		})
-		return err
+		return errorx.New("شما اجازه دسترسی به این فروشگاه را ندارید", "model", err)
 	}
 	err = m.GetConn().Delete(shop).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در حذف فروشگاه رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در حذف فروشگاه رخ داده است", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexShop) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllShopWithPagination", "model")
+func (m *MysqlManager) GetAllShopWithPagination(dto DTOs.IndexShop) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetAllShopWithPagination", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var shops []Shop
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
 	conn = conn.Scopes(DTOs.Paginate("shops", pagination, conn))
@@ -229,29 +181,24 @@ func (m *MysqlManager) GetAllShopWithPagination(c *gin.Context, ctx context.Cont
 	}
 	err := conn.Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت فروشگاه ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت فروشگاه ها", "model", err)
 	}
 	pagination.Data = shops
 	return pagination, nil
 }
 
-func (m *MysqlManager) FindShopByDomain(c *gin.Context, ctx context.Context, name string) (*Shop, *Domain, *Theme, error) {
-	span, ctx := apm.StartSpan(ctx, "FindShopByDomain", "model")
+func (m *MysqlManager) FindShopByDomain(name string) (*Shop, *Domain, *Theme, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindShopByDomain", "model")
 	defer span.End()
-	domain, err := m.FindDomainByName(c, ctx, name)
+	domain, err := m.FindDomainByName(name)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	shop, err := m.FindShopByID(c, ctx, *domain.ShopID)
+	shop, err := m.FindShopByID(*domain.ShopID)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	theme, err := m.FindThemeByID(c, ctx, *shop.ThemeID)
+	theme, err := m.FindThemeByID(*shop.ThemeID)
 	if err != nil {
 		return nil, nil, nil, err
 	}

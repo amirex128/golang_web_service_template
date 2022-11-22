@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -14,11 +15,13 @@ const (
 )
 
 func IndexLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -32,15 +35,18 @@ func IndexLanding(c *gin.Context) {
 }
 
 func BlogLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "blogLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:blogLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 
 	dto, err := validations.IndexPost(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	posts, err := models.NewMysqlManager(ctx).GetAllPostWithPagination(c, ctx, dto)
+	posts, err := models.NewMysqlManager(c).GetAllPostWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	postArray := posts.Data.([]models.Post)
@@ -49,18 +55,21 @@ func BlogLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
+	tags, err := models.NewMysqlManager(c).RandomTags(20)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	categories, err := models.NewMysqlManager(ctx).GetLevel1Categories(c, ctx)
+	categories, err := models.NewMysqlManager(c).GetLevel1Categories()
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	randomPosts, err := models.NewMysqlManager(ctx).RandomPost(c, ctx, 6)
+	randomPosts, err := models.NewMysqlManager(c).RandomPost(6)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range randomPosts {
@@ -80,8 +89,9 @@ func BlogLanding(c *gin.Context) {
 		}()
 	}
 
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -100,19 +110,23 @@ func BlogLanding(c *gin.Context) {
 }
 
 func CategoryLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "categoryLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:categoryLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	categoryID := c.Param("id")
-	category, err := models.NewMysqlManager(ctx).FindCategoryByID(c, ctx, utils.StringToUint64(categoryID))
+	category, err := models.NewMysqlManager(c).FindCategoryByID(utils.StringToUint64(categoryID))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	posts, err := models.NewMysqlManager(ctx).GetAllCategoryPostWithPagination(c, ctx, dto, utils.StringToUint32(categoryID))
+	posts, err := models.NewMysqlManager(c).GetAllCategoryPostWithPagination(dto, utils.StringToUint32(categoryID))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	postArray := posts.Data.([]models.Post)
@@ -121,18 +135,21 @@ func CategoryLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
+	tags, err := models.NewMysqlManager(c).RandomTags(20)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	categories, err := models.NewMysqlManager(ctx).GetLevel1Categories(c, ctx)
+	categories, err := models.NewMysqlManager(c).GetLevel1Categories()
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	randomPosts, err := models.NewMysqlManager(ctx).RandomPost(c, ctx, 6)
+	randomPosts, err := models.NewMysqlManager(c).RandomPost(6)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range randomPosts {
@@ -151,8 +168,9 @@ func CategoryLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -172,19 +190,23 @@ func CategoryLanding(c *gin.Context) {
 }
 
 func TagLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "tagLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:tagLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	tagSlug := c.Param("slug")
-	tag, err := models.NewMysqlManager(ctx).FindTagBySlug(c, ctx, tagSlug)
+	tag, err := models.NewMysqlManager(c).FindTagBySlug(tagSlug)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	posts, err := models.NewMysqlManager(ctx).GetAllTagPostWithPagination(c, ctx, dto, tag.ID)
+	posts, err := models.NewMysqlManager(c).GetAllTagPostWithPagination(dto, tag.ID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	postArray := posts.Data.([]models.Post)
@@ -193,18 +215,21 @@ func TagLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
+	tags, err := models.NewMysqlManager(c).RandomTags(20)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	categories, err := models.NewMysqlManager(ctx).GetLevel1Categories(c, ctx)
+	categories, err := models.NewMysqlManager(c).GetLevel1Categories()
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	randomPosts, err := models.NewMysqlManager(ctx).RandomPost(c, ctx, 6)
+	randomPosts, err := models.NewMysqlManager(c).RandomPost(6)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range randomPosts {
@@ -223,8 +248,9 @@ func TagLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -244,10 +270,11 @@ func TagLanding(c *gin.Context) {
 }
 
 func DetailsLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "detailsLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:detailsLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	slug := c.Param("slug")
-	post, err := models.NewMysqlManager(ctx).FindPostBySlug(slug, ctx)
+	post, err := models.NewMysqlManager(c).FindPostBySlug(slug)
 	if err != nil {
 		c.Set("template", "404-error.html")
 		return
@@ -256,18 +283,21 @@ func DetailsLanding(c *gin.Context) {
 	post.CreatedAt = utils.DateToJalaali(post.CreatedAt)
 	post.UpdatedAt = utils.DateToJalaali(post.UpdatedAt)
 
-	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
+	tags, err := models.NewMysqlManager(c).RandomTags(20)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	categories, err := models.NewMysqlManager(ctx).GetLevel1Categories(c, ctx)
+	categories, err := models.NewMysqlManager(c).GetLevel1Categories()
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	randomPosts, err := models.NewMysqlManager(ctx).RandomPost(c, ctx, 6)
+	randomPosts, err := models.NewMysqlManager(c).RandomPost(6)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range randomPosts {
@@ -287,23 +317,26 @@ func DetailsLanding(c *gin.Context) {
 		}()
 	}
 
-	lastPost, err := models.NewMysqlManager(ctx).GetLastPost(c, ctx, 4)
+	lastPost, err := models.NewMysqlManager(c).GetLastPost(4)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range lastPost {
 		lastPost[i].CreatedAt = utils.DateToJalaali(lastPost[i].CreatedAt)
 		lastPost[i].UpdatedAt = utils.DateToJalaali(lastPost[i].UpdatedAt)
 	}
-	comments, err := models.NewMysqlManager(ctx).GetAllComments(c, ctx, post.ID)
+	comments, err := models.NewMysqlManager(c).GetAllComments(post.ID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range comments {
 		comments[i].EmailHash = utils.GetMD5Hash(comments[i].Email)
 	}
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -324,14 +357,17 @@ func DetailsLanding(c *gin.Context) {
 }
 
 func SearchLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "SearchLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:SearchLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexPost(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	posts, err := models.NewMysqlManager(ctx).GetAllPostWithPagination(c, ctx, dto)
+	posts, err := models.NewMysqlManager(c).GetAllPostWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	postArray := posts.Data.([]models.Post)
@@ -340,18 +376,21 @@ func SearchLanding(c *gin.Context) {
 		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
-	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
+	tags, err := models.NewMysqlManager(c).RandomTags(20)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	categories, err := models.NewMysqlManager(ctx).GetLevel1Categories(c, ctx)
+	categories, err := models.NewMysqlManager(c).GetLevel1Categories()
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	randomPosts, err := models.NewMysqlManager(ctx).RandomPost(c, ctx, 6)
+	randomPosts, err := models.NewMysqlManager(c).RandomPost(6)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range randomPosts {
@@ -370,8 +409,9 @@ func SearchLanding(c *gin.Context) {
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 	}
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -390,15 +430,18 @@ func SearchLanding(c *gin.Context) {
 }
 
 func PageLanding(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "PageLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:PageLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
-	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
+	shop, domain, theme, err := models.NewMysqlManager(c).FindShopByDomain(c.Request.Host)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	page, err := models.NewMysqlManager(ctx).FindPageBySlug(c, ctx, c.Param("slug"))
+	page, err := models.NewMysqlManager(c).FindPageBySlug(c.Param("slug"))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.Set("template", fmt.Sprintf("themes/%d/%s", theme.ID, "page.html"))
@@ -412,7 +455,8 @@ func PageLanding(c *gin.Context) {
 }
 
 func ContactLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "contactLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:contactLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "contact.html")
 	c.Set("data", map[string]interface{}{
@@ -421,7 +465,8 @@ func ContactLanding(c *gin.Context) {
 }
 
 func FaqLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "faqLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:faqLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "faq.html")
 	c.Set("data", map[string]interface{}{
@@ -430,7 +475,8 @@ func FaqLanding(c *gin.Context) {
 }
 
 func PricingLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "pricingLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:pricingLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "pricing.html")
 	c.Set("data", map[string]interface{}{
@@ -439,7 +485,8 @@ func PricingLanding(c *gin.Context) {
 }
 
 func ServicesLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "servicesLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:servicesLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "services.html")
 	c.Set("data", map[string]interface{}{
@@ -448,7 +495,8 @@ func ServicesLanding(c *gin.Context) {
 }
 
 func TestimonialLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "testimonialLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:testimonialLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "testimonial.html")
 	c.Set("data", map[string]interface{}{
@@ -457,7 +505,8 @@ func TestimonialLanding(c *gin.Context) {
 }
 
 func LearnLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "learnLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:learnLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "learn.html")
 	c.Set("data", map[string]interface{}{
@@ -466,7 +515,8 @@ func LearnLanding(c *gin.Context) {
 }
 
 func RulesLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "rulesLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:rulesLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "rules.html")
 	c.Set("data", map[string]interface{}{
@@ -475,7 +525,8 @@ func RulesLanding(c *gin.Context) {
 }
 
 func ReturnRulesLanding(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "returnRulesLanding", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:returnRulesLanding", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	c.Set("template", "return-rules.html")
 	c.Set("data", map[string]interface{}{

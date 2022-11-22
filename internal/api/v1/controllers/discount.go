@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -19,15 +20,18 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CheckDiscount  	true "ورودی"
 func CheckDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "checkDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:checkDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CheckDiscount(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	discount, err := models.NewMysqlManager(ctx).FindDiscountByCodeAndUserID(c, ctx, dto.Code)
+	discount, err := models.NewMysqlManager(c).FindDiscountByCodeAndUserID(dto.Code)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -41,8 +45,9 @@ func CheckDiscount(c *gin.Context) {
 		pIDs = append(pIDs, dto.ProductIDs[i].ProductID)
 	}
 
-	products, err := models.NewMysqlManager(ctx).FindProductByIds(c, ctx, pIDs)
+	products, err := models.NewMysqlManager(c).FindProductByIds(pIDs)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -87,13 +92,15 @@ func CheckDiscount(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateDiscount  	true "ورودی"
 func CreateDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateDiscount(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).CreateDiscount(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateDiscount(dto)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تخفیف با موفقیت ایجاد شد",
@@ -109,14 +116,17 @@ func CreateDiscount(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.UpdateDiscount  	true "ورودی"
 func UpdateDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updateDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.UpdateDiscount(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).UpdateDiscount(c, ctx, dto)
+	err = models.NewMysqlManager(c).UpdateDiscount(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -135,15 +145,18 @@ func UpdateDiscount(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexDiscount(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	discounts, err := models.NewMysqlManager(ctx).GetAllDiscountWithPagination(c, ctx, dto)
+	discounts, err := models.NewMysqlManager(c).GetAllDiscountWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -159,12 +172,14 @@ func IndexDiscount(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه تخفیف" SchemaExample(1)
 func DeleteDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 
-	err := models.NewMysqlManager(ctx).DeleteDiscount(c, ctx, id)
+	err := models.NewMysqlManager(c).DeleteDiscount(id)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -180,13 +195,15 @@ func DeleteDiscount(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه تخفیف" SchemaExample(1)
 func ShowDiscount(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showDiscount", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showDiscount", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 
-	discount, err := models.NewMysqlManager(ctx).FindDiscountById(c, ctx, id)
+	discount, err := models.NewMysqlManager(c).FindDiscountById(id)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if *discount.UserID != *userID {

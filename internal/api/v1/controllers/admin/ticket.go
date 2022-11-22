@@ -10,18 +10,21 @@ import (
 )
 
 func createTicketAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createTicketAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createTicketAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateTicket(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	var userID uint64
 	if dto.GuestMobile == "" {
 		userID = models.GetUser(c)
 	}
-	err = models.NewMysqlManager(ctx).CreateTicket(c, ctx, dto, userID)
+	err = models.NewMysqlManager(c).CreateTicket(c, ctx, dto, userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -29,12 +32,14 @@ func createTicketAdmin(c *gin.Context) {
 	})
 }
 func indexTicketAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicketAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexTicketAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	userID := models.GetUser(c)
 	dto, err := validations.IndexTicket(c)
-	shops, err := models.NewMysqlManager(ctx).GetAllTicketWithPagination(c, ctx, dto, userID)
+	shops, err := models.NewMysqlManager(c).GetAllTicketWithPagination(c, ctx, dto, userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -43,11 +48,13 @@ func indexTicketAdmin(c *gin.Context) {
 }
 
 func showTicketAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showTicketAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showTicketAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	ticketID := utils.StringToUint64(c.Param("ticketID"))
-	ticket, err := models.NewMysqlManager(ctx).GetTicketWithChildren(c, ctx, ticketID)
+	ticket, err := models.NewMysqlManager(c).GetTicketWithChildren(c, ctx, ticketID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

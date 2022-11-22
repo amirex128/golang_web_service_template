@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -18,16 +19,19 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateShop  	true "ورودی"
 func CreateShop(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createShop", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createShop", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateShop(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	userID := models.GetUser(c)
 
-	err = models.NewMysqlManager(ctx).CreateShop(c, ctx, dto, *userID)
+	err = models.NewMysqlManager(c).CreateShop(dto, *userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -43,15 +47,18 @@ func CreateShop(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.UpdateShop  	true "ورودی"
 func UpdateShop(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updateShop", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateShop", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.UpdateShop(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	err = models.NewMysqlManager(ctx).UpdateShop(c, ctx, dto)
+	err = models.NewMysqlManager(c).UpdateShop(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -67,28 +74,31 @@ func UpdateShop(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه فروشگاه" SchemaExample(1)
 func DeleteShop(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteShop", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteShop", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 	dto, err := validations.DeleteShop(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if dto.ProductBehave == "move" {
-		err = models.NewMysqlManager(ctx).MoveProducts(c, ctx, shopID, dto.NewShopID, *userID)
+		err = models.NewMysqlManager(c).MoveProducts(shopID, dto.NewShopID, *userID)
 		if err != nil {
 			return
 		}
 	} else if dto.ProductBehave == "delete_product" {
-		err = models.NewMysqlManager(ctx).DeleteProducts(c, ctx, shopID, *userID)
+		err = models.NewMysqlManager(c).DeleteProducts(shopID, *userID)
 		if err != nil {
 			return
 		}
 	}
 
-	err = models.NewMysqlManager(ctx).DeleteShop(c, ctx, shopID, *userID)
+	err = models.NewMysqlManager(c).DeleteShop(shopID, *userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -104,11 +114,13 @@ func DeleteShop(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه فروشگاه" SchemaExample(1)
 func ShowShop(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showShop", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showShop", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
-	shop, err := models.NewMysqlManager(ctx).FindShopByID(c, ctx, shopID)
+	shop, err := models.NewMysqlManager(c).FindShopByID(shopID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -127,15 +139,18 @@ func ShowShop(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexShop(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexShop", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexShop", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexShop(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	shops, err := models.NewMysqlManager(ctx).GetAllShopWithPagination(c, ctx, dto)
+	shops, err := models.NewMysqlManager(c).GetAllShopWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -152,16 +167,19 @@ func IndexShop(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.SendPrice  	true "ورودی"
 func SendPrice(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "sendPrice", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:sendPrice", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.SendPrice(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).UpdateShop(c, ctx, DTOs.UpdateShop{
+	err = models.NewMysqlManager(c).UpdateShop(DTOs.UpdateShop{
 		SendPrice: dto.SendPrice,
 	})
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -170,7 +188,8 @@ func SendPrice(c *gin.Context) {
 }
 
 func GetInstagramPost(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "getInstagramPost", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:getInstagramPost", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 
 }

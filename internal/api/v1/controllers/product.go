@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -20,14 +21,17 @@ import (
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexProduct(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexProduct", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexProduct", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexProduct(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	products, err := models.NewMysqlManager(ctx).GetAllProductWithPagination(c, ctx, dto)
+	products, err := models.NewMysqlManager(c).GetAllProductWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -45,17 +49,20 @@ func IndexProduct(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateProduct  	true "ورودی"
 func CreateProduct(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createProduct", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createProduct", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	userID := models.GetUser(c)
 
 	dto, err := validations.CreateProduct(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	err = models.NewMysqlManager(ctx).CreateProduct(c, ctx, dto, *userID)
+	err = models.NewMysqlManager(c).CreateProduct(dto, *userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -73,16 +80,19 @@ func CreateProduct(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.UpdateProduct  	true "ورودی"
 func UpdateProduct(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "updateProduct", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateProduct", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.UpdateProduct(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	manager := models.NewMysqlManager(ctx)
+	manager := models.NewMysqlManager(c)
 
-	err = manager.UpdateProduct(c, ctx, dto)
+	err = manager.UpdateProduct(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -100,13 +110,15 @@ func UpdateProduct(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه محصول" SchemaExample(1)
 func DeleteProduct(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteProduct", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteProduct", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 
-	manager := models.NewMysqlManager(ctx)
-	err := manager.DeleteProduct(c, ctx, id)
+	manager := models.NewMysqlManager(c)
+	err := manager.DeleteProduct(id)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -124,13 +136,15 @@ func DeleteProduct(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه محصول" SchemaExample(1)
 func ShowProduct(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showProduct", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showProduct", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
 
-	manager := models.NewMysqlManager(ctx)
-	product, err := manager.FindProductById(c, ctx, id)
+	manager := models.NewMysqlManager(c)
+	product, err := manager.FindProductById(id)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 

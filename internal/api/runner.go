@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/amirex128/selloora_backend/docs"
 	"github.com/amirex128/selloora_backend/internal/models"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/flosch/pongo2"
@@ -36,9 +37,12 @@ func Runner(host string, port string, ctx context.Context) {
 	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		pp.Println("-------------------------error-----------------------")
 		if err, ok := recovered.(error); ok {
+			e2 := errorx.New("خطای پانیک رخ داده است", "panic", err)
 			e := apm.DefaultTracer.Recovered(err)
 			e.SetTransaction(apm.TransactionFromContext(c.Request.Context()))
 			e.Send()
+			errorx.ResponseErrorx(c, e2)
+			return
 		}
 	}))
 	r.Static("/public", "./public")
@@ -95,21 +99,22 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
+			span, ctx := apm.StartSpan(c.Request.Context(), "controller:createTicket", "request")
+			c.Request.WithContext(ctx)
 			defer span.End()
 			dto, err := validations.Verify(c)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
 			if dto.Password == "" {
-				user, err := models.NewMysqlManager(ctx).FindUserByMobileAndCodeVerify(dto, ctx)
+				user, err := models.NewMysqlManager(c).FindUserByMobileAndCodeVerify(dto)
 				if err != nil {
 					return nil, jwt.ErrFailedAuthentication
 				}
 				return user, nil
 
 			} else {
-				user, err := models.NewMysqlManager(ctx).FindUserByMobileAndPassword(dto, ctx)
+				user, err := models.NewMysqlManager(c).FindUserByMobileAndPassword(dto)
 				if err != nil {
 					return nil, jwt.ErrFailedAuthentication
 				}

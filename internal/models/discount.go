@@ -1,13 +1,10 @@
 package models
 
 import (
-	"context"
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 	"strings"
 )
 
@@ -30,7 +27,7 @@ type Discount struct {
 
 func initDiscount(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Discount{})
-	manager.CreateDiscount(&gin.Context{}, context.Background(), DTOs.CreateDiscount{
+	manager.CreateDiscount(DTOs.CreateDiscount{
 		Code:       "test",
 		StartedAt:  "2021-01-01 00:00:00",
 		EndedAt:    "2024-01-01 00:00:00",
@@ -42,24 +39,22 @@ func initDiscount(manager *MysqlManager) {
 		Status:     true,
 	})
 }
-func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto DTOs.CreateDiscount) error {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, ctx, pId)
+		product, err := m.FindProductById(pId)
 		if err != nil {
 			return err
 		}
 		if product.UserID != *userID {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید"})
-			return err
+			return errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
 		}
 	}
 
 	if m.GetConn().Where("code = ?", dto.Code).First(&Discount{}).RowsAffected > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف تکراری است"})
-		return nil
+		return errorx.New("کد تخفیف تکراری است", "model", nil)
 	}
 
 	discount := Discount{
@@ -78,58 +73,33 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto D
 	}
 	err := m.GetConn().Create(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ایجاد کد تخفیف",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ایجاد کد تخفیف", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto DTOs.UpdateDiscount) error {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) UpdateDiscount(dto DTOs.UpdateDiscount) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 
 	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(c, ctx, pId)
+		product, err := m.FindProductById(pId)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "محصول یافت نشد",
-				"error":   err.Error(),
-				"type":    "model",
-			})
-			return err
+			return errorx.New("محصول یافت نشد", "model", err)
 		}
 		if product.UserID != *userID {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "شما اجازه ایجاد کد تخفیف برای این محصول را ندارید",
-				"error":   err.Error(),
-				"type":    "model",
-			})
-			return err
+			return errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", err)
 		}
 	}
 
 	discount := &Discount{}
 	err := m.GetConn().Where("id = ?", dto.ID).First(discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "تخفیف یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("تخفیف یافت نشد", "model", err)
 	}
 
 	if *discount.UserID != *userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه ویرایش این تخفیف را ندارید",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return errors.New("")
+		return errorx.New("شما اجازه ویرایش این تخفیف را ندارید", "model", err)
 	}
 
 	if dto.Code != "" {
@@ -160,100 +130,68 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 	discount.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ویرایش تخفیف"})
-		return err
+		return errorx.New("خطا در ویرایش تخفیف", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) DeleteDiscount(c *gin.Context, ctx context.Context, discountID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) DeleteDiscount(discountID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "تخفیف یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("تخفیف یافت نشد", "model", err)
 	}
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	if *discount.UserID != *userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه حذف این تخفیف را ندارید",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return errors.New("")
+		return errorx.New("شما اجازه حذف این تخفیف را ندارید", "model", err)
 	}
 
 	err = m.GetConn().Delete(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف تخفیف",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف تخفیف", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllDiscountWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexDiscount) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) GetAllDiscountWithPagination(dto DTOs.IndexDiscount) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var discounts []Discount
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("discounts", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
 	}
 	err := conn.Find(&discounts).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت تخفیف ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت تخفیف ها", "model", err)
 	}
 	pagination.Data = discounts
 	return pagination, nil
 }
 
-func (m *MysqlManager) FindDiscountById(c *gin.Context, ctx context.Context, discountID uint64) (Discount, error) {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) FindDiscountById(discountID uint64) (Discount, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 
 	discount := Discount{}
 	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "کد تخفیف یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return discount, err
+		return discount, errorx.New("کد تخفیف یافت نشد", "model", err)
 	}
 	return discount, nil
 }
 
-func (m *MysqlManager) FindDiscountByCodeAndUserID(c *gin.Context, ctx context.Context, code string) (Discount, error) {
-	span, ctx := apm.StartSpan(ctx, "showDiscount", "model")
+func (m *MysqlManager) FindDiscountByCodeAndUserID(code string) (Discount, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	discount := Discount{}
 	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "کد تخفیف یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return discount, err
+		return discount, errorx.New("کد تخفیف یافت نشد", "model", err)
 	}
 	return discount, nil
 }

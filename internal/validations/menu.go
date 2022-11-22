@@ -1,11 +1,10 @@
 package validations
 
 import (
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CreateMenu(c *gin.Context) (DTOs.CreateMenu, error) {
@@ -26,12 +25,7 @@ func CreateMenu(c *gin.Context) (DTOs.CreateMenu, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -59,12 +53,7 @@ func UpdateMenu(c *gin.Context) (DTOs.UpdateMenu, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -80,12 +69,7 @@ func IndexMenu(c *gin.Context) (DTOs.IndexMenu, error) {
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)

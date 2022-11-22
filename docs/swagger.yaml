@@ -91,6 +91,8 @@ definitions:
       mobile:
         description: موبایل
         example: "09024809750"
+        maxLength: 11
+        minLength: 11
         type: string
       postal_code:
         description: کد پستی
@@ -1216,7 +1218,7 @@ info:
     email: amirex128@gmail.com
     name: API Support
     url: https://www.amirshirdel.ir
-  description: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74
+  description: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74
   title: Selloora Backend API
   version: "1.0"
 paths:
@@ -1903,6 +1905,25 @@ paths:
       summary: حذف منو
       tags:
       - menu
+  /user/menu/show/{id}:
+    get:
+      description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش منو
+      tags:
+      - post
   /user/menu/update:
     post:
       description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
@@ -2180,6 +2201,27 @@ paths:
       summary: حذف صفحه
       tags:
       - page
+  /user/page/show/{id}:
+    get:
+      description: هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت
+        معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام
+        ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی
+        همراه با چهار چوب ها نمایش داده شود
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش صفحه
+      tags:
+      - post
   /user/page/update:
     post:
       description: هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت
@@ -2247,6 +2289,7 @@ paths:
         schema:
           $ref: '#/definitions/DTOs.CreatePost'
       responses: {}
+      summary: ایجاد مقاله
       tags:
       - post
   /user/post/delete/{id}:
@@ -2634,6 +2677,25 @@ paths:
       summary: حذف اسلایدر
       tags:
       - slider
+  /user/slider/show/{id}:
+    get:
+      description: هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های
+        مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش اسلایدر
+      tags:
+      - post
   /user/slider/update:
     post:
       description: هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های

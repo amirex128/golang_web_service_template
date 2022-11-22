@@ -1,11 +1,9 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm"
-	"net/http"
 )
 
 type OrderItem struct {
@@ -22,8 +20,8 @@ func initOrderItem(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&OrderItem{})
 }
 
-func (m *MysqlManager) CreateOrderItem(c *gin.Context, ctx context.Context, dto []DTOs.OrderItem, orderID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "CreateOrderItem", "model")
+func (m *MysqlManager) CreateOrderItem(dto []DTOs.OrderItem, orderID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateOrderItem", "model")
 	defer span.End()
 	var orderItems []OrderItem
 	for i := range dto {
@@ -37,12 +35,7 @@ func (m *MysqlManager) CreateOrderItem(c *gin.Context, ctx context.Context, dto 
 	}
 	err := m.GetConn().Create(&orderItems).Error
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "خطا در ثبت سفارش",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ثبت سفارش", "model", err)
 	}
 	return nil
 }

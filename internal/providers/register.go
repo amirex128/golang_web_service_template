@@ -28,4 +28,9 @@ func Initialize(ctx context.Context) {
 	do.ProvideNamed[*ElasticProvider](Injector, "main_elastic", func(i *do.Injector) (*ElasticProvider, error) {
 		return NewElastic(i, ctx)
 	})
+	// logrus
+	do.Provide[*LogrusProvider](Injector, func(i *do.Injector) (*LogrusProvider, error) {
+		return NewLogrus(i, ctx)
+	})
+
 }

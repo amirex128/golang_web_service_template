@@ -5,6 +5,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/constants"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -20,25 +21,30 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateOrder  	true "ورودی"
 func CreateOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateOrder(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	user, err := models.NewMysqlManager(ctx).FindUserByID(c, ctx, dto.UserID)
+	user, err := models.NewMysqlManager(c).FindUserByID(dto.UserID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	shop, err := models.NewMysqlManager(ctx).FindShopByID(c, ctx, dto.ShopID)
+	shop, err := models.NewMysqlManager(c).FindShopByID(dto.ShopID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	customer, err := models.NewMysqlManager(ctx).FindCustomerById(c, ctx, dto.CustomerID)
+	customer, err := models.NewMysqlManager(c).FindCustomerById(dto.CustomerID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -47,8 +53,9 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	discount, err := models.NewMysqlManager(ctx).FindDiscountByCodeAndUserID(c, ctx, dto.DiscountCode)
+	discount, err := models.NewMysqlManager(c).FindDiscountByCodeAndUserID(dto.DiscountCode)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -57,8 +64,9 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	rawProducts, err := models.NewMysqlManager(ctx).FindProductByIds(c, ctx, extractProductIDs(dto))
+	rawProducts, err := models.NewMysqlManager(c).FindProductByIds(extractProductIDs(dto))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	for i := range rawProducts {
@@ -139,13 +147,15 @@ func CreateOrder(c *gin.Context) {
 	order.LastUpdateStatusAt = utils.NowTime()
 	order.CreatedAt = utils.NowTime()
 
-	orderID, err := models.NewMysqlManager(ctx).CreateOrder(c, ctx, order)
+	orderID, err := models.NewMysqlManager(c).CreateOrder(order)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	err = models.NewMysqlManager(ctx).CreateOrderItem(c, ctx, dto.OrderItems, orderID)
+	err = models.NewMysqlManager(c).CreateOrderItem(dto.OrderItems, orderID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -169,7 +179,8 @@ func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
 }
 
 func SadadPaymentVerify(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "sadadPaymentVerify", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:sadadPaymentVerify", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
 	if err != nil {
@@ -199,18 +210,19 @@ func SadadPaymentVerify(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	orderStatus := c.Query("order_status")
 	userID := models.GetUser(c)
 	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {
-		orders, err = models.NewMysqlManager(ctx).GetOrders(c, ctx, *userID, []string{
+		orders, err = models.NewMysqlManager(c).GetOrders(*userID, []string{
 			constants.PendingAcceptOrderStatus,
 		})
 	} else if orderStatus == "processing" {
-		orders, err = models.NewMysqlManager(ctx).GetOrders(c, ctx, *userID, []string{
+		orders, err = models.NewMysqlManager(c).GetOrders(*userID, []string{
 			constants.AcceptedOrderStatus,
 			constants.PendingReceivePostOrderStatus,
 			constants.ReceivedPostOrderStatus,
@@ -220,17 +232,18 @@ func IndexOrder(c *gin.Context) {
 			constants.ReceivedOwnerOrderStatus,
 		})
 	} else if orderStatus == "returned" {
-		orders, err = models.NewMysqlManager(ctx).GetOrders(c, ctx, *userID, []string{
+		orders, err = models.NewMysqlManager(c).GetOrders(*userID, []string{
 			constants.PendingReturnOrderStatus,
 			constants.AcceptedReturnOrderStatus,
 			constants.RejectedReturnOrderStatus,
 		})
 	} else if orderStatus == "completed" {
-		orders, err = models.NewMysqlManager(ctx).GetOrders(c, nil, *userID, []string{
+		orders, err = models.NewMysqlManager(c).GetOrders(*userID, []string{
 			constants.FinishedOrderStatus,
 		})
 	}
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -247,12 +260,14 @@ func IndexOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func ApproveOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "approveOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:approveOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
-	order, err := models.NewMysqlManager(ctx).FindOrderByID(c, ctx, orderID)
+	order, err := models.NewMysqlManager(c).FindOrderByID(orderID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if order.UserID != *userID {
@@ -262,7 +277,7 @@ func ApproveOrder(c *gin.Context) {
 		return
 	}
 	order.Status = constants.AcceptedOrderStatus
-	err = models.NewMysqlManager(ctx).UpdateOrder(c, ctx, order)
+	err = models.NewMysqlManager(c).UpdateOrder(*order)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در تایید سفارش",
@@ -279,12 +294,14 @@ func ApproveOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func CancelOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "cancelOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:cancelOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
-	order, err := models.NewMysqlManager(ctx).FindOrderByID(c, ctx, orderID)
+	order, err := models.NewMysqlManager(c).FindOrderByID(orderID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if order.UserID != *userID {
@@ -294,7 +311,7 @@ func CancelOrder(c *gin.Context) {
 		return
 	}
 	order.Status = constants.CanceledOrderStatus
-	err = models.NewMysqlManager(ctx).UpdateOrder(c, ctx, order)
+	err = models.NewMysqlManager(c).UpdateOrder(*order)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "خطا در تایید سفارش",
@@ -311,14 +328,17 @@ func CancelOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.SendOrder  	true "ورودی"
 func SendOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "sendOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:sendOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.SendOrder(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	order, err := models.NewMysqlManager(ctx).FindOrderByID(c, ctx, dto.OrderID)
+	order, err := models.NewMysqlManager(c).FindOrderByID(dto.OrderID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if order.UserID != *models.GetUser(c) {
@@ -334,8 +354,9 @@ func SendOrder(c *gin.Context) {
 	order.PackageSize = dto.PackageSize
 	order.LastUpdateStatusAt = utils.NowTime()
 
-	err = models.NewMysqlManager(ctx).UpdateOrder(c, ctx, order)
+	err = models.NewMysqlManager(c).UpdateOrder(*order)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	if dto.Courier == "tipax" {
@@ -357,10 +378,12 @@ func SendOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CalculateOrder  	true "ورودی"
 func CalculateSendPrice(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "calculateSendPrice", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:calculateSendPrice", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CalculateOrder(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -377,7 +400,8 @@ func CalculateSendPrice(c *gin.Context) {
 // @Tags order
 // @Router       /user/order/returned [post]
 func ReturnedOrder(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "returnedOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:returnedOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	//TODO
 
@@ -389,7 +413,8 @@ func ReturnedOrder(c *gin.Context) {
 // @Tags order
 // @Router       /user/order/returned/accept [post]
 func AcceptReturnedOrder(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "acceptReturnedOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:acceptReturnedOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	//TODO
 
@@ -403,11 +428,13 @@ func AcceptReturnedOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func ShowOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "showOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
-	order, err := models.NewMysqlManager(ctx).FindOrderWithItemByID(c, ctx, orderID)
+	order, err := models.NewMysqlManager(c).FindOrderWithItemByID(orderID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -423,7 +450,8 @@ func ShowOrder(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func TrackingOrder(c *gin.Context) {
-	span, _ := apm.StartSpan(c.Request.Context(), "trackingOrder", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:trackingOrder", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	trackingCode := c.Param("id")
 	utils.TrackingOrder(trackingCode)
@@ -439,18 +467,22 @@ func TrackingOrder(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexCustomerOrders(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexCustomerOrders", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexCustomerOrders", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexOrderCustomer(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	customer, err := models.NewMysqlManager(ctx).FindCustomerByMobileAndVerifyCode(c, ctx, dto.Mobile, dto.VerifyCode)
+	customer, err := models.NewMysqlManager(c).FindCustomerByMobileAndVerifyCode(dto.Mobile, dto.VerifyCode)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	orders, err := models.NewMysqlManager(ctx).FindOrdersByCustomerID(c, ctx, customer.ID)
+	orders, err := models.NewMysqlManager(c).FindOrdersByCustomerID(customer.ID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

@@ -1,13 +1,11 @@
 package models
 
 import (
-	"context"
 	"fmt"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Product struct {
@@ -40,7 +38,7 @@ func (c Product) GetID() uint64 {
 func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 	for i := 0; i < 100; i++ {
-		manager.CreateProduct(&gin.Context{}, context.Background(), DTOs.CreateProduct{
+		manager.CreateProduct(DTOs.CreateProduct{
 			ShopID:       1,
 			Manufacturer: "سامسونگ",
 			Description:  fmt.Sprintf("توضیحات محصول %d", i),
@@ -57,8 +55,8 @@ func InitProduct(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllProductWithPagination", "model")
+func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetAllProductWithPagination", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var products []Product
@@ -70,19 +68,14 @@ func (m *MysqlManager) GetAllProductWithPagination(c *gin.Context, ctx context.C
 	}
 	err := conn.Where("shop_id=?", dto.ShopID).Find(&products).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت محصولات",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت محصولات", "model", err)
 	}
 	pagination.Data = products
 	return pagination, nil
 }
 
-func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DTOs.CreateProduct, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "CreateProduct", "model")
+func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateProduct", "model")
 	defer span.End()
 
 	var product = Product{
@@ -106,41 +99,26 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DT
 	}
 	err := m.GetConn().Create(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در ایجاد محصول",
-		})
-		return err
+		return errorx.New("خطا در ایجاد محصول", "model", err)
 	}
 	err = m.GetConn().Model(&product).Association("Galleries").Append(galleryIDs)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در ایجاد محصول",
-		})
-		return err
+		return errorx.New("خطا در ایجاد محصول", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DTOs.UpdateProduct) error {
-	span, ctx := apm.StartSpan(ctx, "UpdateProduct", "model")
+func (m *MysqlManager) UpdateProduct(dto DTOs.UpdateProduct) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateProduct", "model")
 	defer span.End()
-	product, err := m.FindProductById(c, ctx, dto.ID)
+	product, err := m.FindProductById(dto.ID)
 	if err != nil {
 		return err
 	}
 
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	if product.UserID != *userID {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "خطای دسترسی",
-			"type":    "model",
-			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
-		})
-		return err
+		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
 	}
 
 	if dto.ShopID > 0 {
@@ -170,107 +148,68 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DT
 
 	err = m.GetConn().Save(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در بروزرسانی محصول",
-		})
-		return err
+		return errorx.New("خطا در بروزرسانی محصول", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) DeleteProduct(c *gin.Context, ctx context.Context, id uint64) error {
-	span, ctx := apm.StartSpan(ctx, "DeleteProduct", "model")
+func (m *MysqlManager) DeleteProduct(id uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteProduct", "model")
 	defer span.End()
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	var product Product
 	err := m.GetConn().Where("id = ?", id).First(&product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در حذف محصول",
-		})
+		return errorx.New("خطا در حذف محصول", "model", err)
 	}
 	if product.UserID != *userID {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "خطای دسترسی",
-			"type":    "model",
-			"message": "شما دسترسی کافی برای ویرایش این محصول را ندارید",
-		})
-		return err
+		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
 	}
 	err = m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در حذف محصول",
-		})
-		return err
+		return errorx.New("خطا در حذف محصول", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) FindProductById(c *gin.Context, ctx context.Context, id uint64) (Product, error) {
-	span, ctx := apm.StartSpan(ctx, "FindProductById", "model")
+func (m *MysqlManager) FindProductById(id uint64) (*Product, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindProductById", "model")
 	defer span.End()
-	var product Product
-	err := m.GetConn().Where("id = ?", id).First(&product).Error
+	var product *Product
+	err := m.GetConn().Where("id = ?", id).First(product).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در دریافت محصول",
-		})
-		return product, err
+		return nil, errorx.New("خطا در دریافت محصول", "model", err)
 	}
 	return product, nil
 }
 
-func (m *MysqlManager) FindProductByIds(c *gin.Context, ctx context.Context, ids []uint64) ([]Product, error) {
-	span, ctx := apm.StartSpan(ctx, "FindProductByIds", "model")
+func (m *MysqlManager) FindProductByIds(ids []uint64) ([]*Product, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindProductByIds", "model")
 	defer span.End()
-	var products []Product
+	products := make([]*Product, 0)
 	err := m.GetConn().Where("id IN (?)", ids).Find(&products).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در دریافت محصولات",
-		})
-		return products, err
+		return nil, errorx.New("خطا در دریافت محصولات", "model", err)
 	}
 	return products, nil
 }
 
-func (m *MysqlManager) MoveProducts(c *gin.Context, ctx context.Context, shopID, newShopID, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "MoveProducts", "model")
+func (m *MysqlManager) MoveProducts(shopID, newShopID, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:MoveProducts", "model")
 	defer span.End()
 	err := m.GetConn().Model(&Product{}).Where("shop_id = ? AND user_id = ?", shopID, userID).Update("shop_id", newShopID).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در انتقال محصولات",
-		})
-		return err
+		return errorx.New("خطا در انتقال محصولات", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) DeleteProducts(c *gin.Context, ctx context.Context, shopID, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "DeleteProducts", "model")
+func (m *MysqlManager) DeleteProducts(shopID, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteProducts", "model")
 	defer span.End()
 	err := m.GetConn().Where("shop_id = ? AND user_id = ?", shopID, userID).Delete(&Product{}).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   err.Error(),
-			"type":    "model",
-			"message": "خطا در حذف محصولات",
-		})
-		return err
+		return errorx.New("خطا در حذف محصولات", "model", err)
 	}
 	return nil
 

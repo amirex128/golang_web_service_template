@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm"
@@ -17,14 +18,17 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateTag  	true "ورودی"
 func CreateTag(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createTag", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createTag", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateTag(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).CreateTag(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateTag(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -44,14 +48,17 @@ func CreateTag(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexTag(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexTag", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexTag", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexTag(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	pagination, err := models.NewMysqlManager(ctx).GetAllTagsWithPagination(c, ctx, dto)
+	pagination, err := models.NewMysqlManager(c).GetAllTagsWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -67,11 +74,13 @@ func IndexTag(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه تگ" SchemaExample(1)
 func DeleteTag(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteTag", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteTag", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := c.Param("id")
-	err := models.NewMysqlManager(ctx).DeleteTag(c, ctx, utils.StringToUint64(id))
+	err := models.NewMysqlManager(c).DeleteTag(utils.StringToUint64(id))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -87,14 +96,17 @@ func DeleteTag(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateTag  	true "ورودی"
 func AddTag(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "addTag", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:addTag", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.AddTag(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).AddTag(c, ctx, dto)
+	err = models.NewMysqlManager(c).AddTag(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

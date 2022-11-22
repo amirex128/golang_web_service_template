@@ -1,12 +1,9 @@
 package models
 
 import (
-	"context"
-	"errors"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/spf13/viper"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Gallery struct {
@@ -34,24 +31,19 @@ func initGallery(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) UploadImage(c *gin.Context, ctx context.Context, gallery *Gallery) (uint64, error) {
-	span, ctx := apm.StartSpan(ctx, "UploadImage", "model")
+func (m *MysqlManager) UploadImage(gallery *Gallery) (uint64, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UploadImage", "model")
 	defer span.End()
 	gallery.FullPath = viper.GetString("server_url") + gallery.Path
 	err := m.GetConn().Create(gallery).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در آپلود تصویر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return 0, err
+		return 0, errorx.New("خطا در آپلود تصویر", "model", err)
 	}
 	return gallery.ID, nil
 }
 
-func (m *MysqlManager) DeleteGallery(c *gin.Context, ctx context.Context, galleryID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "DeleteGallery", "model")
+func (m *MysqlManager) DeleteGallery(galleryID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteGallery", "model")
 	defer span.End()
 	var err error
 	err = m.GetConn().Table("shops").Where("gallery_id=?", galleryID).Update("gallery_id", nil).Error
@@ -59,45 +51,27 @@ func (m *MysqlManager) DeleteGallery(c *gin.Context, ctx context.Context, galler
 	err = m.GetConn().Table("posts").Where("gallery_id=?", galleryID).Update("gallery_id", nil).Error
 	err = m.GetConn().Table("tickets").Where("gallery_id=?", galleryID).Update("gallery_id", nil).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف تصویر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف تصویر", "model", err)
 	}
 	err = m.GetConn().Delete(&Gallery{}, galleryID).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف تصویر",
-			"error":   err.Error(),
-		})
-		return err
+		return errorx.New("خطا در حذف تصویر", "model", err)
 	}
 
 	return nil
 }
 
-func (m *MysqlManager) FindGalleryByID(c *gin.Context, ctx context.Context, galleryID uint64) (*Gallery, error) {
-	span, ctx := apm.StartSpan(ctx, "FindGalleryByID", "model")
+func (m *MysqlManager) FindGalleryByID(galleryID uint64) (*Gallery, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindGalleryByID", "model")
 	defer span.End()
 	var gallery Gallery
 	err := m.GetConn().Where("id = ?", galleryID).First(&gallery).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف تصویر",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("خطا در حذف تصویر", "model", err)
 	}
-	userID := GetUser(c)
+	userID := GetUser(m.Ctx)
 	if gallery.UserID != *userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "شما اجازه حذف این تصویر را ندارید",
-			"error":   errors.New("شما اجازه حذف این تصویر را ندارید"),
-			"type":    "model",
-		})
+		return nil, errorx.New("شما اجازه حذف این تصویر را ندارید", "model", err)
 	}
 	return &gallery, nil
 }

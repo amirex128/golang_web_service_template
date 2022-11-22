@@ -5,6 +5,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/chai2010/webp"
 	"github.com/gin-gonic/gin"
@@ -27,20 +28,24 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateGallery  	true "ورودی"
 func CreateGallery(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createGallery", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createGallery", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateGallery(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	userID := models.GetUser(c)
 
 	galleryAddress, userDir, err := createDirectory(c, *userID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	relativePath, info, err := uploadImage(c, userDir, galleryAddress, dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	size := float64(info.Size() / 1024)
@@ -55,8 +60,9 @@ func CreateGallery(c *gin.Context) {
 		Height:   dto.Height,
 		MimeType: "image/webp",
 	}
-	_, err = models.NewMysqlManager(ctx).UploadImage(c, ctx, gallery)
+	_, err = models.NewMysqlManager(c).UploadImage(gallery)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -73,11 +79,13 @@ func CreateGallery(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه گالری" SchemaExample(1)
 func DeleteGallery(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteGallery", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteGallery", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	galleryID := c.Param("id")
-	gallery, err := models.NewMysqlManager(ctx).FindGalleryByID(c, ctx, utils.StringToUint64(galleryID))
+	gallery, err := models.NewMysqlManager(c).FindGalleryByID(utils.StringToUint64(galleryID))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	abs, _ := filepath.Abs("./")
@@ -89,8 +97,9 @@ func DeleteGallery(c *gin.Context) {
 		})
 		return
 	}
-	err = models.NewMysqlManager(ctx).DeleteGallery(c, ctx, utils.StringToUint64(galleryID))
+	err = models.NewMysqlManager(c).DeleteGallery(utils.StringToUint64(galleryID))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

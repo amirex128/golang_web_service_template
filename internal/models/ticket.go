@@ -1,12 +1,10 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 // تیکتی که پرنت ایدی ان صفر باشد به عنوان تیکت اصلی نمایش داده میشود و بعد از باز کردن آن تمامی تیکت های که پرنت ایدی ان را داشته باشند بر اساس تاریخ مرتب میشوند
@@ -29,27 +27,17 @@ func InitTicket(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Ticket{})
 }
 
-func (m *MysqlManager) CreateTicket(c *gin.Context, ctx context.Context, dto DTOs.CreateTicket, userID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "CreateTicket", "model")
+func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket, userID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateTicket", "model")
 	defer span.End()
 	var parentTicket Ticket
 	if dto.ParentID != 0 {
 		err := m.GetConn().Model(&parentTicket).Where("id = ?", dto.ParentID).Update("is_answer", true).First(&parentTicket).Error
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "خطا در دریافت تیکت ها",
-				"error":   err.Error(),
-				"type":    "model",
-			})
-			return err
+			return errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
-		if *parentTicket.UserID != userID && IsAdmin(c) == false {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "خطا در دریافت تیکت ها",
-				"error":   "شما اجازه ارسال پاسخ به این تیکت را ندارید",
-				"type":    "model",
-			})
-			return err
+		if *parentTicket.UserID != userID && IsAdmin(m.Ctx) == false {
+			return errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
 	}
 
@@ -76,18 +64,13 @@ func (m *MysqlManager) CreateTicket(c *gin.Context, ctx context.Context, dto DTO
 	}
 	err := m.GetConn().Create(&ticket).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ثبت تیکت",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ثبت تیکت", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) GetAllTicketWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexTicket, userID uint64) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllTicketWithPagination", "model")
+func (m *MysqlManager) GetAllTicketWithPagination(dto DTOs.IndexTicket, userID uint64) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetAllTicketWithPagination", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var tickets []Ticket
@@ -99,41 +82,26 @@ func (m *MysqlManager) GetAllTicketWithPagination(c *gin.Context, ctx context.Co
 	}
 	err := conn.Where("user_id = ?", userID).Preload("Gallery").Preload("User").Find(&tickets).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت تیکت ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 	}
 	pagination.Data = tickets
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetTicketWithChildren(c *gin.Context, ctx context.Context, ticketID uint64) ([]Ticket, error) {
-	span, ctx := apm.StartSpan(ctx, "GetTicketWithChildren", "model")
+func (m *MysqlManager) GetTicketWithChildren(ticketID uint64) ([]Ticket, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetTicketWithChildren", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var tickets []Ticket
 	var mainTicket Ticket
 	err := conn.Where("id = ? ", ticketID).First(&mainTicket).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت تیکت ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 	}
 
 	err = conn.Where("parent_id = ?", ticketID).Order("created_at").Preload("Gallery").Preload("User").Find(&tickets).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت تیکت ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 	}
 	tickets = append([]Ticket{mainTicket}, tickets...)
 	return tickets, nil

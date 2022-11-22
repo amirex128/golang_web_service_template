@@ -3,8 +3,10 @@ package models
 import (
 	"context"
 	"github.com/amirex128/selloora_backend/internal/providers"
+	"github.com/gin-gonic/gin"
 	"github.com/samber/do"
 	"github.com/sirupsen/logrus"
+	"net/http/httptest"
 )
 
 type MysqlManager struct {
@@ -36,15 +38,17 @@ func Initialize(ctx context.Context) {
 
 }
 func NewRedisManager(ctx context.Context) *RedisManager {
-	redisManager.Conn = redisManager.Conn.WithContext(ctx)
-	redisManager.Ctx = ctx
-	return redisManager
+	rManager := redisManager
+	rManager.Conn = rManager.Conn.WithContext(ctx)
+	rManager.Ctx = ctx
+	return rManager
 }
 
-func NewMysqlManager(ctx context.Context) *MysqlManager {
-	mysqlManager.Conn = mysqlManager.Conn.WithContext(ctx)
-	mysqlManager.Ctx = ctx
-	return mysqlManager
+func NewMysqlManager(ctx *gin.Context) *MysqlManager {
+	mManager := mysqlManager
+	mManager.Conn = mManager.Conn.WithContext(ctx)
+	mManager.Ctx = ctx
+	return mManager
 }
 
 func NewMysqlMockManager() *MysqlManager {
@@ -64,7 +68,9 @@ func NewMysqlMockManager() *MysqlManager {
 func (m *MysqlManager) initializeTables() {
 	logrus.Info("mysql initialized started")
 	defer logrus.Info("mysql initialized finished")
-	manager := NewMysqlManager(context.Background())
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request = httptest.NewRequest("GET", "/", nil)
+	manager := NewMysqlManager(c)
 	if !initCategory(manager) {
 		return
 	}

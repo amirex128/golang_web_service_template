@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/amirex128/selloora_backend/internal/providers/safe"
+	"github.com/gin-gonic/gin"
 	"github.com/samber/do"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,7 +17,7 @@ import (
 
 type MysqlProvider struct {
 	Conn *gorm.DB
-	Ctx  context.Context
+	Ctx  *gin.Context
 	Mock sqlmock.Sqlmock
 }
 
@@ -42,7 +43,6 @@ func NewMysql(i *do.Injector, ctx context.Context) (*MysqlProvider, error) {
 			return err
 		}
 		mysqlIns.Conn = db
-		mysqlIns.Ctx = ctx
 
 		return nil
 	}, 30*time.Second)
@@ -85,7 +85,6 @@ func NewMysqlMock(i *do.Injector, ctx context.Context) (*MysqlProvider, error) {
 		gormDB.WithContext(ctx)
 		mysqlIns.Conn = gormDB
 		mysqlIns.Mock = mock
-		mysqlIns.Ctx = ctx
 
 		return nil
 	}, 30*time.Second)

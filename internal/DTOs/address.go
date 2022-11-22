@@ -12,7 +12,7 @@ type CreateAddress struct {
 	//کد پستی
 	PostalCode string `form:"postal_code" json:"postal_code" validate:"required,numeric,min=10,max=10" example:"1111111111" fake:"{zip}"`
 	//موبایل
-	Mobile string `form:"mobile" json:"mobile" validate:"required,numeric,startswith" example:"09024809750" fake:"{phone}"`
+	Mobile string `form:"mobile" json:"mobile" validate:"required,numeric,startswith,min=11,max=11" example:"09024809750" fake:"{phone}"`
 	//نام گیرنده
 	FullName string `form:"full_name" json:"full_name" validate:"required" example:"نام گیرنده" fake:"{name}"`
 	//عرض جغذافیایی

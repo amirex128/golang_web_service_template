@@ -1,6 +1,43 @@
 version: '3.9'
 
 services:
+  backend:
+    image: amirex128/selloora-backend:latest
+    depends_on:
+      - "redis"
+      - "mysql"
+      - "nginx"
+      - "elastic"
+      - "kibana"
+      - "apm-server"
+    ports:
+      - "8585:8585"
+    volumes:
+      - "./internal:/app/internal"
+      - "./public:/app/public"
+      - "./configs:/app/configs"
+      - "./templates:/app/templates"
+    environment:
+      - GO111MODULE=on
+      - CGO_ENABLED=1
+      - ELASTIC_APM_ENVIRONMENT=staging
+      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
+      - ELASTIC_APM_SERVICE_NAME=selloora_backend
+      - ELASTIC_APM_LOG_FILE=stderr
+      - ELASTIC_APM_LOG_LEVEL=debug
+      - SELLOORA_MYSQL_MAIN_DB=selloora
+      - SELLOORA_ELASTIC_HOST=elastic
+      - SELLOORA_ELASTIC_PORT=9200
+      - SELLOORA_MYSQL_MAIN_HOST=mysql
+      - SELLOORA_MYSQL_MAIN_PASSWORD=q6766581Amirex
+      - SELLOORA_MYSQL_MAIN_PORT=3306
+      - SELLOORA_MYSQL_MAIN_USER=selloora
+      - SELLOORA_REDIS_DB=1
+      - SELLOORA_REDIS_HOST=redis
+      - SELLOORA_REDIS_PORT=6379
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8585
+      - SERVER_URL=http://localhost:8585
   mysql:
     image: mariadb:10.9.3
     restart: always

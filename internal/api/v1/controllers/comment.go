@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -16,14 +17,17 @@ import (
 // @Router       /user/comment/create [post]
 // @Param comment body DTOs.CreateComment true "ورودی"
 func CreateComment(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createComment", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createComment", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateComment(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).CreateComment(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateComment(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -39,11 +43,13 @@ func CreateComment(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه دیدگاه" SchemaExample(1)
 func ApproveCommentAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "approveCommentAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:approveCommentAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := c.Param("id")
-	err := models.NewMysqlManager(ctx).ApproveComment(c, ctx, utils.StringToUint64(id))
+	err := models.NewMysqlManager(c).ApproveComment(utils.StringToUint64(id))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -59,11 +65,13 @@ func ApproveCommentAdmin(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه دیدگاه" SchemaExample(1)
 func DeleteCommentAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteCommentAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteCommentAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	id := c.Param("id")
-	err := models.NewMysqlManager(ctx).DeleteComment(c, ctx, utils.StringToUint64(id))
+	err := models.NewMysqlManager(c).DeleteComment(utils.StringToUint64(id))
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -82,14 +90,17 @@ func DeleteCommentAdmin(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexCommentAdmin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexCommentAdmin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexCommentAdmin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexComment(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	pagination, err := models.NewMysqlManager(ctx).GetAllCommentWithPagination(c, ctx, dto)
+	pagination, err := models.NewMysqlManager(c).GetAllCommentWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

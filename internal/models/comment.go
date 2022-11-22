@@ -1,12 +1,10 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Comment struct {
@@ -24,7 +22,7 @@ type Comment struct {
 func InitComment(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Comment{})
 	for i := 0; i < 10; i++ {
-		manager.CreateComment(&gin.Context{}, context.Background(), DTOs.CreateComment{
+		manager.CreateComment(DTOs.CreateComment{
 			PostID: 1,
 			Name:   "test test test",
 			Body:   "test test test",
@@ -33,8 +31,8 @@ func InitComment(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateComment(c *gin.Context, ctx context.Context, dto DTOs.CreateComment) (err error) {
-	span, ctx := apm.StartSpan(ctx, "CreateComment", "model")
+func (m *MysqlManager) CreateComment(dto DTOs.CreateComment) (err error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateComment", "model")
 	defer span.End()
 	comment := Comment{
 		PostID:    dto.PostID,
@@ -45,18 +43,13 @@ func (m *MysqlManager) CreateComment(c *gin.Context, ctx context.Context, dto DT
 	}
 	err = m.GetConn().Create(&comment).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در ایجاد دیدگاه",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ایجاد دیدگاه", "model", err)
 	}
 	return
 }
 
-func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexComment) (pagination *DTOs.Pagination, err error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllCommentWithPagination", "model")
+func (m *MysqlManager) GetAllCommentWithPagination(dto DTOs.IndexComment) (pagination *DTOs.Pagination, err error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetAllCommentWithPagination", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var comments []Comment
@@ -68,62 +61,43 @@ func (m *MysqlManager) GetAllCommentWithPagination(c *gin.Context, ctx context.C
 	}
 	err = conn.Find(&comments).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مشکلی در یافتن پست ها پیش آمده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}
 	pagination.Data = comments
 	return pagination, nil
 }
 
-func (m *MysqlManager) GetAllComments(c *gin.Context, ctx context.Context, postID uint64) (comments []*Comment, err error) {
-	span, ctx := apm.StartSpan(ctx, "GetAllComments", "model")
+func (m *MysqlManager) GetAllComments(postID uint64) ([]*Comment, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetAllComments", "model")
 	defer span.End()
-	err = m.GetConn().Where("post_id = ?", postID).Where("approve = ?", true).Order("id DESC").Find(&comments).Error
+	comments := make([]*Comment, 0)
+	err := m.GetConn().Where("post_id = ?", postID).Where("approve = ?", true).Order("id DESC").Find(&comments).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در یافتن دیدگاه ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("خطا در یافتن دیدگاه ها", "model", err)
 	}
 	return comments, nil
 
 }
 
-func (m *MysqlManager) DeleteComment(c *gin.Context, ctx context.Context, id uint64) (err error) {
-	span, ctx := apm.StartSpan(ctx, "DeleteComment", "model")
+func (m *MysqlManager) DeleteComment(id uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteComment", "model")
 	defer span.End()
 	conn := m.GetConn()
-	err = conn.Where("id = ?", id).Delete(&Comment{}).Error
+	err := conn.Where("id = ?", id).Delete(&Comment{}).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در حذف دیدگاه",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف دیدگاه", "model", err)
 	}
-	return
+	return nil
 }
 
-func (m *MysqlManager) ApproveComment(c *gin.Context, ctx context.Context, id uint64) (err error) {
-	span, ctx := apm.StartSpan(ctx, "ApproveComment", "model")
+func (m *MysqlManager) ApproveComment(id uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:ApproveComment", "model")
 	defer span.End()
 	conn := m.GetConn()
-	err = conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
+	err := conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در تایید دیدگاه",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در تایید دیدگاه", "model", err)
 	}
-	return
+	return nil
 
 }

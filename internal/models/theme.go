@@ -1,11 +1,9 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 	"strconv"
 )
 
@@ -22,7 +20,7 @@ func initTheme(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Theme{})
 	for i := 0; i < 3; i++ {
 		var id uint64 = 1
-		manager.CreateTheme(&gin.Context{}, context.Background(), Theme{
+		manager.CreateTheme(Theme{
 			Name:        "قالب شماره" + strconv.Itoa(i),
 			Description: "قالب شماره" + strconv.Itoa(i),
 			GalleryID:   &id,
@@ -30,60 +28,41 @@ func initTheme(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateTheme(c *gin.Context, ctx context.Context, theme Theme) {
+func (m *MysqlManager) CreateTheme(theme Theme) error {
 	err := m.GetConn().Create(&theme).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در سرور رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return
+		return errorx.New("خطایی در سرور رخ داده است", "model", err)
 	}
+	return nil
 }
 
-func (m *MysqlManager) FindThemeByID(c *gin.Context, ctx context.Context, themeID uint64) (*Theme, error) {
-	span, ctx := apm.StartSpan(ctx, "FindThemeByID", "model")
+func (m *MysqlManager) FindThemeByID(themeID uint64) (*Theme, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindThemeByID", "model")
 	defer span.End()
 	theme := &Theme{}
 	err := m.GetConn().Where("id = ?", themeID).First(theme).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مشکلی در پیدا کردن قالب رخ داده است",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("خطایی در سرور رخ داده است", "model", err)
 	}
 	return theme, nil
 }
-func (m *MysqlManager) DeleteTheme(c *gin.Context, ctx context.Context, themeID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "showTheme", "model")
+func (m *MysqlManager) DeleteTheme(themeID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showTheme", "model")
 	defer span.End()
 	theme := Theme{}
 	err := m.GetConn().Where("id = ?", themeID).First(&theme).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "قالب یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("قالب یافت نشد", "model", err)
 	}
 
 	err = m.GetConn().Delete(&theme).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف قالب",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف قالب", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllThemeWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexTheme) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "showTheme", "model")
+func (m *MysqlManager) GetAllThemeWithPagination(dto DTOs.IndexTheme) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showTheme", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var themes []Theme
@@ -95,12 +74,7 @@ func (m *MysqlManager) GetAllThemeWithPagination(c *gin.Context, ctx context.Con
 	}
 	err := conn.Find(&themes).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت قالب ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت قالب ها", "model", err)
 	}
 	pagination.Data = themes
 	return pagination, nil

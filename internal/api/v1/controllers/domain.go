@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -17,14 +18,17 @@ import (
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateDomain  	true "ورودی"
 func CreateDomain(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "createDomain", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createDomain", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.CreateDomain(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(ctx).CreateDomain(c, ctx, dto)
+	err = models.NewMysqlManager(c).CreateDomain(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -40,11 +44,13 @@ func CreateDomain(c *gin.Context) {
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه دامنه" SchemaExample(1)
 func DeleteDomain(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDomain", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteDomain", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	domainID := utils.StringToUint64(c.Param("id"))
-	err := models.NewMysqlManager(ctx).DeleteDomain(c, ctx, domainID)
+	err := models.NewMysqlManager(c).DeleteDomain(domainID)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -63,14 +69,17 @@ func DeleteDomain(c *gin.Context) {
 // @Param	page_size		 query   string	false "تعداد صفحه"
 // @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexDomain(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "indexDomain", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexDomain", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.IndexDomain(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	domains, err := models.NewMysqlManager(ctx).GetAllDomainWithPagination(c, ctx, dto)
+	domains, err := models.NewMysqlManager(c).GetAllDomainWithPagination(dto)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

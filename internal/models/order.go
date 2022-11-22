@@ -1,10 +1,8 @@
 package models
 
 import (
-	"context"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Order struct {
@@ -40,94 +38,66 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(c *gin.Context, ctx context.Context, order Order) (orderID uint64, err error) {
-	span, ctx := apm.StartSpan(ctx, "CreateOrder", "model")
+func (m *MysqlManager) CreateOrder(order Order) (uint64, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateOrder", "model")
 	defer span.End()
-	err = m.GetConn().Create(&order).Error
+	err := m.GetConn().Create(&order).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ثبت سفارش",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return
+		return 0, errorx.New("خطا در ثبت سفارش", "model", err)
 	}
-	orderID = order.ID
-	return
+	return order.ID, nil
 }
 
-func (m *MysqlManager) GetOrders(c *gin.Context, ctx context.Context, userID uint64, orderStatus []string) ([]*Order, error) {
-	span, ctx := apm.StartSpan(ctx, "GetOrders", "model")
+func (m *MysqlManager) GetOrders(userID uint64, orderStatus []string) ([]*Order, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetOrders", "model")
 	defer span.End()
 	var orders []*Order
 	err := m.GetConn().Where("user_id = ? AND status IN (?)", userID, orderStatus).Find(&orders).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت سفارشات",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return orders, err
+		return orders, errorx.New("خطا در دریافت سفارشات", "model", err)
 	}
-	return orders, err
+	return orders, nil
 }
-func (m *MysqlManager) FindOrdersByCustomerID(c *gin.Context, ctx context.Context, customerID uint64) ([]*Order, error) {
-	span, ctx := apm.StartSpan(ctx, "FindOrdersByCustomerID", "model")
+func (m *MysqlManager) FindOrdersByCustomerID(customerID uint64) ([]*Order, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindOrdersByCustomerID", "model")
 	defer span.End()
 	var orders []*Order
 	err := m.GetConn().Where("customer_id = ?", customerID).Find(&orders).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت سفارشات",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return orders, err
+		return nil, errorx.New("خطا در دریافت سفارشات", "model", err)
 	}
-	return orders, err
+	return orders, nil
 }
 
-func (m *MysqlManager) FindOrderByID(c *gin.Context, ctx context.Context, orderID uint64) (order Order, err error) {
-	span, ctx := apm.StartSpan(ctx, "FindOrderByID", "model")
+func (m *MysqlManager) FindOrderByID(orderID uint64) (*Order, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindOrderByID", "model")
 	defer span.End()
-	err = m.GetConn().Where("id = ?", orderID).First(&order).Error
+	var order *Order
+	err := m.GetConn().Where("id = ?", orderID).First(&order).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت سفارش",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return
+		return nil, errorx.New("خطا در دریافت سفارش", "model", err)
 	}
-	return
+	return order, nil
 }
 
-func (m *MysqlManager) UpdateOrder(c *gin.Context, ctx context.Context, order Order) (err error) {
-	span, ctx := apm.StartSpan(ctx, "UpdateOrder", "model")
+func (m *MysqlManager) UpdateOrder(order Order) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateOrder", "model")
 	defer span.End()
-	err = m.GetConn().Save(&order).Error
+	err := m.GetConn().Save(&order).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ثبت سفارش",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return
+		return errorx.New("خطا در ثبت سفارش", "model", err)
 	}
-	return
+	return nil
 }
 
-func (m *MysqlManager) FindOrderWithItemByID(c *gin.Context, ctx context.Context, orderID uint64) (order Order, err error) {
-	span, ctx := apm.StartSpan(ctx, "FindOrderWithItemByID", "model")
+func (m *MysqlManager) FindOrderWithItemByID(orderID uint64) (*Order, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindOrderWithItemByID", "model")
 	defer span.End()
-	err = m.GetConn().Where("id = ?", orderID).Preload("OrderItems").Preload("Shop").Preload("Customer").First(&order).Error
+	var order *Order
+	err := m.GetConn().Where("id = ?", orderID).Preload("OrderItems").Preload("Shop").Preload("Customer").First(order).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در دریافت سفارش",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return
+
+		return nil, errorx.New("خطا در دریافت سفارش", "model", err)
 	}
-	return
+	return order, nil
 }

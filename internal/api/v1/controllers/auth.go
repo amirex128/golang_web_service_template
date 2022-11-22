@@ -5,6 +5,7 @@ import (
 	"github.com/Squwid/go-randomizer"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm"
@@ -19,13 +20,15 @@ import (
 // @Param	Authorization	header string	true "Authentication"
 // @Param	message	body DTOs.RequestLoginRegister 	true "ورودی"
 func RegisterLogin(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:registerLogin", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.RequestLoginRegister(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	user, err := models.NewMysqlManager(ctx).FindUserByMobile(ctx, dto.Mobile)
+	user, err := models.NewMysqlManager(c).FindUserByMobile(dto.Mobile)
 	if err == nil {
 		if user.Password != "" {
 			c.JSON(http.StatusOK, gin.H{
@@ -53,7 +56,7 @@ func RegisterLogin(c *gin.Context) {
 			VerifyCode:    randCode,
 			LastSendSMSAt: lastSendSMSAt,
 		}
-		err = models.NewMysqlManager(ctx).UpdateUser(c, ctx, &newUser)
+		err = models.NewMysqlManager(c).UpdateUser(&newUser)
 		if err != nil {
 			return
 		}
@@ -77,6 +80,7 @@ func RegisterLogin(c *gin.Context) {
 	text := fmt.Sprintf("%s : %s \n %s", "کد ورود به سامانه سلورا", randCode, "سلورا دستیار فروش شما")
 	err = utils.SendSMS(c, ctx, dto.Mobile, text, true)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 
@@ -86,8 +90,9 @@ func RegisterLogin(c *gin.Context) {
 		LastSendSMSAt: utils.NowTime(),
 	}
 
-	err = models.NewMysqlManager(ctx).CreateUser(c, ctx, &newUser)
+	err = models.NewMysqlManager(c).CreateUser(&newUser)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -106,18 +111,21 @@ func RegisterLogin(c *gin.Context) {
 // @Param	Authorization	header string	true "Authentication"
 // @Param	message	body DTOs.ChangePassword 	true "ورودی"
 func ChangePassword(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "changePassword", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:changePassword", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.ChangePassword(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	userID := models.GetUser(c)
-	err = models.NewMysqlManager(ctx).UpdateUser(c, ctx, &models.User{
+	err = models.NewMysqlManager(c).UpdateUser(&models.User{
 		ID:       *userID,
 		Password: models.GeneratePasswordHash(dto.Password),
 	})
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -134,13 +142,15 @@ func ChangePassword(c *gin.Context) {
 // @Param	Authorization	header string	true "Authentication"
 // @Param	message	body DTOs.ChangePassword 	true "ورودی"
 func ForgetPassword(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "ForgetPassword", "request")
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:ForgetPassword", "request")
+	c.Request.WithContext(ctx)
 	defer span.End()
 	dto, err := validations.ForgetPassword(c)
 	if err != nil {
+		errorx.ResponseErrorx(c, err)
 		return
 	}
-	user, err := models.NewMysqlManager(ctx).FindUserByMobile(ctx, dto.Mobile)
+	user, err := models.NewMysqlManager(c).FindUserByMobile(dto.Mobile)
 	if err == nil {
 		dif := utils.DifferentWithNow(user.LastSendSMSAt)
 		var randCode string
@@ -159,7 +169,7 @@ func ForgetPassword(c *gin.Context) {
 			VerifyCode:    randCode,
 			LastSendSMSAt: lastSendSMSAt,
 		}
-		err = models.NewMysqlManager(ctx).UpdateUser(c, ctx, &newUser)
+		err = models.NewMysqlManager(c).UpdateUser(&newUser)
 		if err != nil {
 			return
 		}

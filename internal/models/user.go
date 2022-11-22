@@ -1,13 +1,10 @@
 package models
 
 import (
-	"context"
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm"
-	"net/http"
 )
 
 type User struct {
@@ -35,7 +32,7 @@ type User struct {
 
 func initUser(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&User{})
-	manager.CreateUser(&gin.Context{}, context.Background(), &User{
+	manager.CreateUser(&User{
 		ID:         1,
 		Gender:     "man",
 		Firstname:  "امیر",
@@ -55,32 +52,23 @@ func initUser(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) CreateUser(c *gin.Context, ctx context.Context, user *User) error {
-	span, ctx := apm.StartSpan(ctx, "CreateUser", "model")
+func (m *MysqlManager) CreateUser(user *User) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateUser", "model")
 	defer span.End()
 
 	find := m.GetConn().Where("mobile = ?", user.Mobile).Find(&User{}).RowsAffected
 	if find > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "کاربری با این مشخصات قبلا ثبت شده است",
-			"error":   errors.New("کاربری با این مشخصات قبلا ثبت شده است"),
-		})
-		return errors.New("")
+		return errorx.New("کاربری با این مشخصات قبلا ثبت شده است", "model", nil)
 	}
 	err := m.GetConn().Create(user).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در فرایند ثبت نام شما رخ داده است لطفا مجدد تلاش نمایید", "model", err)
 	}
 	return nil
 }
 
-func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify, ctx context.Context) (*User, error) {
-	span, ctx := apm.StartSpan(ctx, "FindUserByMobileAndCodeVerify", "model")
+func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify) (*User, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindUserByMobileAndCodeVerify", "model")
 	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("mobile = ? and verify_code = ?", user.Mobile, user.VerifyCode).First(res).Error
@@ -89,8 +77,8 @@ func (m *MysqlManager) FindUserByMobileAndCodeVerify(user DTOs.Verify, ctx conte
 	}
 	return res, nil
 }
-func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify, ctx context.Context) (*User, error) {
-	span, ctx := apm.StartSpan(ctx, "FindUserByMobileAndPassword", "model")
+func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify) (*User, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindUserByMobileAndPassword", "model")
 	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("mobile = ? and password = ?", user.Mobile, GeneratePasswordHash(user.Password)).First(res).Error
@@ -99,9 +87,9 @@ func (m *MysqlManager) FindUserByMobileAndPassword(user DTOs.Verify, ctx context
 	}
 	return res, nil
 }
-func (m *MysqlManager) FindUserByMobile(ctx context.Context, mobile string) (*User, error) {
+func (m *MysqlManager) FindUserByMobile(mobile string) (*User, error) {
 
-	span, ctx := apm.StartSpan(ctx, "FindUserByMobile", "model")
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindUserByMobile", "model")
 	defer span.End()
 
 	res := &User{}
@@ -112,35 +100,25 @@ func (m *MysqlManager) FindUserByMobile(ctx context.Context, mobile string) (*Us
 	return res, nil
 }
 
-func (m *MysqlManager) FindUserByID(c *gin.Context, ctx context.Context, userID uint64) (*User, error) {
-	span, ctx := apm.StartSpan(ctx, "FindUserByID", "model")
+func (m *MysqlManager) FindUserByID(userID uint64) (*User, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindUserByID", "model")
 	defer span.End()
 	res := &User{}
 	err := m.GetConn().Where("id = ?", userID).First(res).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "فروشگاه یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return nil, err
+		return nil, errorx.New("کاربر یافت نشد", "model", err)
 	}
 	return res, nil
 }
 
-func (m *MysqlManager) UpdateUser(c *gin.Context, ctx context.Context, user *User) error {
-	span, ctx := apm.StartSpan(ctx, "UpdateUser", "model")
+func (m *MysqlManager) UpdateUser(user *User) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateUser", "model")
 	defer span.End()
 
 	var newUser User
 	err := m.GetConn().Where("id = ?", user.ID).First(&newUser).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "کاربر یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("کاربر یافت نشد", "model", err)
 	}
 	if user.Gender != "" {
 		newUser.Gender = user.Gender
@@ -185,12 +163,7 @@ func (m *MysqlManager) UpdateUser(c *gin.Context, ctx context.Context, user *Use
 
 	err = m.GetConn().Save(&newUser).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطایی در فرایند ویرایش شما رخ داده است لطفا مجدد تلاش نمایید",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطایی در فرایند ویرایش شما رخ داده است لطفا مجدد تلاش نمایید", "model", err)
 	}
 	return nil
 }

@@ -1,11 +1,9 @@
 package models
 
 import (
-	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	"github.com/gin-gonic/gin"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"net/http"
 )
 
 type Menu struct {
@@ -21,7 +19,7 @@ type Menu struct {
 func initMenu(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Menu{})
 	for i := 0; i < 20; i++ {
-		manager.CreateMenu(&gin.Context{}, context.Background(), DTOs.CreateMenu{
+		manager.CreateMenu(DTOs.CreateMenu{
 			Name:     "dsaD",
 			Link:     "DSADSA",
 			ShopID:   1,
@@ -31,8 +29,8 @@ func initMenu(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateMenu(c *gin.Context, ctx context.Context, dto DTOs.CreateMenu) error {
-	span, ctx := apm.StartSpan(ctx, "showMenu", "model")
+func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")
 	defer span.End()
 
 	// find last sort number
@@ -52,27 +50,17 @@ func (m *MysqlManager) CreateMenu(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	err = m.GetConn().Create(&menu).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ایجاد کد منو",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در ایجاد کد منو", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) UpdateMenu(c *gin.Context, ctx context.Context, dto DTOs.UpdateMenu) error {
-	span, ctx := apm.StartSpan(ctx, "showMenu", "model")
+func (m *MysqlManager) UpdateMenu(dto DTOs.UpdateMenu) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")
 	defer span.End()
 	menu := &Menu{}
 	err := m.GetConn().Where("id = ?", dto.ID).First(menu).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "منو یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("منو یافت نشد", "model", err)
 	}
 
 	if dto.Name != "" {
@@ -92,39 +80,27 @@ func (m *MysqlManager) UpdateMenu(c *gin.Context, ctx context.Context, dto DTOs.
 	}
 	err = m.GetConn().Save(menu).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در ویرایش منو"})
-		return err
+		return errorx.New("خطا در ویرایش منو", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) DeleteMenu(c *gin.Context, ctx context.Context, menuID uint64) error {
-	span, ctx := apm.StartSpan(ctx, "showMenu", "model")
+func (m *MysqlManager) DeleteMenu(menuID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")
 	defer span.End()
 	menu := Menu{}
 	err := m.GetConn().Where("id = ?", menuID).First(&menu).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "منو یافت نشد",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("منو یافت نشد", "model", err)
 	}
 
 	err = m.GetConn().Delete(&menu).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "خطا در حذف منو",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return err
+		return errorx.New("خطا در حذف منو", "model", err)
 	}
 	return nil
 }
-func (m *MysqlManager) GetAllMenuWithPagination(c *gin.Context, ctx context.Context, dto DTOs.IndexMenu) (*DTOs.Pagination, error) {
-	span, ctx := apm.StartSpan(ctx, "showMenu", "model")
+func (m *MysqlManager) GetAllMenuWithPagination(dto DTOs.IndexMenu) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")
 	defer span.End()
 	conn := m.GetConn()
 	var menus []Menu
@@ -136,13 +112,19 @@ func (m *MysqlManager) GetAllMenuWithPagination(c *gin.Context, ctx context.Cont
 	}
 	err := conn.Find(&menus).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطا در دریافت منو ها",
-			"error":   err.Error(),
-			"type":    "model",
-		})
-		return pagination, err
+		return nil, errorx.New("خطا در دریافت منو ها", "model", err)
 	}
 	pagination.Data = menus
 	return pagination, nil
+}
+
+func (m *MysqlManager) FindMenuByID(id uint64) (*Menu, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindMenuByID", "model")
+	defer span.End()
+	menu := &Menu{}
+	err := m.GetConn().Where("id = ?", id).First(menu).Error
+	if err != nil {
+		return menu, errorx.New("منو مورد نظر یافت نشد", "model", err)
+	}
+	return menu, nil
 }

@@ -1,11 +1,10 @@
 package validations
 
 import (
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CreateShop(c *gin.Context) (DTOs.CreateShop, error) {
@@ -33,12 +32,7 @@ func CreateShop(c *gin.Context) (DTOs.CreateShop, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -54,12 +48,7 @@ func IndexShop(c *gin.Context) (DTOs.IndexShop, error) {
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -88,12 +77,7 @@ func UpdateShop(c *gin.Context) (DTOs.UpdateShop, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -120,12 +104,7 @@ func CheckSocial(c *gin.Context) (DTOs.CheckSocial, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -150,12 +129,7 @@ func SendPrice(c *gin.Context) (DTOs.SendPrice, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -179,12 +153,7 @@ func DeleteShop(c *gin.Context) (DTOs.DeleteShop, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)

@@ -1,11 +1,10 @@
 package validations
 
 import (
-	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func CreateTheme(c *gin.Context) (DTOs.CreateTheme, error) {
@@ -26,12 +25,7 @@ func CreateTheme(c *gin.Context) (DTOs.CreateTheme, error) {
 	}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
@@ -47,12 +41,7 @@ func IndexTheme(c *gin.Context) (DTOs.IndexTheme, error) {
 	tags := ValidationTags{}
 	err := c.Bind(&dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "مقادیر ارسال شده نا درست میباشد",
-			"type":    "validation",
-			"error":   err.Error(),
-		})
-		return dto, errors.New("validation error")
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
 
 	err = validate.Struct(dto)
