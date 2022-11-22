@@ -50,6 +50,7 @@ func WaitExitSignal() os.Signal {
 
 func InitializeConfig(prefix string) {
 	logrus.AddHook(&apmlogrus.Hook{})
+	logrus.SetOutput(os.Stdout)
 
 	viper.AutomaticEnv()
 	viper.SetConfigName("config")

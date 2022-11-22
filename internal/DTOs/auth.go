@@ -1,19 +1,26 @@
 package DTOs
 
 type Verify struct {
-	Mobile     string `form:"mobile" json:"mobile" validate:"required,min=11,max=11,startswith=09"`
-	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4"`
-	Password   string `form:"password" json:"password"  validate:"omitempty,min=6,max=20"`
+	//موبایل
+	Mobile string `form:"mobile" json:"mobile" validate:"required,min=11,max=11,startswith=09" example:"09024809750"`
+	//کد تایید درصورتی که با کد میخواهید وارد شوید
+	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4" example:"4563"`
+	//پسورد درصورتی که با پسورد میخواهید وارد شودی
+	Password string `form:"password" json:"password"  validate:"omitempty,min=6,max=20" example:"123456789"`
 }
 type RequestLoginRegister struct {
-	Mobile string `form:"mobile" json:"mobile"  validate:"required,min=11,max=11,startswith=09"`
+	//موبایل
+	Mobile string `form:"mobile" json:"mobile"  validate:"required,min=11,max=11,startswith=09" example:"09024809750"`
 }
 
 type ChangePassword struct {
-	Password      string `form:"password" json:"password"  validate:"required,min=6,max=20"`
-	AgainPassword string `form:"again_password" json:"again_password"  validate:"required,min=6,max=20,eqfield=Password"`
+	//پسورد
+	Password string `form:"password" json:"password"  validate:"required,min=6,max=20" example:"123456789"`
+	//تکرار پسورد
+	AgainPassword string `form:"again_password" json:"again_password"  validate:"required,min=6,max=20,eqfield=Password" example:"123456789"`
 }
 
 type ForgetPassword struct {
-	Mobile string `form:"mobile" json:"mobile"  validate:"required,min=11,max=11,startswith=09"`
+	//پسورد
+	Mobile string `form:"mobile" json:"mobile"  validate:"required,min=11,max=11,startswith=09" example:"09024809750"`
 }

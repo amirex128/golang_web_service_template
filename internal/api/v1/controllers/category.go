@@ -83,10 +83,10 @@ func UpdateCategory(c *gin.Context) {
 }
 
 // DeleteCategory
-// @Summary حذف آدرس
-// @description کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
-// @Tags address
-// @Router       /user/address/delete/{id} [post]
+// @Summary حذف دسته بندی
+// @description کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند
+// @Tags category
+// @Router       /user/category/delete/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه آدرس" SchemaExample(1)
 func DeleteCategory(c *gin.Context) {

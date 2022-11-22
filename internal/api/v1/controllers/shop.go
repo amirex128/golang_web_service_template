@@ -10,6 +10,13 @@ import (
 	"net/http"
 )
 
+// CreateShop
+// @Summary ایجاد فروشگاه
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreateShop  	true "ورودی"
 func CreateShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createShop", "request")
 	defer span.End()
@@ -28,6 +35,13 @@ func CreateShop(c *gin.Context) {
 	})
 }
 
+// UpdateShop
+// @Summary ویرایش فروشگاه
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop/update [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.UpdateShop  	true "ورودی"
 func UpdateShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updateShop", "request")
 	defer span.End()
@@ -45,6 +59,13 @@ func UpdateShop(c *gin.Context) {
 	})
 }
 
+// DeleteShop
+// @Summary حذف فروشگاه
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه فروشگاه" SchemaExample(1)
 func DeleteShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteShop", "request")
 	defer span.End()
@@ -75,6 +96,13 @@ func DeleteShop(c *gin.Context) {
 	})
 }
 
+// ShowShop
+// @Summary نمایش فروشگاه
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه فروشگاه" SchemaExample(1)
 func ShowShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showShop", "request")
 	defer span.End()
@@ -88,6 +116,16 @@ func ShowShop(c *gin.Context) {
 	})
 }
 
+// IndexShop
+// @Summary لیست فروشگاه
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexShop", "request")
 	defer span.End()
@@ -106,33 +144,13 @@ func IndexShop(c *gin.Context) {
 	})
 }
 
-func CheckSocial(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "checkSocial", "request")
-	defer span.End()
-	_, err := validations.CheckSocial(c)
-	if err != nil {
-		return
-	}
-	// TODO بررسی وضعیت تایید شبکه اجتماعی
-	var resultCheck bool
-	resultCheck = true
-	err = models.NewMysqlManager(ctx).UpdateShop(c, ctx, DTOs.UpdateShop{
-		VerifySocial: true,
-	})
-	if err != nil {
-		return
-	}
-	if resultCheck {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "تایید شبکه اجتماعی با موفقیت انجام شد",
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "تایید شبکه اجتماعی با انجام نشد",
-	})
-}
-
+// SendPrice
+// @Summary ویرایش هزینه ارسال سفارشات به صورت جدا
+// @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+// @Tags shop
+// @Router       /user/shop/send-price [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.SendPrice  	true "ورودی"
 func SendPrice(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "sendPrice", "request")
 	defer span.End()

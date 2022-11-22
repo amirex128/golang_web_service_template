@@ -61,7 +61,7 @@ func (m *MysqlManager) CreateTicket(c *gin.Context, ctx context.Context, dto DTO
 			return &userID
 		}(),
 		ParentID:    dto.ParentID,
-		IsAnswer:    dto.IsAnswer,
+		IsAnswer:    false,
 		GuestName:   dto.GuestName,
 		GuestMobile: dto.GuestMobile,
 		Title:       dto.Title,

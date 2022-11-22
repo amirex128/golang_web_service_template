@@ -1,0 +1,89 @@
+filebeat.inputs:
+  - type: container
+    enabled: true
+    paths:
+      -/var/lib/docker/containers/*/*.log
+    stream: all # can be all, stdout or stderr
+
+#========================== Filebeat autodiscover ==============================
+# See this URL on how to run Apache2 Filebeat module: # https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      # https://www.elastic.co/guide/en/beats/filebeat/current/configuration-autodiscover-hints.html
+      # This URL alos contains instructions on multi-line logs
+      hints.enabled: true
+
+#================================ Processors ===================================
+processors:
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_locale:
+      format: offset
+  - add_host_metadata:
+      netinfo.enabled: true
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: [ "elastic:9200" ]
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: "kibana:5601"
+
+#============================== Filebeat modules ===============================
+######################## Filebeat Configuration ############################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see filebeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+
+#==========================  Modules configuration =============================
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: true
+
+  - module: elasticsearch
+    server:
+      enabled: true
+    slowlog:
+      enabled: true
+    audit:
+      enabled: true
+
+  - module: kibana
+    log:
+      enabled: false
+    audit:
+      enabled: false
+
+  - module: mysql
+    error:
+      enabled: true
+    slowlog:
+      enabled: true
+
+  - module: nginx
+    access:
+      enabled: true
+    error:
+      enabled: true
+
+  - module: redis
+    log:
+      enabled: true
+    slowlog:
+      enabled: true
+
+#  - module: mongodb
+#    log:
+#      enabled: true
+

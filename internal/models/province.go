@@ -1,7 +1,7 @@
 package models
 
 import (
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +20,7 @@ type ProductProvince struct {
 func initProvince(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Province{})
 	manager.GetConn().AutoMigrate(&ProductProvince{})
-	provinces := utils2.ReadCsvFile("./csv/provinces.csv")
+	provinces := utils.ReadCsvFile("./csv/provinces.csv")
 	manager.CreateAllProvinces(provinces)
 
 }
@@ -29,7 +29,7 @@ func (m *MysqlManager) CreateAllProvinces(files [][]string) {
 	for i := range files {
 		value := files[i]
 		province = append(province, Province{
-			ID:          utils2.StringToInt(value[0]),
+			ID:          utils.StringToInt(value[0]),
 			PersianName: value[1],
 			EnglishName: value[2],
 			Cod:         value[3],

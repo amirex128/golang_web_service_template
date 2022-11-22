@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,7 +18,7 @@ type City struct {
 
 func initCity(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&City{})
-	cities := utils2.ReadCsvFile("./csv/cities.csv")
+	cities := utils.ReadCsvFile("./csv/cities.csv")
 	manager.CreateAllCities(cities)
 }
 func (m *MysqlManager) CreateAllCities(files [][]string) {
@@ -26,13 +26,13 @@ func (m *MysqlManager) CreateAllCities(files [][]string) {
 	for i := range files {
 		value := files[i]
 		cities = append(cities, City{
-			ID:          utils2.StringToInt(value[0]),
-			ProvinceID:  utils2.StringToInt(value[1]),
+			ID:          utils.StringToInt(value[0]),
+			ProvinceID:  utils.StringToInt(value[1]),
 			PersianName: value[2],
-			EnglishName: utils2.StringConvert(value[5]),
-			Code:        utils2.StringConvert(value[6]),
-			Lat:         utils2.StringConvert(value[7]),
-			Lng:         utils2.StringConvert(value[8]),
+			EnglishName: utils.StringConvert(value[5]),
+			Code:        utils.StringConvert(value[6]),
+			Lat:         utils.StringConvert(value[7]),
+			Lng:         utils.StringConvert(value[8]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(cities, 100).Error

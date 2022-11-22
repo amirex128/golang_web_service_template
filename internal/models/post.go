@@ -36,8 +36,6 @@ func InitPost(manager *MysqlManager) {
 			Body:      "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
 			Slug:      "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
 			GalleryID: 1,
-			CreatedAt: utils.NowTime(),
-			UpdatedAt: utils.NowTime(),
 		}, 1)
 	}
 }

@@ -1,48 +1,46 @@
 version: '3.9'
 
 services:
-  backend:
-    image: amirex128/selloora-backend:latest
-    depends_on:
-      - "redis"
-      - "mysql"
-      - "nginx"
-      - "elastic"
-      - "kibana"
-      - "apm-server"
-    networks:
-      - selloora
-    ports:
-      - "8585:8585"
-    volumes:
-      - "./internal:/app/internal"
-      - "./public:/app/public"
-      - "./configs:/app/configs"
-      - "./templates:/app/templates"
-    environment:
-      - GO111MODULE=on
-      - CGO_ENABLED=1
-      - ELASTIC_APM_ENVIRONMENT=staging
-      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
-      - ELASTIC_APM_SERVICE_NAME=selloora_backend
-      - ELASTIC_APM_LOG_FILE=stderr
-      - ELASTIC_APM_LOG_LEVEL=debug
-      - SELLOORA_MYSQL_MAIN_DB=selloora
-      - SELLOORA_ELASTIC_HOST=elastic
-      - SELLOORA_ELASTIC_PORT=9200
-      - SELLOORA_MYSQL_MAIN_HOST=mysql
-      - SELLOORA_MYSQL_MAIN_PASSWORD=q6766581Amirex
-      - SELLOORA_MYSQL_MAIN_PORT=3306
-      - SELLOORA_MYSQL_MAIN_USER=selloora
-      - SELLOORA_REDIS_DB=1
-      - SELLOORA_REDIS_HOST=redis
-      - SELLOORA_REDIS_PORT=6379
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8585
-      - SERVER_URL=http://localhost:8585
+  #  backend:
+  #    image: amirex128/selloora-backend:latest
+  #    depends_on:
+  #      - "redis"
+  #      - "mysql"
+  #      - "nginx"
+  #      - "elastic"
+  #      - "kibana"
+  #      - "apm-server"
+  #    networks:
+  #      - elastic
+  #    ports:
+  #      - "8585:8585"
+  #    volumes:
+  #      - "./internal:/app/internal"
+  #      - "./public:/app/public"
+  #      - "./configs:/app/configs"
+  #      - "./templates:/app/templates"
+  #    environment:
+  #      - GO111MODULE=on
+  #      - CGO_ENABLED=1
+  #      - ELASTIC_APM_ENVIRONMENT=staging
+  #      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
+  #      - ELASTIC_APM_SERVICE_NAME=selloora_backend
+  #      - ELASTIC_APM_LOG_FILE=stderr
+  #      - ELASTIC_APM_LOG_LEVEL=debug
+  #      - SELLOORA_MYSQL_MAIN_DB=selloora
+  #      - SELLOORA_ELASTIC_HOST=elastic
+  #      - SELLOORA_ELASTIC_PORT=9200
+  #      - SELLOORA_MYSQL_MAIN_HOST=mysql
+  #      - SELLOORA_MYSQL_MAIN_PASSWORD=q6766581Amirex
+  #      - SELLOORA_MYSQL_MAIN_PORT=3306
+  #      - SELLOORA_MYSQL_MAIN_USER=selloora
+  #      - SELLOORA_REDIS_DB=1
+  #      - SELLOORA_REDIS_HOST=redis
+  #      - SELLOORA_REDIS_PORT=6379
+  #      - SERVER_HOST=0.0.0.0
+  #      - SERVER_PORT=8585
+  #      - SERVER_URL=http://localhost:8585
   mysql:
-    networks:
-      - selloora
     image: mariadb:10.9.3
     restart: always
     environment:
@@ -52,10 +50,7 @@ services:
       - ./volumes/mariadb/init:/docker-entrypoint-initdb.d
     ports:
       - '3306:3306'
-      - '3372:3306'
   nginx:
-    networks:
-      - selloora
     image: nginx:1.23.2-alpine
     restart: always
     ports:
@@ -64,55 +59,114 @@ services:
     volumes:
       - './volumes/nginx/conf.d:/etc/nginx/conf.d'
   redis:
-    networks:
-      - selloora
     image: redis:6.2.7
     restart: always
     ports:
-      - '6379:6379'
-      - '6399:6379'
-      - '6390:6379'
+      - "6379:6379"
   elastic:
-    networks:
-      - selloora
     image: elasticsearch:7.4.2
     restart: always
+    networks:
+      - elastic
     ports:
-      - 9213:9200
-      - 9313:9300
-      - 9204:9200
-      - 9305:9300
+      - "9200:9200"
     environment:
       - cluster.name=elastic
       - bootstrap.memory_lock=true
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.seed_hosts=elastic
+      - network.host=0.0.0.0
   kibana:
-    networks:
-      - selloora
     depends_on:
       - elastic
     restart: always
     image: kibana:7.4.2
-    ports:
-      - "5613:5601"
-    environment:
-      - SERVER_NAME=dev.search.snappfood.ir
-      - ELASTICSEARCH_HOSTS=http://elastic:9200
-  apm-server:
+    hostname: "kibana"
     networks:
-      - selloora
+      - elastic
+    volumes:
+      - ./volumes/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_URL=http://elastic:9200
+      - server.ssl.enabled=false
+  apm-server:
     depends_on:
       - elastic
       - kibana
     restart: always
     user: apm-server
     image: docker.elastic.co/apm/apm-server:7.4.2
+    networks:
+      - elastic
     ports:
-      - 8200:8200
+      - "8200:8200"
     volumes:
       - ./volumes/apm/apm-server.yml:/usr/share/apm-server/apm-server.yml
-
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.port=8200
+        - com.df.srcPort=8200
+    command: >
+      --strict.perms=false -e
+      -E apm-server.rum.enabled=true
+      -E setup.kibana.host=kibana:5601
+      -E setup.template.settings.index.number_of_replicas=0
+      -E apm-server.kibana.enabled=true
+      -E apm-server.kibana.host=kibana:5601
+      -E output.elasticsearch.hosts=["elastic:9200"]
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.4.2
+    depends_on:
+      - elastic
+      - kibana
+    restart: always
+    volumes:
+      - ./volumes/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/:/var/log/:ro
+      - /var/log/audit/:/var/log/audit/:ro
+    environment:
+      - ELASTICSEARCH_HOST=elastic:9200
+      - KIBANA_HOST=kibana:5601
+    command: [ "--strict.perms=false" ]
+    networks:
+      - elastic
+    hostname: "filebeat"
+    user: root
+    deploy:
+      mode: global
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.4.2
+    depends_on:
+      - elastic
+      - kibana
+    restart: always
+    volumes:
+      - ./volumes/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+#      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - metricbeat:/usr/share/metricbeat/data
+    environment:
+      - ELASTICSEARCH_HOST=elastic:9200
+      - KIBANA_HOST=kibana:5601
+    command: ["--strict.perms=false", "-system.hostfs=/hostfs"]
+    networks:
+      - elastic
+    hostname: "metricbeat"
+    user: root
+    deploy:
+      mode: global
 networks:
-  selloora:
-    driver: bridge
+  elastic:
+volumes:
+  metricbeat:

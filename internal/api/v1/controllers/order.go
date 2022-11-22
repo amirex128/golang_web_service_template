@@ -4,7 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/constants"
 	"github.com/amirex128/selloora_backend/internal/models"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -52,7 +52,7 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	if utils2.DifferentWithNow(discount.StartedAt) < 0 || utils2.DifferentWithNow(discount.EndedAt) > 0 {
+	if utils.DifferentWithNow(discount.StartedAt) < 0 || utils.DifferentWithNow(discount.EndedAt) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف منقضی شده است"})
 		return
 	}
@@ -92,14 +92,14 @@ func CreateOrder(c *gin.Context) {
 	}
 
 	productDiscounts := strings.Split(discount.ProductIDs, ",")
-	applyDiscount := utils2.ApplyDiscount(productDiscounts, utils2.DiscountPriceType{
+	applyDiscount := utils.ApplyDiscount(productDiscounts, utils.DiscountPriceType{
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
 	}, extractProductIDs(dto))
-	var productCalculate []utils2.ProductDiscountCalculatorType
+	var productCalculate []utils.ProductDiscountCalculatorType
 	for i := range rawProducts {
-		productCalculate = append(productCalculate, utils2.ProductDiscountCalculatorType{
+		productCalculate = append(productCalculate, utils.ProductDiscountCalculatorType{
 			ProductID: rawProducts[i].ID,
 			Price:     rawProducts[i].Price,
 			Count: func() *DTOs.OrderItem {
@@ -112,7 +112,7 @@ func CreateOrder(c *gin.Context) {
 			}().Count,
 		})
 	}
-	calculateDiscountProduct := utils2.CalculateDiscountProduct(applyDiscount, productCalculate, utils2.DiscountPriceType{
+	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productCalculate, utils.DiscountPriceType{
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
@@ -136,8 +136,8 @@ func CreateOrder(c *gin.Context) {
 	order.IP = c.ClientIP()
 	order.Status = constants.PendingPaymentOrderStatus
 	order.Description = dto.Description
-	order.LastUpdateStatusAt = utils2.NowTime()
-	order.CreatedAt = utils2.NowTime()
+	order.LastUpdateStatusAt = utils.NowTime()
+	order.CreatedAt = utils.NowTime()
 
 	orderID, err := models.NewMysqlManager(ctx).CreateOrder(c, ctx, order)
 	if err != nil {
@@ -149,7 +149,7 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 
-	err = utils2.SadadPayRequest(c, 10000000, 10000.0)
+	err = utils.SadadPayRequest(c, 10000000, 10000.0)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در ارتباط با درگاه پرداخت رخ داده است",
@@ -171,7 +171,7 @@ func extractProductIDs(dto DTOs.CreateOrder) []uint64 {
 func SadadPaymentVerify(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "sadadPaymentVerify", "request")
 	defer span.End()
-	err := utils2.SadadVerify(c, 1, 1000.0, 100000, "")
+	err := utils.SadadVerify(c, 1, 1000.0, 100000, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "خطایی در ارتباط با درگاه پرداخت رخ داده است و مبلغ پرداختی شما تا 72 ساعت آینده به حساب شما برگشت داده میشود لطفا مجدد پرداخت خود را انجام دهید",
@@ -249,7 +249,7 @@ func IndexOrder(c *gin.Context) {
 func ApproveOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "approveOrder", "request")
 	defer span.End()
-	orderID := utils2.StringToUint64(c.Param("id"))
+	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 	order, err := models.NewMysqlManager(ctx).FindOrderByID(c, ctx, orderID)
 	if err != nil {
@@ -281,7 +281,7 @@ func ApproveOrder(c *gin.Context) {
 func CancelOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "cancelOrder", "request")
 	defer span.End()
-	orderID := utils2.StringToUint64(c.Param("id"))
+	orderID := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 	order, err := models.NewMysqlManager(ctx).FindOrderByID(c, ctx, orderID)
 	if err != nil {
@@ -332,14 +332,14 @@ func SendOrder(c *gin.Context) {
 	order.Status = constants.ChooseCourierOrderStatus
 	order.Weight = dto.Weight
 	order.PackageSize = dto.PackageSize
-	order.LastUpdateStatusAt = utils2.NowTime()
+	order.LastUpdateStatusAt = utils.NowTime()
 
 	err = models.NewMysqlManager(ctx).UpdateOrder(c, ctx, order)
 	if err != nil {
 		return
 	}
 	if dto.Courier == "tipax" {
-		err = utils2.TipaxSendOrderRequest(c)
+		err = utils.TipaxSendOrderRequest(c)
 		if err != nil {
 			return
 		}
@@ -364,7 +364,7 @@ func CalculateSendPrice(c *gin.Context) {
 		return
 	}
 
-	err = utils2.CalculateSendPriceTipax(dto)
+	err = utils.CalculateSendPriceTipax(dto)
 
 	c.JSON(http.StatusOK, gin.H{
 		"tipax": "",
@@ -405,7 +405,7 @@ func AcceptReturnedOrder(c *gin.Context) {
 func ShowOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showOrder", "request")
 	defer span.End()
-	orderID := utils2.StringToUint64(c.Param("id"))
+	orderID := utils.StringToUint64(c.Param("id"))
 	order, err := models.NewMysqlManager(ctx).FindOrderWithItemByID(c, ctx, orderID)
 	if err != nil {
 		return
@@ -419,14 +419,14 @@ func ShowOrder(c *gin.Context) {
 // @Summary پیگیری وضعیت ارسال سفارش
 // @description مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش در چه مرحله ای به سر میبرد
 // @Tags order
-// @Router       /user/order/show/{id} [get]
+// @Router       /user/order/tracking/{id} [get]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func TrackingOrder(c *gin.Context) {
 	span, _ := apm.StartSpan(c.Request.Context(), "trackingOrder", "request")
 	defer span.End()
 	trackingCode := c.Param("id")
-	utils2.TrackingOrder(trackingCode)
+	utils.TrackingOrder(trackingCode)
 }
 
 // IndexCustomerOrders

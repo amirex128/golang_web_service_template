@@ -30,6 +30,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	v1 := r.Group("api/v1")
 	v1.POST("/verify", authMiddleware.LoginHandler)
 	v1.POST("/login/register", controllers.RegisterLogin)
+	v1.POST("/forget", controllers.ForgetPassword)
 
 	v1.POST("/user/ticket/create", controllers.CreateTicket)
 	v1.POST("user/comment/create", controllers.CreateComment)
@@ -94,10 +95,18 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			shop.POST("/update", controllers.UpdateShop)
 			shop.GET("/show/:id", controllers.ShowShop)
 			shop.POST("/delete/:id", controllers.DeleteShop)
-			shop.POST("/check", controllers.CheckSocial)
 			shop.POST("/send-price", controllers.SendPrice)
 			shop.GET("/instagram", controllers.GetInstagramPost)
 		}
+
+		slider := user.Group("slider")
+		{
+			slider.GET("/list", controllers.IndexSlider)
+			slider.POST("/create", controllers.CreateSlider)
+			slider.POST("/update", controllers.UpdateSlider)
+			slider.POST("/delete/:id", controllers.DeleteSlider)
+		}
+
 		post := user.Group("post")
 		{
 			post.GET("/list", controllers.IndexPost)
@@ -105,6 +114,10 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			post.POST("/create", controllers.CreatePost)
 			post.POST("/update", controllers.UpdatePost)
 			post.POST("/delete/:id", controllers.DeletePost)
+		}
+		theme := user.Group("theme")
+		{
+			theme.GET("/list", controllers.IndexTheme)
 		}
 		category := user.Group("category")
 		{

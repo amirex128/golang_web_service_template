@@ -28,6 +28,8 @@ type CreateUpdateCustomer struct {
 }
 
 type IndexOrderCustomer struct {
-	Mobile     string `form:"mobile" json:"mobile" validate:"omitempty,min=11,max=11,startswith=09"`
-	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4"`
+	//موبایل
+	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,min=11,max=11,startswith=09"  example:"09024809750"`
+	//کد تائید دریافتی که جکم توکن را برای مشتریان دارند و تمامی وبسرویس های آن ها با استفاده از این کد کار خواهند کرد
+	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4" example:"1234"`
 }

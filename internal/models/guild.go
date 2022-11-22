@@ -1,7 +1,7 @@
 package models
 
 import (
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +22,7 @@ type GuildProduct struct {
 func initGuild(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Guild{})
 	manager.GetConn().AutoMigrate(&GuildProduct{})
-	guilds := utils2.ReadCsvFile("./csv/guilds.csv")
+	guilds := utils.ReadCsvFile("./csv/guilds.csv")
 	manager.CreateAllGuilds(guilds)
 }
 
@@ -31,12 +31,12 @@ func (m *MysqlManager) CreateAllGuilds(files [][]string) {
 	for i := range files {
 		value := files[i]
 		guilds = append(guilds, Guild{
-			ID:         utils2.StringToInt(value[0]),
-			ParentID:   utils2.StringToInt(value[1]),
+			ID:         utils.StringToInt(value[0]),
+			ParentID:   utils.StringToInt(value[1]),
 			Name:       value[2],
 			Equivalent: value[4],
-			Sort:       utils2.StringToUint(value[5]),
-			Active:     utils2.ActiveConvert(value[6]),
+			Sort:       utils.StringToUint(value[5]),
+			Active:     utils.ActiveConvert(value[6]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(guilds, 100).Error

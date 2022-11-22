@@ -1,7 +1,7 @@
 package models
 
 import (
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,7 +13,7 @@ type FeatureItemValue struct {
 
 func initFeatureItemValue(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItemValue{})
-	featureItemValues := utils2.ReadCsvFile("./csv/feature_item_values.csv")
+	featureItemValues := utils.ReadCsvFile("./csv/feature_item_values.csv")
 	manager.CreateAllFeatureItemValues(featureItemValues)
 }
 func (m *MysqlManager) CreateAllFeatureItemValues(files [][]string) {
@@ -21,8 +21,8 @@ func (m *MysqlManager) CreateAllFeatureItemValues(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItemValue = append(featureItemValue, FeatureItemValue{
-			ID:            utils2.StringToInt(value[0]),
-			FeatureItemID: utils2.StringToInt(value[1]),
+			ID:            utils.StringToInt(value[0]),
+			FeatureItemID: utils.StringToInt(value[1]),
 			Value:         value[2],
 		})
 	}

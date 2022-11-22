@@ -4,33 +4,33 @@ import (
 	"context"
 	"fmt"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
 
 type Product struct {
-	ID               uint64     `gorm:"primary_key;auto_increment" json:"id"`
-	UserID           uint64     `json:"user_id"`
-	User             User       `gorm:"foreignKey:user_id" json:"user"`
-	ShopID           uint64     `json:"shop_id"`
-	Shop             Shop       `gorm:"foreignKey:shop_id" json:"shop"`
-	Description      string     `json:"description"`
-	Name             string     `json:"name"`
-	ShortDescription string     `json:"short_description"`
-	TotalSales       uint32     `json:"total_sales"`
-	Status           string     `json:"block_status" sql:"type:ENUM('block','ok')"`
-	Quantity         uint32     `json:"quantity"`
-	Price            float32    `json:"price"`
-	Active           byte       `json:"active"`
-	CreatedAt        string     `json:"created_at"`
-	UpdatedAt        string     `json:"updated_at"`
-	StartedAt        string     `json:"started_at"`
-	EndedAt          string     `json:"ended_at"`
-	Categories       []Category `gorm:"many2many:category_product;" json:"categories"`
-	Galleries        []Gallery  `gorm:"many2many:gallery_product;" json:"galleries"`
-	DeliveryTime     uint32     `json:"delivery_time"` // مدت زمان ارسال
+	ID           uint64     `gorm:"primary_key;auto_increment" json:"id"`
+	UserID       uint64     `json:"user_id"`
+	User         User       `gorm:"foreignKey:user_id" json:"user"`
+	ShopID       uint64     `json:"shop_id"`
+	Shop         Shop       `gorm:"foreignKey:shop_id" json:"shop"`
+	Description  string     `json:"description"`
+	Name         string     `json:"name"`
+	TotalSales   uint32     `json:"total_sales"`
+	Status       string     `json:"block_status" sql:"type:ENUM('block','ok')"`
+	Quantity     uint32     `json:"quantity"`
+	Price        float32    `json:"price"`
+	Active       byte       `json:"active"`
+	CreatedAt    string     `json:"created_at"`
+	UpdatedAt    string     `json:"updated_at"`
+	StartedAt    string     `json:"started_at"`
+	EndedAt      string     `json:"ended_at"`
+	Tags         []Tag      `gorm:"many2many:product_tag;" json:"tags"`
+	Categories   []Category `gorm:"many2many:category_product;" json:"categories"`
+	Galleries    []Gallery  `gorm:"many2many:gallery_product;" json:"galleries"`
+	DeliveryTime uint32     `json:"delivery_time"` // مدت زمان ارسال
 }
 
 func (c Product) GetID() uint64 {
@@ -41,23 +41,18 @@ func InitProduct(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Product{})
 	for i := 0; i < 100; i++ {
 		manager.CreateProduct(&gin.Context{}, context.Background(), DTOs.CreateProduct{
-			ShopID:           1,
-			ManufacturerId:   1,
-			Description:      fmt.Sprintf("توضیحات محصول %d", i),
-			Name:             fmt.Sprintf("محصول %d", i),
-			ShortDescription: fmt.Sprintf("توضیحات کوتاه محصول %d", i),
-			Quantity:         10,
-			Price:            10000,
-			Weight:           100,
-			Height:           100,
-			Width:            100,
-			StartedAt:        "2020-01-01 00:00:00",
-			EndedAt:          "2024-01-01 00:00:00",
-			DeliveryTime:     1,
-			OptionId:         1,
-			OptionItemID:     1,
-			CategoryID:       1,
-			GalleryIDs:       []uint64{1},
+			ShopID:       1,
+			Manufacturer: "سامسونگ",
+			Description:  fmt.Sprintf("توضیحات محصول %d", i),
+			Name:         fmt.Sprintf("محصول %d", i),
+			Quantity:     10,
+			Price:        10000,
+			StartedAt:    "2020-01-01 00:00:00",
+			EndedAt:      "2024-01-01 00:00:00",
+			OptionId:     1,
+			OptionItemID: 1,
+			CategoryID:   1,
+			GalleryIDs:   []uint64{1},
 		}, 1)
 	}
 }
@@ -91,19 +86,17 @@ func (m *MysqlManager) CreateProduct(c *gin.Context, ctx context.Context, dto DT
 	defer span.End()
 
 	var product = Product{
-		UserID:           userID,
-		ShopID:           dto.ShopID,
-		Description:      dto.Description,
-		Name:             dto.Name,
-		ShortDescription: dto.ShortDescription,
-		Quantity:         dto.Quantity,
-		Price:            dto.Price,
-		Active:           1,
-		CreatedAt:        utils2.NowTime(),
-		UpdatedAt:        utils2.NowTime(),
-		StartedAt:        utils2.DateTimeConvert(dto.StartedAt),
-		EndedAt:          utils2.DateTimeConvert(dto.EndedAt),
-		DeliveryTime:     dto.DeliveryTime,
+		UserID:      userID,
+		ShopID:      dto.ShopID,
+		Description: dto.Description,
+		Name:        dto.Name,
+		Quantity:    dto.Quantity,
+		Price:       dto.Price,
+		Active:      1,
+		CreatedAt:   utils.NowTime(),
+		UpdatedAt:   utils.NowTime(),
+		StartedAt:   utils.DateTimeConvert(dto.StartedAt),
+		EndedAt:     utils.DateTimeConvert(dto.EndedAt),
 	}
 
 	var galleryIDs []Gallery
@@ -159,27 +152,20 @@ func (m *MysqlManager) UpdateProduct(c *gin.Context, ctx context.Context, dto DT
 	if dto.Name != "" {
 		product.Name = dto.Name
 	}
-	if dto.ShortDescription != "" {
-		product.ShortDescription = dto.ShortDescription
-	}
 	if dto.Quantity > 0 {
 		product.Quantity = dto.Quantity
 	}
 	if dto.Price > 0 {
 		product.Price = dto.Price
 	}
-	if dto.Active != "" {
-		product.Active = utils2.ActiveConvert(dto.Active)
-	}
-	product.UpdatedAt = utils2.NowTime()
+	product.Active = utils.ActiveConvert(dto.Active)
+
+	product.UpdatedAt = utils.NowTime()
 	if dto.StartedAt != "" {
-		product.StartedAt = utils2.DateTimeConvert(dto.StartedAt)
+		product.StartedAt = utils.DateTimeConvert(dto.StartedAt)
 	}
 	if dto.EndedAt != "" {
-		product.EndedAt = utils2.DateTimeConvert(dto.EndedAt)
-	}
-	if dto.DeliveryTime > 0 {
-		product.DeliveryTime = dto.DeliveryTime
+		product.EndedAt = utils.DateTimeConvert(dto.EndedAt)
 	}
 
 	err = m.GetConn().Save(&product).Error

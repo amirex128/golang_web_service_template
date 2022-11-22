@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+// UpdateProfile
+// @Summary ویرایش اطلاعات پروفایل کاربر
+// @description کاربر میتواند اطلاعات پروفایل خود را ویرایش نماید
+// @Tags user
+// @Router       /user/profile/update [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.UpdateUser  	true "ورودی"
 func UpdateProfile(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "registerLogin", "request")
 	defer span.End()

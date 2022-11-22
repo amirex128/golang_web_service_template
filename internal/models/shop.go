@@ -6,7 +6,6 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/gosimple/slug"
 	"go.elastic.co/apm/v2"
 	"net/http"
 )
@@ -14,10 +13,8 @@ import (
 type Shop struct {
 	ID            uint64     `gorm:"primary_key;auto_increment" json:"id"`
 	Name          string     `json:"name"`
-	EnglishName   string     `json:"english_name"`
 	Type          string     `json:"type" sql:"type:ENUM('instagram','telegram','website')"`
 	SocialAddress string     `json:"social_address"`
-	VerifySocial  bool       `json:"verify_social"`
 	SendPrice     float32    `json:"send_price"`
 	Description   string     `json:"description"`
 	Phone         string     `json:"phone"`
@@ -45,7 +42,6 @@ func initShop(manager *MysqlManager) {
 		manager.CreateShop(&gin.Context{}, context.Background(), DTOs.CreateShop{
 			Name:          "فروشگاه امیر",
 			Type:          "instagram",
-			EnglishName:   "instagram",
 			SocialAddress: "amirex_dev",
 			GalleryID:     1,
 			ThemeID:       1,
@@ -58,10 +54,8 @@ func (m *MysqlManager) CreateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	defer span.End()
 	shop := &Shop{
 		Name:          dto.Name,
-		EnglishName:   slug.MakeLang(dto.EnglishName, "en"),
 		Type:          dto.Type,
 		SocialAddress: dto.SocialAddress,
-		VerifySocial:  false,
 		SendPrice:     dto.SendPrice,
 		Description:   dto.Description,
 		Phone:         dto.Phone,
@@ -142,9 +136,6 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	if dto.Name != "" {
 		shop.Name = dto.Name
 	}
-	if dto.EnglishName != "" {
-		shop.EnglishName = slug.MakeLang(dto.EnglishName, "en")
-	}
 	if dto.Type != "" {
 		shop.Type = dto.Type
 	}
@@ -181,7 +172,6 @@ func (m *MysqlManager) UpdateShop(c *gin.Context, ctx context.Context, dto DTOs.
 	if dto.SendPrice != 0 {
 		shop.SendPrice = dto.SendPrice
 	}
-	shop.VerifySocial = dto.VerifySocial
 	err = m.GetConn().Save(shop).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

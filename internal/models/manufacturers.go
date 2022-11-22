@@ -1,7 +1,7 @@
 package models
 
 import (
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,7 +15,7 @@ type Manufacturer struct {
 
 func initManufacturer(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Manufacturer{})
-	manufacturer := utils2.ReadCsvFile("./csv/manufacturers.csv")
+	manufacturer := utils.ReadCsvFile("./csv/manufacturers.csv")
 	manager.CreateAllManufacturer(manufacturer)
 }
 
@@ -24,7 +24,7 @@ func (m *MysqlManager) CreateAllManufacturer(files [][]string) {
 	for i := range files {
 		value := files[i]
 		manufacturer = append(manufacturer, Manufacturer{
-			ID:               utils2.StringToInt(value[0]),
+			ID:               utils.StringToInt(value[0]),
 			CountryName:      value[2],
 			ShortDescription: value[3],
 			PersianName:      value[5],

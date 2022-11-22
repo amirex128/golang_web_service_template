@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,7 +17,7 @@ type FeatureGroup struct {
 
 func initFeatureGroup(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureGroup{})
-	featureGroups := utils2.ReadCsvFile("./csv/feature_groups.csv")
+	featureGroups := utils.ReadCsvFile("./csv/feature_groups.csv")
 	manager.CreateAllFeatureGroups(featureGroups)
 }
 func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
@@ -25,12 +25,12 @@ func (m *MysqlManager) CreateAllFeatureGroups(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureGroups = append(featureGroups, FeatureGroup{
-			ID:          utils2.StringToInt(value[0]),
-			CategoryID:  utils2.StringToInt(value[1]),
+			ID:          utils.StringToInt(value[0]),
+			CategoryID:  utils.StringToInt(value[1]),
 			Title:       value[2],
-			Icon:        utils2.StringConvert(value[3]),
-			Sort:        utils2.StringToUint(value[4]),
-			Description: utils2.StringConvert(value[5]),
+			Icon:        utils.StringConvert(value[3]),
+			Sort:        utils.StringToUint(value[4]),
+			Description: utils.StringConvert(value[5]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureGroups, 100).Error

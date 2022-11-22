@@ -9,6 +9,13 @@ import (
 	"net/http"
 )
 
+// CreateTicket
+// @Summary ایجاد تیکت
+// @description کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند
+// @Tags ticket
+// @Router       /user/ticket/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreateTicket  	true "ورودی"
 func CreateTicket(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createTicket", "request")
 	defer span.End()
@@ -28,6 +35,13 @@ func CreateTicket(c *gin.Context) {
 		"message": "تیکت شما با موفقیت ثبت شد و همکاران ما به زودی با شما تماس خواهد گرفت",
 	})
 }
+
+// IndexTicket
+// @Summary لیست تیکت ها
+// @description کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند
+// @Tags ticket
+// @Router       /user/ticket [get]
+// @Param	Authorization	 header string	true "Authentication"
 func IndexTicket(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexTicket", "request")
 	defer span.End()
@@ -42,6 +56,13 @@ func IndexTicket(c *gin.Context) {
 	})
 }
 
+// ShowTicket
+// @Summary نمایش تیکت های یک موضوع
+// @description کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند
+// @Tags ticket
+// @Router       /user/ticket/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه تیکت های یک موضوع" SchemaExample(1)
 func ShowTicket(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showTicket", "request")
 	defer span.End()

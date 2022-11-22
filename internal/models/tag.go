@@ -10,10 +10,11 @@ import (
 )
 
 type Tag struct {
-	ID    uint64 `json:"id"`
-	Name  string `json:"name"`
-	Slug  string `json:"slug"`
-	Posts []Post `gorm:"many2many:post_tag;" json:"posts"`
+	ID       uint64    `json:"id"`
+	Name     string    `json:"name"`
+	Slug     string    `json:"slug"`
+	Posts    []Post    `gorm:"many2many:post_tag;" json:"posts"`
+	Products []Product `gorm:"many2many:product_tag;" json:"products"`
 }
 
 func initTag(manager *MysqlManager) {
@@ -87,7 +88,12 @@ func (m *MysqlManager) DeleteTag(c *gin.Context, ctx context.Context, id uint64)
 func (m *MysqlManager) AddTag(c *gin.Context, ctx context.Context, dto DTOs.AddTag) (err error) {
 	span, ctx := apm.StartSpan(ctx, "AddTag", "model")
 	defer span.End()
-	err = m.GetConn().Model(&Post{ID: dto.PostID}).Association("Tags").Append(&Tag{ID: dto.TagID})
+	if dto.Type == "post" {
+		err = m.GetConn().Model(&Post{ID: dto.PostID}).Association("Tags").Append(&Tag{ID: dto.TagID})
+
+	} else {
+		err = m.GetConn().Model(&Product{ID: dto.ProductID}).Association("Tags").Append(&Tag{ID: dto.TagID})
+	}
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "خطا در افزودن تگ",

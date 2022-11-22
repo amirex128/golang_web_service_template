@@ -2,46 +2,64 @@ package DTOs
 
 type IndexProduct struct {
 	Index
-	ShopID uint64 `form:"shop_id" json:"shop_id"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" json:"shop_id" example:"0"`
 }
 
 type CreateProduct struct {
-	ShopID           uint64   `form:"shop_id" validate:"required"`
-	ManufacturerId   uint32   `form:"manufacturer_id" validate:"numeric"`
-	Description      string   `form:"description" validate:"required,min=3,max=1000"`
-	Name             string   `form:"name" validate:"required,min=3,max=100"`
-	ShortDescription string   `form:"short_description" validate:"required,min=3,max=300"`
-	Quantity         uint32   `form:"quantity" validate:"numeric"`
-	Price            float32  `form:"price" validate:"numeric"`
-	Weight           uint32   `form:"weight" validate:"numeric"`
-	Height           uint32   `form:"height" validate:"numeric"`
-	Width            uint32   `form:"width" validate:"numeric"`
-	StartedAt        string   `form:"started_at" validate:"datetime"`
-	EndedAt          string   `form:"ended_at" validate:"datetime"`
-	DeliveryTime     uint32   `form:"delivery_time" validate:"numeric"` // مدت زمان ارسال
-	OptionId         uint32   `form:"option_id" validate:"numeric"`
-	OptionItemID     uint32   `form:"option_item_id" validate:"numeric"`
-	CategoryID       uint64   `form:"category_id" validate:"required,numeric"`
-	GalleryIDs       []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"required,dive,numeric"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" validate:"required" example:"0"`
+	//برند محصول
+	Manufacturer string `form:"manufacturer_id" validate:"omitempty" example:"سامسونگ"`
+	//توضیحات محصول
+	Description string `form:"description" validate:"omitempty" example:"توضیحات محصول"`
+	//نام محصول
+	Name string `form:"name" validate:"required,min=3,max=100" example:"گوشی موبایل گلگسی نوت ۱۰"`
+	//تعداد موجودی
+	Quantity uint32 `form:"quantity" validate:"required,numeric" example:"10"`
+	//قیمت محصول
+	Price float32 `form:"price" validate:"required,numeric" example:"1000000"`
+	//تاریخ شروع فروش
+	StartedAt string `form:"started_at" validate:"omitempty,datetime" example:"2020-01-01 00:00:00"`
+	//تاریخ پایان فروش
+	EndedAt string `form:"ended_at" validate:"omitempty,datetime" example:"2025-01-01 00:00:00"`
+	//شناسه آشپن محصول
+	OptionId uint32 `form:"option_id" validate:"numeric" example:"1"`
+	//شناسه آیتم انتخاب شده از آپشن
+	OptionItemID uint32 `form:"option_item_id" validate:"numeric" example:"1"`
+	//شناسه دسته بندی
+	CategoryID uint64 `form:"category_id" validate:"required,numeric" example:"1"`
+	//شناسه تصاویر انتخاب شده برای این محصول
+	GalleryIDs []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"required,dive,numeric"`
 }
 
 type UpdateProduct struct {
-	ID               uint64   `form:"id" validate:"omitempty,numeric"`
-	ShopID           uint64   `form:"shop_id" validate:"omitempty,required"`
-	ManufacturerId   uint32   `form:"manufacturer_id" validate:"omitempty,numeric"`
-	Description      string   `form:"description" validate:"omitempty,min=3,max=1000"`
-	Name             string   `form:"name" validate:"omitempty,min=3,max=100"`
-	ShortDescription string   `form:"short_description" validate:"omitempty,min=3,max=300"`
-	Quantity         uint32   `form:"quantity" validate:"omitempty,numeric"`
-	Price            float32  `form:"price" validate:"omitempty,numeric"`
-	Weight           uint32   `form:"weight" validate:"omitempty,numeric"`
-	Height           uint32   `form:"height" validate:"omitempty,numeric"`
-	Width            uint32   `form:"width" validate:"omitempty,numeric"`
-	Active           string   `form:"active" validate:"omitempty,numeric"`
-	StartedAt        string   `form:"started_at" validate:"omitempty,datetime"`
-	EndedAt          string   `form:"ended_at" validate:"omitempty,datetime"`
-	DeliveryTime     uint32   `form:"delivery_time" validate:"omitempty,numeric"` // مدت زمان ارسال
-	OptionId         uint32   `form:"option_id" validate:"omitempty,numeric"`
-	OptionItemID     uint32   `form:"option_item_id" validate:"omitempty,numeric"`
-	GalleryIDs       []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"omitempty,dive,numeric"`
+	//شناسه محصول برای ویرایش
+	ID uint64 `form:"id" validate:"omitempty,numeric" example:"1"`
+	//شناسه فروشگاه جهت انتقال یک محصول از یک فروشگاه به فروشگاه دیگر
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"omitempty,numeric" example:"2"`
+	//برند محصول
+	Manufacturer string `form:"manufacturer_id" validate:"omitempty,numeric" example:"سامسونگ"`
+	//توضیحات محصول
+	Description string `form:"description" validate:"omitempty,min=3,max=1000" example:"توضیحات محصول"`
+	//نام محصول
+	Name string `form:"name" validate:"omitempty,min=3,max=100" example:"گوشی موبایل گلگسی نوت ۱۰"`
+	//تعداد موجودی
+	Quantity uint32 `form:"quantity" validate:"omitempty,numeric" example:"10"`
+	//قیمت محصول
+	Price float32 `form:"price" validate:"omitempty,numeric" example:"1000000"`
+	//وضعیت فعال یا غیر فعال بودن محصول
+	Active bool `form:"active" validate:"omitempty,numeric" example:"true"`
+	//تاریخ شروع فروش
+	StartedAt string `form:"started_at" validate:"omitempty,datetime" example:"2020-01-01 00:00:00"`
+	//تاریخ پایان فروش
+	EndedAt string `form:"ended_at" validate:"omitempty,datetime" example:"2025-01-01 00:00:00"`
+	//شناسه آیتم انتخاب شده از آپشن
+	OptionId uint32 `form:"option_id" validate:"omitempty,numeric" example:"1"`
+	//شناسه آیتم انتخاب شده از آپشن
+	OptionItemID uint32 `form:"option_item_id" validate:"omitempty,numeric" example:"1"`
+	//شناسه دسته بندی
+	CategoryID uint64 `form:"category_id" validate:"required,numeric" example:"1"`
+	//شناسه تصاویر انتخاب شده برای این محصول
+	GalleryIDs []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"omitempty,dive,numeric"`
 }

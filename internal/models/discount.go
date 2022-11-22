@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
 	"net/http"
@@ -65,16 +65,16 @@ func (m *MysqlManager) CreateDiscount(c *gin.Context, ctx context.Context, dto D
 	discount := Discount{
 		Code:       dto.Code,
 		UserID:     userID,
-		StartedAt:  utils2.DateTimeConvert(dto.StartedAt),
-		EndedAt:    utils2.DateTimeConvert(dto.EndedAt),
+		StartedAt:  utils.DateTimeConvert(dto.StartedAt),
+		EndedAt:    utils.DateTimeConvert(dto.EndedAt),
 		Count:      dto.Count,
 		Type:       dto.Type,
 		Amount:     dto.Amount,
 		Percent:    dto.Percent,
-		ProductIDs: strings.Join(utils2.Uint64ToStringArray(dto.ProductIDs), ","),
+		ProductIDs: strings.Join(utils.Uint64ToStringArray(dto.ProductIDs), ","),
 		Status:     dto.Status,
-		CreatedAt:  utils2.NowTime(),
-		UpdatedAt:  utils2.NowTime(),
+		CreatedAt:  utils.NowTime(),
+		UpdatedAt:  utils.NowTime(),
 	}
 	err := m.GetConn().Create(&discount).Error
 	if err != nil {
@@ -136,10 +136,10 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 		discount.Code = dto.Code
 	}
 	if dto.StartedAt != "" {
-		discount.StartedAt = utils2.DateTimeConvert(dto.StartedAt)
+		discount.StartedAt = utils.DateTimeConvert(dto.StartedAt)
 	}
 	if dto.EndedAt != "" {
-		discount.EndedAt = utils2.DateTimeConvert(dto.EndedAt)
+		discount.EndedAt = utils.DateTimeConvert(dto.EndedAt)
 	}
 	if dto.Count != 0 {
 		discount.Count = dto.Count
@@ -154,10 +154,10 @@ func (m *MysqlManager) UpdateDiscount(c *gin.Context, ctx context.Context, dto D
 		discount.Percent = dto.Percent
 	}
 	if dto.ProductIDs != nil {
-		discount.ProductIDs = strings.Join(utils2.Uint64ToStringArray(dto.ProductIDs), ",")
+		discount.ProductIDs = strings.Join(utils.Uint64ToStringArray(dto.ProductIDs), ",")
 	}
 	discount.Status = dto.Status
-	discount.UpdatedAt = utils2.NowTime()
+	discount.UpdatedAt = utils.NowTime()
 	err = m.GetConn().Save(discount).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"go.elastic.co/apm"
@@ -39,18 +39,18 @@ func initCategory(manager *MysqlManager) bool {
 		return false
 	}
 
-	categories := utils2.ReadCsvFile("./csv/categories.csv")
+	categories := utils.ReadCsvFile("./csv/categories.csv")
 	manager.CreateAllCategories(categories)
-	categoryRelated := utils2.ReadCsvFile("./csv/category_related.csv")
+	categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
 	manager.CreateAllCategoryRelated(categoryRelated)
 
 	for i := 0; i < 10; i++ {
 		manager.CreateCategory(&gin.Context{}, context.Background(), DTOs.CreateCategory{
-			Name:        "دسته بندی " + utils2.IntToString(i),
+			Name:        "دسته بندی " + utils.IntToString(i),
 			Type:        "post",
 			GalleryID:   0,
-			Equivalent:  "کلمه مترادف" + utils2.IntToString(i),
-			Description: "توضیحات دسته بندی " + utils2.IntToString(i),
+			Equivalent:  "کلمه مترادف" + utils.IntToString(i),
+			Description: "توضیحات دسته بندی " + utils.IntToString(i),
 		})
 	}
 	return true
@@ -110,13 +110,13 @@ func (m *MysqlManager) CreateAllCategories(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categories = append(categories, Category{
-			ID:          utils2.StringToUint64(value[0]),
-			ParentID:    utils2.StringToUint64(value[1]),
+			ID:          utils.StringToUint64(value[0]),
+			ParentID:    utils.StringToUint64(value[1]),
 			GalleryID:   nil,
 			UserID:      nil,
 			Name:        value[2],
 			Type:        "product",
-			Sort:        utils2.StringToUint32(value[3]),
+			Sort:        utils.StringToUint32(value[3]),
 			Equivalent:  value[4],
 			Description: value[7],
 		})
@@ -132,8 +132,8 @@ func (m *MysqlManager) CreateAllCategoryRelated(files [][]string) {
 	for i := range files {
 		value := files[i]
 		categoryRelated = append(categoryRelated, CategoryRelated{
-			CategoryID:        utils2.StringToUint32(value[0]),
-			CategoryRelatedID: utils2.StringToUint32(value[1]),
+			CategoryID:        utils.StringToUint32(value[0]),
+			CategoryRelatedID: utils.StringToUint32(value[1]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(categoryRelated, 100).Error

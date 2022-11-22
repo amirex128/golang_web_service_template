@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/amirex128/selloora_backend/internal/models"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -45,8 +45,8 @@ func BlogLanding(c *gin.Context) {
 	}
 	postArray := posts.Data.([]models.Post)
 	for i := range postArray {
-		postArray[i].CreatedAt = utils2.DateToJalaali(postArray[i].CreatedAt)
-		postArray[i].UpdatedAt = utils2.DateToJalaali(postArray[i].UpdatedAt)
+		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
 	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
@@ -65,14 +65,14 @@ func BlogLanding(c *gin.Context) {
 	}
 	for i := range randomPosts {
 		randomPosts[i].CreatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].CreatedAt)
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 		randomPosts[i].UpdatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].UpdatedAt)
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
@@ -107,18 +107,18 @@ func CategoryLanding(c *gin.Context) {
 		return
 	}
 	categoryID := c.Param("id")
-	category, err := models.NewMysqlManager(ctx).FindCategoryByID(c, ctx, utils2.StringToUint64(categoryID))
+	category, err := models.NewMysqlManager(ctx).FindCategoryByID(c, ctx, utils.StringToUint64(categoryID))
 	if err != nil {
 		return
 	}
-	posts, err := models.NewMysqlManager(ctx).GetAllCategoryPostWithPagination(c, ctx, dto, utils2.StringToUint32(categoryID))
+	posts, err := models.NewMysqlManager(ctx).GetAllCategoryPostWithPagination(c, ctx, dto, utils.StringToUint32(categoryID))
 	if err != nil {
 		return
 	}
 	postArray := posts.Data.([]models.Post)
 	for i := range postArray {
-		postArray[i].CreatedAt = utils2.DateToJalaali(postArray[i].CreatedAt)
-		postArray[i].UpdatedAt = utils2.DateToJalaali(postArray[i].UpdatedAt)
+		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
 	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
@@ -137,14 +137,14 @@ func CategoryLanding(c *gin.Context) {
 	}
 	for i := range randomPosts {
 		randomPosts[i].CreatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].CreatedAt)
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 		randomPosts[i].UpdatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].UpdatedAt)
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
@@ -189,8 +189,8 @@ func TagLanding(c *gin.Context) {
 	}
 	postArray := posts.Data.([]models.Post)
 	for i := range postArray {
-		postArray[i].CreatedAt = utils2.DateToJalaali(postArray[i].CreatedAt)
-		postArray[i].UpdatedAt = utils2.DateToJalaali(postArray[i].UpdatedAt)
+		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
 	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
@@ -209,14 +209,14 @@ func TagLanding(c *gin.Context) {
 	}
 	for i := range randomPosts {
 		randomPosts[i].CreatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].CreatedAt)
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 		randomPosts[i].UpdatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].UpdatedAt)
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
@@ -253,8 +253,8 @@ func DetailsLanding(c *gin.Context) {
 		return
 	}
 
-	post.CreatedAt = utils2.DateToJalaali(post.CreatedAt)
-	post.UpdatedAt = utils2.DateToJalaali(post.UpdatedAt)
+	post.CreatedAt = utils.DateToJalaali(post.CreatedAt)
+	post.UpdatedAt = utils.DateToJalaali(post.UpdatedAt)
 
 	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
 	if err != nil {
@@ -272,14 +272,14 @@ func DetailsLanding(c *gin.Context) {
 	}
 	for i := range randomPosts {
 		randomPosts[i].CreatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].CreatedAt)
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 		randomPosts[i].UpdatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].UpdatedAt)
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
@@ -292,15 +292,15 @@ func DetailsLanding(c *gin.Context) {
 		return
 	}
 	for i := range lastPost {
-		lastPost[i].CreatedAt = utils2.DateToJalaali(lastPost[i].CreatedAt)
-		lastPost[i].UpdatedAt = utils2.DateToJalaali(lastPost[i].UpdatedAt)
+		lastPost[i].CreatedAt = utils.DateToJalaali(lastPost[i].CreatedAt)
+		lastPost[i].UpdatedAt = utils.DateToJalaali(lastPost[i].UpdatedAt)
 	}
 	comments, err := models.NewMysqlManager(ctx).GetAllComments(c, ctx, post.ID)
 	if err != nil {
 		return
 	}
 	for i := range comments {
-		comments[i].EmailHash = utils2.GetMD5Hash(comments[i].Email)
+		comments[i].EmailHash = utils.GetMD5Hash(comments[i].Email)
 	}
 	shop, domain, theme, err := models.NewMysqlManager(ctx).FindShopByDomain(c, ctx, c.Request.Host)
 	if err != nil {
@@ -336,8 +336,8 @@ func SearchLanding(c *gin.Context) {
 	}
 	postArray := posts.Data.([]models.Post)
 	for i := range postArray {
-		postArray[i].CreatedAt = utils2.DateToJalaali(postArray[i].CreatedAt)
-		postArray[i].UpdatedAt = utils2.DateToJalaali(postArray[i].UpdatedAt)
+		postArray[i].CreatedAt = utils.DateToJalaali(postArray[i].CreatedAt)
+		postArray[i].UpdatedAt = utils.DateToJalaali(postArray[i].UpdatedAt)
 	}
 	posts.Data = postArray
 	tags, err := models.NewMysqlManager(ctx).RandomTags(c, ctx, 20)
@@ -356,14 +356,14 @@ func SearchLanding(c *gin.Context) {
 	}
 	for i := range randomPosts {
 		randomPosts[i].CreatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].CreatedAt)
+			ago := utils.DateAgo(randomPosts[i].CreatedAt)
 			if ago == 0 {
 				return "امروز"
 			}
 			return fmt.Sprintf("%d روز قبل", ago)
 		}()
 		randomPosts[i].UpdatedAt = func() string {
-			ago := utils2.DateAgo(randomPosts[i].UpdatedAt)
+			ago := utils.DateAgo(randomPosts[i].UpdatedAt)
 			if ago == 0 {
 				return "امروز"
 			}

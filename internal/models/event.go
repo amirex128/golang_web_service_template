@@ -1,7 +1,7 @@
 package models
 
 import (
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 	"strconv"
 )
@@ -16,7 +16,7 @@ type Event struct {
 
 func initEvent(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Event{})
-	events := utils2.ReadCsvFile("./csv/events.csv")
+	events := utils.ReadCsvFile("./csv/events.csv")
 	manager.CreateAllEvents(events)
 }
 func (m *MysqlManager) CreateAllEvents(files [][]string) {
@@ -29,7 +29,7 @@ func (m *MysqlManager) CreateAllEvents(files [][]string) {
 				return val
 			}(),
 			Name:      value[1],
-			Active:    utils2.ActiveConvert(value[2]),
+			Active:    utils.ActiveConvert(value[2]),
 			StartedAt: value[3],
 			EndedAt:   value[4],
 		})

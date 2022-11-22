@@ -10,6 +10,13 @@ import (
 	"net/http"
 )
 
+// CreatePost
+// @Summary ایجاد مقاله
+// @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
+// @Tags post
+// @Router       /user/post/create [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.CreatePost  	true "ورودی"
 func CreatePost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "createPost", "request")
 	defer span.End()
@@ -33,6 +40,13 @@ func CreatePost(c *gin.Context) {
 	})
 }
 
+// UpdatePost
+// @Summary ویرایش مقاله
+// @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
+// @Tags post
+// @Router       /user/post/update [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	message	 body   DTOs.UpdatePost  	true "ورودی"
 func UpdatePost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "updatePost", "request")
 	defer span.End()
@@ -54,6 +68,13 @@ func UpdatePost(c *gin.Context) {
 	})
 }
 
+// ShowPost
+// @Summary نمایش مقاله
+// @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
+// @Tags post
+// @Router       /user/post/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه " SchemaExample(1)
 func ShowPost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showPost", "request")
 	defer span.End()
@@ -67,6 +88,16 @@ func ShowPost(c *gin.Context) {
 	})
 }
 
+// IndexPost
+// @Summary لیست مقالات
+// @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
+// @Tags post
+// @Router       /user/post [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexPost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexPost", "request")
 	defer span.End()
@@ -85,6 +116,13 @@ func IndexPost(c *gin.Context) {
 
 }
 
+// DeletePost
+// @Summary حدف مقاله
+// @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
+// @Tags post
+// @Router       /user/post/delete/{id} [post]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه " SchemaExample(1)
 func DeletePost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deletePost", "request")
 	defer span.End()

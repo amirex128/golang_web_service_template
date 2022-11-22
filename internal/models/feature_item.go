@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +21,7 @@ type FeatureItem struct {
 func initFeatureItem(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&FeatureItem{})
 	initFeatureItemProduct(manager)
-	featureItems := utils2.ReadCsvFile("./csv/feature_items.csv")
+	featureItems := utils.ReadCsvFile("./csv/feature_items.csv")
 	manager.CreateAllFeatureItems(featureItems)
 }
 
@@ -30,15 +30,15 @@ func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {
 	for i := range files {
 		value := files[i]
 		featureItems = append(featureItems, FeatureItem{
-			ID:            utils2.StringToInt(value[0]),
-			FeatureItemID: utils2.StringToInt(value[1]),
+			ID:            utils.StringToInt(value[0]),
+			FeatureItemID: utils.StringToInt(value[1]),
 			Title:         value[2],
 			Type:          value[3],
 			Actions:       value[4],
-			Active:        utils2.ActiveConvert(value[5]),
-			Icon:          utils2.StringConvert(value[6]),
+			Active:        utils.ActiveConvert(value[5]),
+			Icon:          utils.StringConvert(value[6]),
 			InputType:     value[7],
-			Sort:          utils2.StringToUint(value[8]),
+			Sort:          utils.StringToUint(value[8]),
 		})
 	}
 	err := m.GetConn().CreateInBatches(featureItems, 100).Error

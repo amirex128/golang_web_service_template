@@ -5,7 +5,7 @@ import (
 	"github.com/Squwid/go-randomizer"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -29,7 +29,7 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	dif := utils2.DifferentWithNow(customer.LastSendSMSAt)
+	dif := utils.DifferentWithNow(customer.LastSendSMSAt)
 	var randCode string
 	var lastSendSMSAt string
 	if dif < 7200 && dif > 0 {
@@ -37,7 +37,7 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 		lastSendSMSAt = customer.LastSendSMSAt
 	} else {
 		randCode = fmt.Sprintf("%d", randomizer.Number(1000, 9999))
-		lastSendSMSAt = utils2.NowTime()
+		lastSendSMSAt = utils.NowTime()
 	}
 	if customer.ID > 0 {
 		_, err = models.NewMysqlManager(ctx).UpdateCustomer(c, nil, DTOs.CreateUpdateCustomer{
@@ -59,7 +59,7 @@ func RequestCreateLoginCustomer(c *gin.Context) {
 		return
 	}
 	text := fmt.Sprintf("%s %s : %s", "کد تایید", shop.Name, randCode)
-	err = utils2.SendSMS(c, ctx, dto.Mobile, text, true)
+	err = utils.SendSMS(c, ctx, dto.Mobile, text, true)
 	if err != nil {
 		return
 	}

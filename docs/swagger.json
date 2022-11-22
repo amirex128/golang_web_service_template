@@ -17,6 +17,90 @@
     "host": "localhost:8585",
     "basePath": "/",
     "paths": {
+        "/forget": {
+            "post": {
+                "description": "در صورتی که کاربر پسورد خود را فراموش کرده باشد با استفاده از این وبسرویس درخواست کد تائید میتواند برای شماره همراه خود بدهد و بعد از دریافت کد تائید میتواند به وبسرویس ورود برود و در آنجا پسورد خود را با استفاده از توکن دریافتی عوض کند",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "فراموشی رمز عبور",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.ChangePassword"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/login/register": {
+            "post": {
+                "description": "بعد از وارد کردن شماره همراه در صورت ثبت نام شما و تنظیم شدن پسورد بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "ثبت نام و ورود",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.RequestLoginRegister"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/profile/change-password": {
+            "post": {
+                "description": "درصورتی که کاربر ثبت نام نکرده بود و کد تائید را وارد نمود یک توکن دریافت میکند که میتواند با استفاده از آن توکن پسورد خود را تغییر دهد",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "تغییر پسورد",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.ChangePassword"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/address/create": {
             "post": {
                 "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
@@ -207,6 +291,32 @@
                         "schema": {
                             "$ref": "#/definitions/DTOs.CreateCategory"
                         }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/category/delete/{id}": {
+            "post": {
+                "description": "کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند",
+                "tags": [
+                    "category"
+                ],
+                "summary": "حذف دسته بندی",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه آدرس",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -1097,6 +1207,32 @@
         },
         "/user/order/show/{id}": {
             "get": {
+                "description": "مشتری نیاز دارد سفارش خود را از طریق پنل مشتری مشاهده نماید",
+                "tags": [
+                    "order"
+                ],
+                "summary": "نمایش جزئیات سفارش",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه سفارش",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/tracking/{id}": {
+            "get": {
                 "description": "مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش در چه مرحله ای به سر میبرد",
                 "tags": [
                     "order"
@@ -1120,6 +1256,1004 @@
                 ],
                 "responses": {}
             }
+        },
+        "/user/page": {
+            "get": {
+                "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
+                "tags": [
+                    "page"
+                ],
+                "summary": "لیست صفحه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/page/create": {
+            "post": {
+                "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
+                "tags": [
+                    "page"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreatePage"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/page/delete/{id}": {
+            "post": {
+                "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
+                "tags": [
+                    "page"
+                ],
+                "summary": "حذف صفحه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه صفحه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/page/update": {
+            "post": {
+                "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
+                "tags": [
+                    "page"
+                ],
+                "summary": "ویرایش صفحه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdatePage"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/post": {
+            "get": {
+                "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
+                "tags": [
+                    "post"
+                ],
+                "summary": "لیست مقالات",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/post/create": {
+            "post": {
+                "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
+                "tags": [
+                    "post"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreatePost"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/post/delete/{id}": {
+            "post": {
+                "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
+                "tags": [
+                    "post"
+                ],
+                "summary": "حدف مقاله",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/post/show/{id}": {
+            "get": {
+                "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
+                "tags": [
+                    "post"
+                ],
+                "summary": "نمایش مقاله",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/post/update": {
+            "post": {
+                "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
+                "tags": [
+                    "post"
+                ],
+                "summary": "ویرایش مقاله",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdatePost"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/product": {
+            "get": {
+                "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
+                "tags": [
+                    "product"
+                ],
+                "summary": "لیست محصولات",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/product/create": {
+            "post": {
+                "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
+                "tags": [
+                    "product"
+                ],
+                "summary": "ایجاد محصول",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateProduct"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/product/delete/{id}": {
+            "post": {
+                "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
+                "tags": [
+                    "product"
+                ],
+                "summary": "حذف محصول",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه محصول",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/product/show/{id}": {
+            "get": {
+                "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
+                "tags": [
+                    "product"
+                ],
+                "summary": "نمایش محصول",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه محصول",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/product/update": {
+            "post": {
+                "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
+                "tags": [
+                    "product"
+                ],
+                "summary": "ویرایش محصول",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateProduct"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/profile/update": {
+            "post": {
+                "description": "کاربر میتواند اطلاعات پروفایل خود را ویرایش نماید",
+                "tags": [
+                    "user"
+                ],
+                "summary": "ویرایش اطلاعات پروفایل کاربر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateUser"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop": {
+            "get": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "لیست فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/create": {
+            "post": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "ایجاد فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateShop"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/delete/{id}": {
+            "post": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "حذف فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه فروشگاه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/send-price": {
+            "post": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "ویرایش هزینه ارسال سفارشات به صورت جدا",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.SendPrice"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/show/{id}": {
+            "get": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "نمایش فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه فروشگاه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/update": {
+            "post": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "ویرایش فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateShop"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/slider": {
+            "get": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "slider"
+                ],
+                "summary": "لیست اسلایدر ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/slider/create": {
+            "post": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "slider"
+                ],
+                "summary": "ایجاد اسلایدر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateSlider"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/slider/delete/{id}": {
+            "post": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "slider"
+                ],
+                "summary": "حذف اسلایدر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه اسلایدر",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/slider/update": {
+            "post": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "slider"
+                ],
+                "summary": "ویرایش اسلایدر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.UpdateSlider"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/tag": {
+            "get": {
+                "description": "مقالات یا محصولات برای سئو بیشتر میتوانند بر روی خود تگ قرار دهند تا برای کلمات کلیدی مورد نظر بهترین نتیجه را به دست آورند",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "لیست تگ ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/tag/add": {
+            "post": {
+                "description": "مقالات یا محصولات برای سئو بیشتر میتوانند بر روی خود تگ قرار دهند تا برای کلمات کلیدی مورد نظر بهترین نتیجه را به دست آورند",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "افزودن یک تگ به محصول یا مقاله",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateTag"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/tag/create": {
+            "post": {
+                "description": "مقالات یا محصولات برای سئو بیشتر میتوانند بر روی خود تگ قرار دهند تا برای کلمات کلیدی مورد نظر بهترین نتیجه را به دست آورند",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "ایجاد تگ",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateTag"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/tag/delete/{id}": {
+            "post": {
+                "description": "مقالات یا محصولات برای سئو بیشتر میتوانند بر روی خود تگ قرار دهند تا برای کلمات کلیدی مورد نظر بهترین نتیجه را به دست آورند",
+                "tags": [
+                    "tag"
+                ],
+                "summary": "حذف تگ",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه تگ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/theme": {
+            "get": {
+                "description": "کاربر در هنگام ایجاد فروشگاه باید قالب فروشگاه خود را انتخاب نماید یا این که در آینده بتواند قالب خود را تغییر دهد",
+                "tags": [
+                    "theme"
+                ],
+                "summary": "لیست قالب ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/ticket": {
+            "get": {
+                "description": "کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند",
+                "tags": [
+                    "ticket"
+                ],
+                "summary": "لیست تیکت ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/ticket/create": {
+            "post": {
+                "description": "کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند",
+                "tags": [
+                    "ticket"
+                ],
+                "summary": "ایجاد تیکت",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateTicket"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/ticket/show/{id}": {
+            "get": {
+                "description": "کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند",
+                "tags": [
+                    "ticket"
+                ],
+                "summary": "نمایش تیکت های یک موضوع",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه تیکت های یک موضوع",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -1133,16 +2267,52 @@
             ],
             "properties": {
                 "address_id": {
-                    "type": "integer"
+                    "description": "شناسه آدرس مبدا ارسال سفارش",
+                    "type": "integer",
+                    "example": 1
                 },
                 "package_size": {
-                    "type": "string"
+                    "description": "ابعاد بسته مورد نیاز جهت ارسال",
+                    "type": "string",
+                    "enum": [
+                        "10x10x10",
+                        "20x20x20",
+                        "30x30x30"
+                    ],
+                    "example": "10x10x10"
                 },
                 "value": {
-                    "type": "integer"
+                    "description": "ارزش تقریبی کل سفارشات جهت بیمه ارسال",
+                    "type": "integer",
+                    "example": 10000
                 },
                 "weight": {
-                    "type": "integer"
+                    "description": "وزن کل سفارشات",
+                    "type": "integer",
+                    "example": 1000
+                }
+            }
+        },
+        "DTOs.ChangePassword": {
+            "type": "object",
+            "required": [
+                "again_password",
+                "password"
+            ],
+            "properties": {
+                "again_password": {
+                    "description": "تکرار پسورد",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6,
+                    "example": "123456789"
+                },
+                "password": {
+                    "description": "پسورد",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6,
+                    "example": "123456789"
                 }
             }
         },
@@ -1382,13 +2552,23 @@
             ],
             "properties": {
                 "name": {
-                    "type": "string"
+                    "description": "نام دامنه که باید یا به صورت\nexample.com\nیا به صورت ساب دامنه سلورا\nexample.selloora.com",
+                    "type": "string",
+                    "example": "example.com"
                 },
                 "shop_id": {
-                    "type": "integer"
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
                 },
                 "type": {
-                    "type": "string"
+                    "description": "نوع دامنه که یا ساب دامنه میباشد یا دامنه اختصاصی",
+                    "type": "string",
+                    "enum": [
+                        "domain",
+                        "subdomain"
+                    ],
+                    "example": "domain"
                 }
             }
         },
@@ -1400,10 +2580,14 @@
             ],
             "properties": {
                 "height": {
-                    "type": "integer"
+                    "description": "طول تصویر",
+                    "type": "integer",
+                    "example": 300
                 },
                 "width": {
-                    "type": "integer"
+                    "description": "عرض تصویر",
+                    "type": "integer",
+                    "example": 300
                 }
             }
         },
@@ -1411,19 +2595,35 @@
             "type": "object",
             "properties": {
                 "link": {
-                    "type": "string"
+                    "description": "لینک منو",
+                    "type": "string",
+                    "example": "https://example.selloora.com/page/test"
                 },
                 "name": {
-                    "type": "string"
+                    "description": "نام منو برای نمایش در لیست ها",
+                    "type": "string",
+                    "example": "خانه"
                 },
                 "parent_id": {
-                    "type": "integer"
+                    "description": "شناسه منو بالا سری برای منو های اصلی و باید صفر ارسال شود",
+                    "type": "integer",
+                    "example": 0
                 },
                 "position": {
-                    "type": "string"
+                    "description": "محل قرار گیری منو در قالب که با توجه به تنظیمات قالب میباشد",
+                    "type": "string",
+                    "enum": [
+                        "top",
+                        "bottom",
+                        "right",
+                        "left"
+                    ],
+                    "example": "top"
                 },
                 "shop_id": {
-                    "type": "integer"
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1438,30 +2638,387 @@
             ],
             "properties": {
                 "customer_id": {
-                    "type": "integer"
+                    "description": "شناسه مشتری",
+                    "type": "integer",
+                    "example": 1
                 },
                 "description": {
-                    "type": "string"
+                    "description": "توضیحات سفارش",
+                    "type": "string",
+                    "example": "توضیحات ارسال سفارش"
                 },
                 "discount_code": {
-                    "type": "string"
+                    "description": "کد تخفیف",
+                    "type": "string",
+                    "example": "asdf"
                 },
                 "order_items": {
+                    "description": "لیست اقلام داخل سفارش",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/DTOs.OrderItem"
                     }
                 },
                 "shop_id": {
-                    "type": "integer"
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
                 },
                 "user_id": {
-                    "type": "integer"
+                    "description": "شناسه مالک فروشگاه",
+                    "type": "integer",
+                    "example": 1
                 },
                 "verify_code": {
+                    "description": "کد تائید سفارش که حکم تکن را برای مشاری دارد",
                     "type": "string",
                     "maxLength": 20,
-                    "minLength": 2
+                    "minLength": 2,
+                    "example": "1524"
+                }
+            }
+        },
+        "DTOs.CreatePage": {
+            "type": "object",
+            "required": [
+                "body",
+                "shop_id",
+                "slug",
+                "title",
+                "type"
+            ],
+            "properties": {
+                "body": {
+                    "description": "محتوا صفحه که میتواند از اچ تی ام ال تشکیل شده باشد",
+                    "type": "string",
+                    "example": "\u003cp\u003eمتن صفحه درباره ما\u003c/p\u003e"
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "slug": {
+                    "description": "آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد",
+                    "type": "string",
+                    "example": "about-us"
+                },
+                "title": {
+                    "description": "عنوان صفحه",
+                    "type": "string",
+                    "example": "درباره ما"
+                },
+                "type": {
+                    "description": "نوع صفحه که همراه با چارچوب قالب باشد یا صفحه کاملا خالی",
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "blank"
+                    ],
+                    "example": "normal"
+                }
+            }
+        },
+        "DTOs.CreatePost": {
+            "type": "object",
+            "required": [
+                "body",
+                "category_id",
+                "gallery_id",
+                "slug",
+                "title"
+            ],
+            "properties": {
+                "body": {
+                    "description": "محتوای مقاله که میتواند از اچ تی ام ال تشکیل شده باشد",
+                    "type": "string",
+                    "example": "\u003cp\u003eمتن مقاله\u003c/p\u003e"
+                },
+                "category_id": {
+                    "description": "شناسه دسته بندی مقاله",
+                    "type": "integer",
+                    "example": 1
+                },
+                "gallery_id": {
+                    "description": "شناسه تصویر شاخص مقاله",
+                    "type": "integer",
+                    "example": 1
+                },
+                "slug": {
+                    "description": "آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد",
+                    "type": "string",
+                    "example": "amoozesh-barnamenevisi"
+                },
+                "title": {
+                    "description": "عنوان مقاله",
+                    "type": "string",
+                    "example": "آموزش برنامه نویسی"
+                }
+            }
+        },
+        "DTOs.CreateProduct": {
+            "type": "object",
+            "required": [
+                "categoryID",
+                "gallery_ids",
+                "name",
+                "price",
+                "quantity",
+                "shopID"
+            ],
+            "properties": {
+                "categoryID": {
+                    "description": "شناسه دسته بندی",
+                    "type": "integer",
+                    "example": 1
+                },
+                "description": {
+                    "description": "توضیحات محصول",
+                    "type": "string",
+                    "example": "توضیحات محصول"
+                },
+                "endedAt": {
+                    "description": "تاریخ پایان فروش",
+                    "type": "string",
+                    "example": "2025-01-01 00:00:00"
+                },
+                "gallery_ids": {
+                    "description": "شناسه تصاویر انتخاب شده برای این محصول",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "manufacturer": {
+                    "description": "برند محصول",
+                    "type": "string",
+                    "example": "سامسونگ"
+                },
+                "name": {
+                    "description": "نام محصول",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "گوشی موبایل گلگسی نوت ۱۰"
+                },
+                "optionId": {
+                    "description": "شناسه آشپن محصول",
+                    "type": "integer",
+                    "example": 1
+                },
+                "optionItemID": {
+                    "description": "شناسه آیتم انتخاب شده از آپشن",
+                    "type": "integer",
+                    "example": 1
+                },
+                "price": {
+                    "description": "قیمت محصول",
+                    "type": "number",
+                    "example": 1000000
+                },
+                "quantity": {
+                    "description": "تعداد موجودی",
+                    "type": "integer",
+                    "example": 10
+                },
+                "shopID": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 0
+                },
+                "startedAt": {
+                    "description": "تاریخ شروع فروش",
+                    "type": "string",
+                    "example": "2020-01-01 00:00:00"
+                }
+            }
+        },
+        "DTOs.CreateShop": {
+            "type": "object",
+            "required": [
+                "name",
+                "social_address",
+                "type"
+            ],
+            "properties": {
+                "description": {
+                    "description": "توضیحات فروشگاه",
+                    "type": "string",
+                    "example": "توضیحات فروشگاه"
+                },
+                "email": {
+                    "description": "ایمیل برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128@gmail.com"
+                },
+                "gallery_id": {
+                    "description": "تصویر لوگو فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "instagram_id": {
+                    "description": "آیدی اینستاگرام برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex_dev"
+                },
+                "mobile": {
+                    "description": "شماره موبایل برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "name": {
+                    "description": "نام فروشگاه",
+                    "type": "string",
+                    "example": "فروشگاه امیر"
+                },
+                "phone": {
+                    "description": "شماره تلفن برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "05136643278"
+                },
+                "send_price": {
+                    "description": "هزینه ارسال تومان",
+                    "type": "number",
+                    "example": 20000
+                },
+                "social_address": {
+                    "description": "آدرس شبکه اجتماعیی که میخواهید متصل کنید به فروشگاه برای دریافت محصولات از ان",
+                    "type": "string",
+                    "example": "amirex_dev"
+                },
+                "telegram_id": {
+                    "description": "آیدی تلگرام برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128"
+                },
+                "theme_id": {
+                    "description": "شناسه قالب",
+                    "type": "integer",
+                    "example": 1
+                },
+                "type": {
+                    "description": "نوع فروشگاه که میتواند به صورت اینستاگرامی باشد یا وبسایتی باشد یا روبیکا یا ربات تلگرام",
+                    "type": "string",
+                    "enum": [
+                        "instagram",
+                        "telegram",
+                        "website",
+                        "rubika"
+                    ],
+                    "example": "instagram"
+                },
+                "website": {
+                    "description": "وبسایت شخصی برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "https://amirshirdel.ir"
+                },
+                "whatsapp_id": {
+                    "description": "آیدی واتس آپ برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128"
+                }
+            }
+        },
+        "DTOs.CreateSlider": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "توضیحات اسلایدر",
+                    "type": "string",
+                    "example": "توضیحات اسلایدر"
+                },
+                "gallery_id": {
+                    "description": "تصویر اسلایدر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "link": {
+                    "description": "لینک اسلایدر",
+                    "type": "string",
+                    "example": "https://google.com"
+                },
+                "position": {
+                    "description": "محل قرار گیری اسلایدر",
+                    "type": "string",
+                    "enum": [
+                        "top",
+                        "bottom",
+                        "right",
+                        "left"
+                    ],
+                    "example": "top"
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "description": "عنوان اسلایدر",
+                    "type": "string",
+                    "example": "عنوان اسلایدر"
+                }
+            }
+        },
+        "DTOs.CreateTag": {
+            "type": "object",
+            "required": [
+                "name",
+                "slug"
+            ],
+            "properties": {
+                "name": {
+                    "description": "عنوان تگ",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 3,
+                    "example": "عنوان تگ"
+                },
+                "slug": {
+                    "description": "آدرس تگ",
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 3,
+                    "example": "slug-tag"
+                }
+            }
+        },
+        "DTOs.CreateTicket": {
+            "type": "object",
+            "required": [
+                "body",
+                "title"
+            ],
+            "properties": {
+                "body": {
+                    "description": "متن تیکت بدون اچ تی ام ال باید باشد",
+                    "type": "string",
+                    "example": "متن پیام"
+                },
+                "gallery_id": {
+                    "description": "فایل تصویری پیوست شده",
+                    "type": "integer",
+                    "example": 1
+                },
+                "guest_mobile": {
+                    "description": "موبایل کاربری که ثبت نام نکرده و از طریق سایت پیام میگذارد",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "guest_name": {
+                    "description": "نام کاربری که ثبت نام نکرده و از طریق سایت پیام میگذارد",
+                    "type": "string",
+                    "example": "امیر"
+                },
+                "parent_id": {
+                    "description": "شناسه تیکت قبلی",
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "description": "عنوان تیکت",
+                    "type": "string",
+                    "example": "عنوان"
                 }
             }
         },
@@ -1525,13 +3082,19 @@
             ],
             "properties": {
                 "count": {
-                    "type": "integer"
+                    "description": "تعداد",
+                    "type": "integer",
+                    "example": 10
                 },
                 "option_id": {
-                    "type": "integer"
+                    "description": "شناسه آپشن محصول",
+                    "type": "integer",
+                    "example": 1
                 },
                 "product_id": {
-                    "type": "integer"
+                    "description": "شناسه محصول",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1571,6 +3134,21 @@
                 }
             }
         },
+        "DTOs.RequestLoginRegister": {
+            "type": "object",
+            "required": [
+                "mobile"
+            ],
+            "properties": {
+                "mobile": {
+                    "description": "موبایل",
+                    "type": "string",
+                    "maxLength": 11,
+                    "minLength": 11,
+                    "example": "09024809750"
+                }
+            }
+        },
         "DTOs.SendOrder": {
             "type": "object",
             "required": [
@@ -1583,26 +3161,62 @@
             ],
             "properties": {
                 "address_id": {
-                    "type": "integer"
+                    "description": "شناسه آدرس مبدا ارسال سفارش",
+                    "type": "integer",
+                    "example": 1
                 },
                 "courier": {
+                    "description": "شرکت سرویس دهنده جهت ارسال سفارش",
                     "type": "string",
                     "enum": [
                         "tipax",
                         "post"
-                    ]
+                    ],
+                    "example": "tipax"
                 },
                 "order_id": {
-                    "type": "integer"
+                    "description": "شناسه سفارش",
+                    "type": "integer",
+                    "example": 1
                 },
                 "package_size": {
-                    "type": "string"
+                    "description": "ابعاد بسته مورد نیاز جهت ارسال",
+                    "type": "string",
+                    "enum": [
+                        "10x10x10",
+                        "20x20x20",
+                        "30x30x30"
+                    ],
+                    "example": "10x10x10"
                 },
                 "value": {
-                    "type": "integer"
+                    "description": "ارزش تقریبی کل سفارشات جهت بیمه ارسال به تومان",
+                    "type": "integer",
+                    "example": 10000
                 },
                 "weight": {
-                    "type": "integer"
+                    "description": "وزن کل سفارشات بر گرم",
+                    "type": "integer",
+                    "example": 1000
+                }
+            }
+        },
+        "DTOs.SendPrice": {
+            "type": "object",
+            "required": [
+                "send_price",
+                "shop_id"
+            ],
+            "properties": {
+                "send_price": {
+                    "description": "هزینه ارسال تومان",
+                    "type": "number",
+                    "example": 30000
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1777,22 +3391,408 @@
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "description": "شناسه منو برای ویرایش",
+                    "type": "integer",
+                    "example": 1
                 },
                 "link": {
-                    "type": "string"
+                    "description": "لینک منو",
+                    "type": "string",
+                    "example": "https://example.selloora.com/page/test"
                 },
                 "name": {
-                    "type": "string"
+                    "description": "نام منو",
+                    "type": "string",
+                    "example": "خانه"
                 },
                 "parent_id": {
-                    "type": "integer"
+                    "description": "شناسه منو بالا سری",
+                    "type": "integer",
+                    "example": 0
                 },
                 "position": {
-                    "type": "string"
+                    "description": "شناسه منو بالا سری برای منو های اصلی و باید صفر ارسال شود",
+                    "type": "string",
+                    "enum": [
+                        "top",
+                        "bottom",
+                        "right",
+                        "left"
+                    ],
+                    "example": "top"
                 },
                 "sort": {
-                    "type": "integer"
+                    "description": "ترتیب منو",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "DTOs.UpdatePage": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "body": {
+                    "description": "محتوا صفحه که میتواند از اچ تی ام ال تشکیل شده باشد",
+                    "type": "string",
+                    "example": "\u003cp\u003eمتن صفحه تماس با ما\u003c/p\u003e"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "slug": {
+                    "description": "آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد",
+                    "type": "string",
+                    "example": "contact-us"
+                },
+                "title": {
+                    "description": "عنوان صفحه",
+                    "type": "string",
+                    "example": "تماس با ما"
+                },
+                "type": {
+                    "description": "نوع صفحه که همراه با چارچوب قالب باشد یا صفحه کاملا خالی",
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "blank"
+                    ],
+                    "example": "normal"
+                }
+            }
+        },
+        "DTOs.UpdatePost": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "body": {
+                    "description": "محتوای مقاله که میتواند از اچ تی ام ال تشکیل شده باشد",
+                    "type": "string",
+                    "example": "\u003cp\u003eمتن مقاله\u003c/p\u003e"
+                },
+                "category_id": {
+                    "description": "شناسه دسته بندی مقاله",
+                    "type": "integer",
+                    "example": 1
+                },
+                "gallery_id": {
+                    "description": "شناسه تصویر شاخص مقاله",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "description": "شناسه مقاله برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "slug": {
+                    "description": "آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد",
+                    "type": "string",
+                    "example": "amoozesh-barnamenevisi"
+                },
+                "title": {
+                    "description": "عنوان مقاله",
+                    "type": "string",
+                    "example": "آموزش برنامه نویسی"
+                }
+            }
+        },
+        "DTOs.UpdateProduct": {
+            "type": "object",
+            "required": [
+                "categoryID"
+            ],
+            "properties": {
+                "active": {
+                    "description": "وضعیت فعال یا غیر فعال بودن محصول",
+                    "type": "boolean",
+                    "example": true
+                },
+                "categoryID": {
+                    "description": "شناسه دسته بندی",
+                    "type": "integer",
+                    "example": 1
+                },
+                "description": {
+                    "description": "توضیحات محصول",
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 3,
+                    "example": "توضیحات محصول"
+                },
+                "endedAt": {
+                    "description": "تاریخ پایان فروش",
+                    "type": "string",
+                    "example": "2025-01-01 00:00:00"
+                },
+                "gallery_ids": {
+                    "description": "شناسه تصاویر انتخاب شده برای این محصول",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "description": "شناسه محصول برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "manufacturer": {
+                    "description": "برند محصول",
+                    "type": "string",
+                    "example": "سامسونگ"
+                },
+                "name": {
+                    "description": "نام محصول",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "گوشی موبایل گلگسی نوت ۱۰"
+                },
+                "optionId": {
+                    "description": "شناسه آیتم انتخاب شده از آپشن",
+                    "type": "integer",
+                    "example": 1
+                },
+                "optionItemID": {
+                    "description": "شناسه آیتم انتخاب شده از آپشن",
+                    "type": "integer",
+                    "example": 1
+                },
+                "price": {
+                    "description": "قیمت محصول",
+                    "type": "number",
+                    "example": 1000000
+                },
+                "quantity": {
+                    "description": "تعداد موجودی",
+                    "type": "integer",
+                    "example": 10
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه جهت انتقال یک محصول از یک فروشگاه به فروشگاه دیگر",
+                    "type": "integer",
+                    "example": 2
+                },
+                "startedAt": {
+                    "description": "تاریخ شروع فروش",
+                    "type": "string",
+                    "example": "2020-01-01 00:00:00"
+                }
+            }
+        },
+        "DTOs.UpdateShop": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "description": "توضیحات فروشگاه",
+                    "type": "string",
+                    "example": "توضیحات فروشگاه"
+                },
+                "email": {
+                    "description": "ایمیل برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128@gmail.com"
+                },
+                "gallery_id": {
+                    "description": "تصویر لوگو فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "description": "شناسه فروشگاه برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "instagram_id": {
+                    "description": "آیدی اینستاگرام برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex_dev"
+                },
+                "mobile": {
+                    "description": "شماره موبایل برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "name": {
+                    "description": "نام فروشگاه",
+                    "type": "string",
+                    "example": "فروشگاه امیر"
+                },
+                "phone": {
+                    "description": "شماره تلفن برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "05136643278"
+                },
+                "send_price": {
+                    "description": "هزینه ارسال تومان",
+                    "type": "number",
+                    "example": 25000
+                },
+                "social_address": {
+                    "description": "آدرس شبکه اجتماعیی که میخواهید متصل کنید به فروشگاه برای دریافت محصولات از ان",
+                    "type": "string",
+                    "example": "amirex_dev"
+                },
+                "telegram_id": {
+                    "description": "آیدی تلگرام برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128"
+                },
+                "theme_id": {
+                    "description": "شناسه قالب",
+                    "type": "integer",
+                    "example": 1
+                },
+                "type": {
+                    "description": "نوع فروشگاه که میتواند به صورت اینستاگرامی باشد یا وبسایتی باشد یا روبیکا یا ربات تلگرام",
+                    "type": "string",
+                    "enum": [
+                        "instagram",
+                        "telegram",
+                        "website",
+                        "rubika"
+                    ],
+                    "example": "instagram"
+                },
+                "website": {
+                    "description": "وبسایت شخصی برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "https://amirshirdel.ir"
+                },
+                "whatsapp_id": {
+                    "description": "آیدی واتس آپ برای نمایش در فروشگاه برای پشتیبانی",
+                    "type": "string",
+                    "example": "amirex128"
+                }
+            }
+        },
+        "DTOs.UpdateSlider": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "توضیحات اسلایدر",
+                    "type": "string",
+                    "example": "توضیحات اسلایدر"
+                },
+                "gallery_id": {
+                    "description": "تصویر اسلایدر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "description": "شناسه اسلایدر برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "link": {
+                    "description": "لینک اسلایدر",
+                    "type": "string",
+                    "example": "https://google.com"
+                },
+                "position": {
+                    "description": "محل قرار گیری اسلایدر",
+                    "type": "string",
+                    "enum": [
+                        "top",
+                        "bottom",
+                        "right",
+                        "left"
+                    ],
+                    "example": "top"
+                },
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "sort": {
+                    "description": "ترتیب اسلایدر",
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "description": "عنوان اسلایدر",
+                    "type": "string",
+                    "example": "عنوان اسلایدر"
+                }
+            }
+        },
+        "DTOs.UpdateUser": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "again_password": {
+                    "description": "تکرار پسورد در صورت پر شدن به قصد تغییر پسورد",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6,
+                    "example": "123456789"
+                },
+                "cart_number": {
+                    "description": "شماره کارت",
+                    "type": "string",
+                    "maxLength": 16,
+                    "minLength": 16,
+                    "example": "6037998125410760"
+                },
+                "email": {
+                    "description": "ایمیل",
+                    "type": "string",
+                    "example": "amirex128@gmail.com"
+                },
+                "firstname": {
+                    "description": "نام",
+                    "type": "string",
+                    "example": "امیر"
+                },
+                "gender": {
+                    "description": "جنسیت",
+                    "type": "string",
+                    "enum": [
+                        "man",
+                        "woman"
+                    ],
+                    "example": "man"
+                },
+                "id": {
+                    "description": "شناسه کاربر برای ویرایش",
+                    "type": "integer",
+                    "example": 1
+                },
+                "lastname": {
+                    "description": "نام خانوادگی",
+                    "type": "string",
+                    "example": "شیردل"
+                },
+                "mobile": {
+                    "description": "موبایل",
+                    "type": "string",
+                    "example": "09024809750"
+                },
+                "password": {
+                    "description": "پسورد",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6,
+                    "example": "123456789"
+                },
+                "shaba": {
+                    "description": "شماره شبا",
+                    "type": "string",
+                    "maxLength": 24,
+                    "minLength": 24,
+                    "example": "IR820540102680020817909002"
                 }
             }
         }

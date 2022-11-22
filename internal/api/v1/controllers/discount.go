@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/models"
-	utils2 "github.com/amirex128/selloora_backend/internal/utils"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -31,7 +31,7 @@ func CheckDiscount(c *gin.Context) {
 		return
 	}
 
-	if utils2.DifferentWithNow(discount.StartedAt) < 0 || utils2.DifferentWithNow(discount.EndedAt) > 0 {
+	if utils.DifferentWithNow(discount.StartedAt) < 0 || utils.DifferentWithNow(discount.EndedAt) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "کد تخفیف منقضی شده است"})
 		return
 	}
@@ -48,14 +48,14 @@ func CheckDiscount(c *gin.Context) {
 
 	productDiscounts := strings.Split(discount.ProductIDs, ",")
 
-	applyDiscount := utils2.ApplyDiscount(productDiscounts, utils2.DiscountPriceType{
+	applyDiscount := utils.ApplyDiscount(productDiscounts, utils.DiscountPriceType{
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
 	}, pIDs)
-	var productsCalculate []utils2.ProductDiscountCalculatorType
+	var productsCalculate []utils.ProductDiscountCalculatorType
 	for i := range products {
-		productsCalculate = append(productsCalculate, utils2.ProductDiscountCalculatorType{
+		productsCalculate = append(productsCalculate, utils.ProductDiscountCalculatorType{
 			ProductID: products[i].ID,
 			Price:     products[i].Price,
 			Count: func() *DTOs.ProductListDiscount {
@@ -68,7 +68,7 @@ func CheckDiscount(c *gin.Context) {
 			}().Count,
 		})
 	}
-	calculateDiscountProduct := utils2.CalculateDiscountProduct(applyDiscount, productsCalculate, utils2.DiscountPriceType{
+	calculateDiscountProduct := utils.CalculateDiscountProduct(applyDiscount, productsCalculate, utils.DiscountPriceType{
 		Percent: discount.Percent,
 		Amount:  discount.Amount,
 		Type:    discount.Type,
@@ -161,7 +161,7 @@ func IndexDiscount(c *gin.Context) {
 func DeleteDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "deleteDiscount", "request")
 	defer span.End()
-	id := utils2.StringToUint64(c.Param("id"))
+	id := utils.StringToUint64(c.Param("id"))
 
 	err := models.NewMysqlManager(ctx).DeleteDiscount(c, ctx, id)
 	if err != nil {
@@ -182,7 +182,7 @@ func DeleteDiscount(c *gin.Context) {
 func ShowDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "showDiscount", "request")
 	defer span.End()
-	id := utils2.StringToUint64(c.Param("id"))
+	id := utils.StringToUint64(c.Param("id"))
 	userID := models.GetUser(c)
 
 	discount, err := models.NewMysqlManager(ctx).FindDiscountById(c, ctx, id)

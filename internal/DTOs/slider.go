@@ -1,26 +1,41 @@
 package DTOs
 
 type CreateSlider struct {
-	ShopID      uint64 `form:"shop_id" json:"shop_id" validation:"required"`
-	Link        string `form:"link" json:"link" validation:"omitempty"`
-	Title       string `form:"title" json:"title" validation:"required"`
-	Description string `form:"description" json:"description" validation:"omitempty"`
-	GalleryID   uint64 `form:"gallery_id" json:"gallery_id" validation:"required"`
-	Position    string `form:"position" json:"position" validation:"required"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"required" example:"1"`
+	//لینک اسلایدر
+	Link string `form:"link" json:"link" validation:"omitempty" example:"https://google.com"`
+	//عنوان اسلایدر
+	Title string `form:"title" json:"title" validation:"required" example:"عنوان اسلایدر"`
+	//توضیحات اسلایدر
+	Description string `form:"description" json:"description" validation:"omitempty" example:"توضیحات اسلایدر"`
+	//تصویر اسلایدر
+	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validation:"required" example:"1"`
+	//محل قرار گیری اسلایدر
+	Position string `form:"position" json:"position" validation:"required" example:"top" enums:"top,bottom,right,left"`
 }
 
 type UpdateSlider struct {
-	ID          uint64 `form:"id" json:"id" validation:"required"`
-	ShopID      uint64 `form:"shop_id" json:"shop_id" validation:"omitempty"`
-	Link        string `form:"link" json:"link" validation:"omitempty"`
-	Title       string `form:"title" json:"title" validation:"omitempty"`
-	Description string `form:"description" json:"description" validation:"omitempty"`
-	GalleryID   uint64 `form:"gallery_id" json:"gallery_id" validation:"omitempty"`
-	Sort        uint32 `form:"sort" json:"sort" validation:"omitempty"`
-	Position    string `form:"position" json:"position" validation:"omitempty"`
+	//شناسه اسلایدر برای ویرایش
+	ID uint64 `form:"id" json:"id" validation:"required" example:"1"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"omitempty" example:"1"`
+	//لینک اسلایدر
+	Link string `form:"link" json:"link" validation:"omitempty" example:"https://google.com"`
+	//عنوان اسلایدر
+	Title string `form:"title" json:"title" validation:"omitempty" example:"عنوان اسلایدر"`
+	//توضیحات اسلایدر
+	Description string `form:"description" json:"description" validation:"omitempty" example:"توضیحات اسلایدر"`
+	//تصویر اسلایدر
+	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validation:"omitempty" example:"1"`
+	//ترتیب اسلایدر
+	Sort uint32 `form:"sort" json:"sort" validation:"omitempty" example:"1"`
+	//محل قرار گیری اسلایدر
+	Position string `form:"position" json:"position" validation:"omitempty" example:"top" enums:"top,bottom,right,left"`
 }
 
 type IndexSlider struct {
 	Index
-	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"omitempty"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"omitempty" example:"1"`
 }

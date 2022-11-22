@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+// IndexTheme
+// @Summary لیست قالب ها
+// @description کاربر در هنگام ایجاد فروشگاه باید قالب فروشگاه خود را انتخاب نماید یا این که در آینده بتواند قالب خود را تغییر دهد
+// @Tags theme
+// @Router       /user/theme [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	search			 query   string	false "متن جستجو"
+// @Param	page			 query   string	false "شماره صفحه"
+// @Param	page_size		 query   string	false "تعداد صفحه"
+// @Param	sort			 query   string	false "مرتب سازی براساس desc/asc"
 func IndexTheme(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "indexTheme", "request")
 	defer span.End()
