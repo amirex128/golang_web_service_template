@@ -31,7 +31,7 @@ func initAddress(manager *MysqlManager) {
 }
 
 func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) error {
-	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:GetTicketWithChildren", "model")
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateAddress", "model")
 	defer span.End()
 	userID := GetUser(m.Ctx)
 	address := &Address{
@@ -48,7 +48,7 @@ func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) error {
 	}
 	err := m.GetConn().Create(address).Error
 	if err != nil {
-		return errorx.New("خطایی در ثبت آدرس رخ داده است", "model", err)
+		return errorx.New("خطایی در ثبت آدرس رخ داده است", "model:panic", err)
 	}
 	return nil
 }
@@ -120,6 +120,7 @@ func (m *MysqlManager) IndexAddress(userID uint64) ([]*Address, error) {
 	}
 	return addresses, nil
 }
+
 func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs.Pagination, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:IndexAddress", "model")
 	defer span.End()
@@ -138,4 +139,15 @@ func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs
 	}
 	pagination.Data = addresses
 	return pagination, nil
+}
+
+func (m *MysqlManager) FindAddressByID(addressID uint64) (*Address, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindAddressByID", "model")
+	defer span.End()
+	address := &Address{}
+	err := m.GetConn().Where("id = ?", addressID).First(address).Error
+	if err != nil {
+		return nil, errorx.New("مشکلی در یافتن آدرس پیش آمده است", "model", err)
+	}
+	return address, nil
 }

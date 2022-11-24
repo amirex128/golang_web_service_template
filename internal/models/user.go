@@ -50,6 +50,24 @@ func initUser(manager *MysqlManager) {
 		UpdatedAt:  utils.NowTime(),
 		CreatedAt:  utils.NowTime(),
 	})
+	manager.CreateUser(&User{
+		ID:         2,
+		Gender:     "man",
+		Firstname:  "امیر",
+		Lastname:   "شیردلی",
+		Email:      "amirex128@gmail.com",
+		Mobile:     "09024809750",
+		ExpireAt:   "",
+		Status:     "",
+		VerifyCode: "",
+		CartNumber: "",
+		Shaba:      "",
+		IsAdmin:    true,
+		Financial:  nil,
+		GalleryID:  nil,
+		UpdatedAt:  utils.NowTime(),
+		CreatedAt:  utils.NowTime(),
+	})
 }
 
 func (m *MysqlManager) CreateUser(user *User) error {

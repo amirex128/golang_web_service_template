@@ -37,6 +37,7 @@ func Initialize(ctx context.Context) {
 	}
 
 }
+
 func NewRedisManager(ctx context.Context) *RedisManager {
 	rManager := redisManager
 	rManager.Conn = rManager.Conn.WithContext(ctx)
@@ -46,23 +47,9 @@ func NewRedisManager(ctx context.Context) *RedisManager {
 
 func NewMysqlManager(ctx *gin.Context) *MysqlManager {
 	mManager := mysqlManager
-	mManager.Conn = mManager.Conn.WithContext(ctx)
+	mManager.Conn = mManager.Conn.WithContext(ctx.Request.Context())
 	mManager.Ctx = ctx
 	return mManager
-}
-
-func NewMysqlMockManager() *MysqlManager {
-	if mysqlMockManager == nil {
-		providers.Initialize(context.Background())
-		mysqlMockProvider, err := do.InvokeNamed[*providers.MysqlProvider](providers.Injector, "main_mysql_mock")
-		if err != nil {
-			panic(err)
-		}
-
-		mysqlMockManager = &MysqlManager{mysqlMockProvider}
-	}
-
-	return mysqlMockManager
 }
 
 func (m *MysqlManager) initializeTables() {

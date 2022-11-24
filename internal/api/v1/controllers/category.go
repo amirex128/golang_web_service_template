@@ -113,3 +113,25 @@ func DeleteCategory(c *gin.Context) {
 		"message": "دسته بندی با موفقیت حذف شد",
 	})
 }
+
+// ShowCategory
+// @Summary نمایش دسته بندی
+// @description هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
+// @Tags post
+// @Router       /user/category/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه " SchemaExample(1)
+func ShowCategory(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showCategory", "request")
+	c.Request.WithContext(ctx)
+	defer span.End()
+	categoryID := c.Param("id")
+	category, err := models.NewMysqlManager(c).FindCategoryByID(utils.StringToUint64(categoryID))
+	if err != nil {
+		errorx.ResponseErrorx(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"category": category,
+	})
+}

@@ -102,3 +102,14 @@ func (m *MysqlManager) GetAllDomainWithPagination(dto DTOs.IndexDomain) (*DTOs.P
 	pagination.Data = domains
 	return pagination, nil
 }
+
+func (m *MysqlManager) FindDomainByID(domainID uint64) (*Domain, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindDomainByID", "model")
+	defer span.End()
+	domain := &Domain{}
+	err := m.GetConn().Where("id = ?", domainID).First(domain).Error
+	if err != nil {
+		return nil, errorx.New("مشکلی در یافتن دامنه پیش آمده است", "model", err)
+	}
+	return domain, nil
+}

@@ -10,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	mysqlApm "go.elastic.co/apm/module/apmgormv2/v2/driver/mysql"
-	mysqlGorm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"time"
 )
@@ -47,47 +46,5 @@ func NewMysql(i *do.Injector, ctx context.Context) (*MysqlProvider, error) {
 		return nil
 	}, 30*time.Second)
 	logrus.Infof("mysql service is registered")
-	return mysqlIns, nil
-}
-
-func NewMysqlMock(i *do.Injector, ctx context.Context) (*MysqlProvider, error) {
-
-	mysqlIns := new(MysqlProvider)
-
-	safe.Try(func() error {
-
-		db, mock, err := sqlmock.New()
-		if err != nil {
-			return err
-		}
-
-		if db == nil {
-			return err
-		}
-
-		if mock == nil {
-			return err
-		}
-
-		dialector := mysqlGorm.New(mysqlGorm.Config{
-			DSN:        "sqlmock_db_0",
-			DriverName: "mysql",
-			Conn:       db,
-		})
-		gormDB, err := gorm.Open(dialector, &gorm.Config{
-			SkipDefaultTransaction: true,
-		})
-		if err != nil {
-			logrus.Errorf("failed to register mysql service")
-			return err
-		}
-
-		gormDB.WithContext(ctx)
-		mysqlIns.Conn = gormDB
-		mysqlIns.Mock = mock
-
-		return nil
-	}, 30*time.Second)
-	logrus.Infof("mysql mock service is registered")
 	return mysqlIns, nil
 }

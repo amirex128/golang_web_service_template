@@ -74,7 +74,15 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			address.GET("/list", controllers.IndexAddress)
 			address.POST("/create", controllers.CreateAddress)
 			address.POST("/update", controllers.UpdateAddress)
+			address.GET("/show/:id", controllers.ShowAddress)
 			address.POST("/delete/:id", controllers.DeleteAddress)
+		}
+		domain := user.Group("domain")
+		{
+			domain.GET("/list", controllers.IndexDomain)
+			domain.POST("/create", controllers.CreateDomain)
+			domain.GET("//show/:id", controllers.ShowDomain)
+			domain.POST("/delete/:id", controllers.DeleteDomain)
 		}
 		order := user.Group("order")
 		{

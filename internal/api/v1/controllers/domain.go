@@ -86,3 +86,25 @@ func IndexDomain(c *gin.Context) {
 		"domains": domains,
 	})
 }
+
+// ShowDomain
+// @Summary نمایش دامنه
+// @description هر فروشگاه برای خود میتواند به تعداد دلخواه دامنه در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
+// @Tags post
+// @Router       /user/domain/show/{id} [get]
+// @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه " SchemaExample(1)
+func ShowDomain(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showDomain", "request")
+	c.Request.WithContext(ctx)
+	defer span.End()
+	domainID := c.Param("id")
+	domain, err := models.NewMysqlManager(c).FindDomainByID(utils.StringToUint64(domainID))
+	if err != nil {
+		errorx.ResponseErrorx(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"domain": domain,
+	})
+}

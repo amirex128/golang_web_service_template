@@ -7,6 +7,7 @@ import (
 	"github.com/samber/do"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 )
 
 type Errorx struct {
@@ -21,8 +22,21 @@ func (e *Errorx) Error() string {
 }
 
 func ResponseErrorx(c *gin.Context, err error) {
+	logrusProvider := do.MustInvoke[*providers.LogrusProvider](providers.Injector)
 	e := err.(*Errorx)
+	if strings.Contains(e.Type, ":panic") {
+		//tr := apm.DefaultTracer().Recovered(e)
+		//tr.SetTransaction(apm.TransactionFromContext(c.Request.Context()))
+		//tr.Send()
+	}
 	if e.Err != nil {
+		logrus.Errorf("Errorx: %s, %s, %s, %s", e.Message, e.Type, e.Args, e.Error())
+		logrusProvider.Log.WithFields(logrus.Fields{
+			"message": e.Message,
+			"type":    e.Type,
+			"error":   e.Error(),
+			"args":    e.Args,
+		}).Error("Errorx")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": e.Message,
 			"type":    e.Type,
@@ -30,6 +44,13 @@ func ResponseErrorx(c *gin.Context, err error) {
 			"error":   e.Err.Error(),
 		})
 	} else {
+		logrus.Errorf("Errorx: %s, %s, %s", e.Message, e.Type)
+		logrusProvider.Log.WithFields(logrus.Fields{
+			"message": e.Message,
+			"type":    e.Type,
+			"error":   "",
+			"args":    e.Args,
+		}).Error("Errorx")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": e.Message,
 			"type":    e.Type,
@@ -40,25 +61,6 @@ func ResponseErrorx(c *gin.Context, err error) {
 }
 
 func New(message, typ string, sendError error, args ...interface{}) *Errorx {
-	logrusProvider := do.MustInvoke[*providers.LogrusProvider](providers.Injector)
-	if sendError != nil {
-		logrus.Errorf("Errorx: %s, %s, %s", message, typ, sendError.Error())
-		logrusProvider.Log.WithFields(logrus.Fields{
-			"message": message,
-			"type":    typ,
-			"error":   sendError.Error(),
-			"args":    args,
-		}).Error("Errorx")
-	} else {
-		logrus.Errorf("Errorx: %s, %s, %s", message, typ)
-		logrusProvider.Log.WithFields(logrus.Fields{
-			"message": message,
-			"type":    typ,
-			"error":   "",
-			"args":    args,
-		}).Error("Errorx")
-	}
-
 	return &Errorx{
 		Message: message,
 		Type:    typ,

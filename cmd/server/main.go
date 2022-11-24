@@ -5,16 +5,10 @@ import (
 	"fmt"
 	"github.com/amirex128/selloora_backend/internal/api"
 	"github.com/amirex128/selloora_backend/internal/models"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"go.elastic.co/apm/module/apmlogrus"
 	"os"
 	"os/signal"
 	"syscall"
-)
-
-const (
-	appName = "selloora"
 )
 
 // @title Selloora Backend API
@@ -31,12 +25,14 @@ const (
 
 func main() {
 	ctx, _ := context.WithCancel(context.Background())
-
-	InitializeConfig(appName)
 	models.Initialize(ctx)
 
 	//global_loaders.Initializer(ctx)
-	api.Runner(viper.GetString("server_host"), viper.GetString("server_port"), ctx)
+	r := api.Runner()
+	err := r.Run(viper.GetString("server_host") + ":" + viper.GetString("server_port"))
+	if err != nil {
+		panic(err)
+	}
 
 	sig := WaitExitSignal()
 	fmt.Println(sig.String())
@@ -45,11 +41,4 @@ func WaitExitSignal() os.Signal {
 	quit := make(chan os.Signal, 6)
 	signal.Notify(quit, syscall.SIGABRT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 	return <-quit
-}
-
-func InitializeConfig(prefix string) {
-	logrus.AddHook(&apmlogrus.Hook{})
-	logrus.SetOutput(os.Stdout)
-	viper.AutomaticEnv()
-
 }
