@@ -22,7 +22,7 @@ func createTicketAdmin(c *gin.Context) {
 	if dto.GuestMobile == "" {
 		userID = models.GetUser(c)
 	}
-	err = models.NewMysqlManager(c).CreateTicket(c, ctx, dto, userID)
+	_, err = models.NewMysqlManager(c).CreateTicket(c, ctx, dto, userID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

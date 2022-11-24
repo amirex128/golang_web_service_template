@@ -100,10 +100,11 @@ func CreateDiscount(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateDiscount(dto)
+	discount, err := models.NewMysqlManager(c).CreateDiscount(dto)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تخفیف با موفقیت ایجاد شد",
+		"data":    discount,
 	})
 
 }
@@ -112,8 +113,9 @@ func CreateDiscount(c *gin.Context) {
 // @Summary ویرایش تخفیف
 // @description ویرایش تخفیف
 // @Tags discount
-// @Router       /user/discount/update [post]
+// @Router       /user/discount/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه تخفیف" SchemaExample(1)
 // @Param	message	 body   DTOs.UpdateDiscount  	true "ورودی"
 func UpdateDiscount(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateDiscount", "request")

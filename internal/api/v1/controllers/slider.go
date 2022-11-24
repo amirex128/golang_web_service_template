@@ -26,13 +26,14 @@ func CreateSlider(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateSlider(dto)
+	slider, err := models.NewMysqlManager(c).CreateSlider(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "اسلایدر با موفقیت ایجاد شد",
+		"data":    slider,
 	})
 }
 
@@ -40,8 +41,9 @@ func CreateSlider(c *gin.Context) {
 // @Summary ویرایش اسلایدر
 // @description هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
 // @Tags slider
-// @Router       /user/slider/update [post]
+// @Router       /user/slider/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdateSlider  	true "ورودی"
 func UpdateSlider(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateSlider", "request")

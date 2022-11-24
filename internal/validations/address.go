@@ -5,6 +5,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 func CreateAddress(c *gin.Context) (DTOs.CreateAddress, error) {
@@ -85,6 +86,10 @@ func UpdateAddress(c *gin.Context) (DTOs.UpdateAddress, error) {
 	err = validateTags(tags, err, c)
 	if err != nil {
 		return dto, err
+	}
+	id := strings.Replace(c.Param("id"), "/", "", -1)
+	if dto.ID == 0 && id != "" {
+		dto.ID = utils.StringToUint64(id)
 	}
 	return dto, nil
 }

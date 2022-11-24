@@ -13,7 +13,5 @@ RUN go mod tidy
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g ./cmd/server/main.go -o ./docs
 RUN go build -o ./cmd/server/server ./cmd/server
-RUN go install github.com/cosmtrek/air@latest
 EXPOSE 8585
 CMD ["/app/cmd/server/server"]
-#CMD ["air"]

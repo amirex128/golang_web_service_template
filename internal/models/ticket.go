@@ -27,21 +27,21 @@ func InitTicket(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Ticket{})
 }
 
-func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket, userID uint64) error {
+func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket, userID uint64) (*Ticket, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateTicket", "model")
 	defer span.End()
 	var parentTicket Ticket
 	if dto.ParentID != 0 {
 		err := m.GetConn().Model(&parentTicket).Where("id = ?", dto.ParentID).Update("is_answer", true).First(&parentTicket).Error
 		if err != nil {
-			return errorx.New("خطا در دریافت تیکت ها", "model", err)
+			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
 		if *parentTicket.UserID != userID && IsAdmin(m.Ctx) == false {
-			return errorx.New("خطا در دریافت تیکت ها", "model", err)
+			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
 	}
 
-	ticket := Ticket{
+	ticket := &Ticket{
 		UserID: func() *uint64 {
 			if userID == 0 {
 				return nil
@@ -62,11 +62,11 @@ func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket, userID uint64) error 
 		}(),
 		CreatedAt: utils.NowTime(),
 	}
-	err := m.GetConn().Create(&ticket).Error
+	err := m.GetConn().Create(ticket).Error
 	if err != nil {
-		return errorx.New("خطا در ثبت تیکت", "model", err)
+		return ticket, errorx.New("خطا در ثبت تیکت", "model", err)
 	}
-	return nil
+	return ticket, nil
 }
 
 func (m *MysqlManager) GetAllTicketWithPagination(dto DTOs.IndexTicket, userID uint64) (*DTOs.Pagination, error) {

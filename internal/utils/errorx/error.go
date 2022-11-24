@@ -1,7 +1,6 @@
 package errorx
 
 import (
-	"fmt"
 	"github.com/amirex128/selloora_backend/internal/providers"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do"
@@ -18,18 +17,24 @@ type Errorx struct {
 }
 
 func (e *Errorx) Error() string {
-	return fmt.Sprintf("Errorx: %s, %s, %s", e.Message, e.Type, e.Err.Error())
+	return e.Err.Error()
 }
 
 func ResponseErrorx(c *gin.Context, err error) {
 	logrusProvider := do.MustInvoke[*providers.LogrusProvider](providers.Injector)
 	e := err.(*Errorx)
+
 	if strings.Contains(e.Type, ":panic") {
 		//tr := apm.DefaultTracer().Recovered(e)
 		//tr.SetTransaction(apm.TransactionFromContext(c.Request.Context()))
 		//tr.Send()
 	}
+
 	if e.Err != nil {
+		if strings.Contains(e.Error(), "record not found") {
+			e.Message = "موردی یافت نشد"
+		}
+
 		logrus.Errorf("Errorx: %s, %s, %s, %s", e.Message, e.Type, e.Args, e.Error())
 		logrusProvider.Log.WithFields(logrus.Fields{
 			"message": e.Message,

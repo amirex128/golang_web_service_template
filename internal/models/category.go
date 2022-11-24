@@ -55,7 +55,7 @@ func initCategory(manager *MysqlManager) bool {
 
 }
 
-func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) error {
+func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) (*Category, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateCategory", "model")
 	defer span.End()
 	var lastSort Category
@@ -64,7 +64,7 @@ func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) error {
 		lastSort.Sort = 0
 	}
 	userID := GetUser(m.Ctx)
-	category := Category{
+	category := &Category{
 		Name:     dto.Name,
 		ParentID: 0,
 		UserID:   userID,
@@ -79,11 +79,11 @@ func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) error {
 		Equivalent:  dto.Equivalent,
 		Description: dto.Description,
 	}
-	err = m.GetConn().Create(&category).Error
+	err = m.GetConn().Create(category).Error
 	if err != nil {
-		return errorx.New("در ایجاد دسته بندی مشکلی به وجود آمده است", "model", err)
+		return category, errorx.New("در ایجاد دسته بندی مشکلی به وجود آمده است", "model", err)
 	}
-	return nil
+	return category, nil
 }
 
 func (m *MysqlManager) GetLevel1Categories() ([]*Category, error) {

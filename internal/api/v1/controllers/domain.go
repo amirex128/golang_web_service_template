@@ -26,13 +26,14 @@ func CreateDomain(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateDomain(dto)
+	domain, err := models.NewMysqlManager(c).CreateDomain(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "دامنه با موفقیت ایجاد شد",
+		"data":    domain,
 	})
 }
 

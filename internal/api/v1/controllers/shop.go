@@ -29,13 +29,14 @@ func CreateShop(c *gin.Context) {
 	}
 	userID := models.GetUser(c)
 
-	err = models.NewMysqlManager(c).CreateShop(dto, *userID)
+	shop, err := models.NewMysqlManager(c).CreateShop(dto, *userID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "فروشگاه با موفقیت ایجاد شد",
+		"data":    shop,
 	})
 }
 
@@ -43,8 +44,9 @@ func CreateShop(c *gin.Context) {
 // @Summary ویرایش فروشگاه
 // @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
 // @Tags shop
-// @Router       /user/shop/update [post]
+// @Router       /user/shop/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdateShop  	true "ورودی"
 func UpdateShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateShop", "request")

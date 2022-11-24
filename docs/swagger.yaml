@@ -1353,7 +1353,26 @@ paths:
       summary: لیست آدرس
       tags:
       - address
-  /user/address/update:
+  /user/address/show/{id}:
+    get:
+      description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
+        هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش آدرس
+      tags:
+      - post
+  /user/address/update/{id}:
     post:
       description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
         هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید
@@ -1362,6 +1381,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: شناسه آدرس
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -1439,7 +1462,7 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: شناسه آدرس
+      - description: شناسه دسته بندی
         in: path
         name: id
         required: true
@@ -1448,7 +1471,26 @@ paths:
       summary: حذف دسته بندی
       tags:
       - category
-  /user/category/update:
+  /user/category/show/{id}:
+    get:
+      description: هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های
+        مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش دسته بندی
+      tags:
+      - post
+  /user/category/update/{id}:
     post:
       description: کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته
         بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان
@@ -1459,6 +1501,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -1711,7 +1757,7 @@ paths:
       summary: نمایش تخفیف
       tags:
       - discount
-  /user/discount/update:
+  /user/discount/update/{id}:
     post:
       description: ویرایش تخفیف
       parameters:
@@ -1719,6 +1765,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: شناسه تخفیف
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -1797,6 +1847,25 @@ paths:
       summary: حذف دامنه
       tags:
       - domain
+  /user/domain/show/{id}:
+    get:
+      description: هر فروشگاه برای خود میتواند به تعداد دلخواه دامنه در موقعیت های
+        مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش دامنه
+      tags:
+      - post
   /user/gallery/create:
     post:
       description: با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده
@@ -1924,7 +1993,7 @@ paths:
       summary: نمایش منو
       tags:
       - post
-  /user/menu/update:
+  /user/menu/update/{id}:
     post:
       description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
         به قالب خود را کم و زیاد نماید
@@ -1933,6 +2002,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -2222,7 +2295,7 @@ paths:
       summary: نمایش صفحه
       tags:
       - post
-  /user/page/update:
+  /user/page/update/{id}:
     post:
       description: هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت
         معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام
@@ -2233,6 +2306,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -2328,7 +2405,7 @@ paths:
       summary: نمایش مقاله
       tags:
       - post
-  /user/post/update:
+  /user/post/update/{id}:
     post:
       description: فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
       parameters:
@@ -2336,6 +2413,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -2435,7 +2516,7 @@ paths:
       summary: نمایش محصول
       tags:
       - product
-  /user/product/update:
+  /user/product/update/{id}:
     post:
       description: محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل
         رنگ و اندازه میباشد
@@ -2444,6 +2525,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -2587,7 +2672,7 @@ paths:
       summary: نمایش فروشگاه
       tags:
       - shop
-  /user/shop/update:
+  /user/shop/update/{id}:
     post:
       description: هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته
         باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند
@@ -2597,6 +2682,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body
@@ -2696,7 +2785,7 @@ paths:
       summary: نمایش اسلایدر
       tags:
       - post
-  /user/slider/update:
+  /user/slider/update/{id}:
     post:
       description: هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های
         مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید
@@ -2705,6 +2794,10 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
         type: string
       - description: ورودی
         in: body

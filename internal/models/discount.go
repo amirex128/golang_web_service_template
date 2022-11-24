@@ -39,25 +39,25 @@ func initDiscount(manager *MysqlManager) {
 		Status:     true,
 	})
 }
-func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) error {
+func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 	userID := GetUser(m.Ctx)
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(pId)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if product.UserID != *userID {
-			return errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
+			return nil, errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
 		}
 	}
 
 	if m.GetConn().Where("code = ?", dto.Code).First(&Discount{}).RowsAffected > 0 {
-		return errorx.New("کد تخفیف تکراری است", "model", nil)
+		return nil, errorx.New("کد تخفیف تکراری است", "model", nil)
 	}
 
-	discount := Discount{
+	discount := &Discount{
 		Code:       dto.Code,
 		UserID:     userID,
 		StartedAt:  utils.DateTimeConvert(dto.StartedAt),
@@ -71,11 +71,11 @@ func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) error {
 		CreatedAt:  utils.NowTime(),
 		UpdatedAt:  utils.NowTime(),
 	}
-	err := m.GetConn().Create(&discount).Error
+	err := m.GetConn().Create(discount).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد کد تخفیف", "model", err)
+		return discount, errorx.New("خطا در ایجاد کد تخفیف", "model", err)
 	}
-	return nil
+	return discount, nil
 }
 func (m *MysqlManager) UpdateDiscount(dto DTOs.UpdateDiscount) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")

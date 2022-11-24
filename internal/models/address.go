@@ -30,7 +30,7 @@ func initAddress(manager *MysqlManager) {
 	manager.CreateAddress(*address)
 }
 
-func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) error {
+func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) (*Address, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateAddress", "model")
 	defer span.End()
 	userID := GetUser(m.Ctx)
@@ -48,9 +48,9 @@ func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) error {
 	}
 	err := m.GetConn().Create(address).Error
 	if err != nil {
-		return errorx.New("خطایی در ثبت آدرس رخ داده است", "model:panic", err)
+		return address, errorx.New("خطایی در ثبت آدرس رخ داده است", "model:panic", err)
 	}
-	return nil
+	return address, nil
 }
 
 func (m *MysqlManager) UpdateAddress(dto DTOs.UpdateAddress) error {

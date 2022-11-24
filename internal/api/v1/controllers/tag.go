@@ -26,13 +26,14 @@ func CreateTag(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateTag(dto)
+	tag, err := models.NewMysqlManager(c).CreateTag(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تگ با موفقیت ایجاد شد",
+		"data":    tag,
 	})
 
 }

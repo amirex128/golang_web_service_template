@@ -48,7 +48,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			product.GET("/list", controllers.IndexProduct)
 			product.GET("/show/:id", controllers.ShowProduct)
 			product.POST("/create", controllers.CreateProduct)
-			product.POST("/update", controllers.UpdateProduct)
+			product.POST("/update/*id", controllers.UpdateProduct)
 			product.POST("/delete/:id", controllers.DeleteProduct)
 		}
 		ticket := user.Group("ticket")
@@ -66,14 +66,14 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			discount.GET("/list", controllers.IndexDiscount)
 			discount.GET("/show/:id", controllers.ShowDiscount)
 			discount.POST("/create", controllers.CreateDiscount)
-			discount.POST("/update", controllers.UpdateDiscount)
+			discount.POST("/update/*id", controllers.UpdateDiscount)
 			discount.POST("/delete/:id", controllers.DeleteDiscount)
 		}
 		address := user.Group("address")
 		{
 			address.GET("/list", controllers.IndexAddress)
 			address.POST("/create", controllers.CreateAddress)
-			address.POST("/update", controllers.UpdateAddress)
+			address.POST("/update/*id", controllers.UpdateAddress)
 			address.GET("/show/:id", controllers.ShowAddress)
 			address.POST("/delete/:id", controllers.DeleteAddress)
 		}
@@ -81,7 +81,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			domain.GET("/list", controllers.IndexDomain)
 			domain.POST("/create", controllers.CreateDomain)
-			domain.GET("//show/:id", controllers.ShowDomain)
+			domain.GET("/show/:id", controllers.ShowDomain)
 			domain.POST("/delete/:id", controllers.DeleteDomain)
 		}
 		order := user.Group("order")
@@ -100,7 +100,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			shop.GET("list", controllers.IndexShop)
 			shop.POST("/create", controllers.CreateShop)
-			shop.POST("/update", controllers.UpdateShop)
+			shop.POST("/update/*id", controllers.UpdateShop)
 			shop.GET("/show/:id", controllers.ShowShop)
 			shop.POST("/delete/:id", controllers.DeleteShop)
 			shop.POST("/send-price", controllers.SendPrice)
@@ -112,7 +112,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			slider.GET("/list", controllers.IndexSlider)
 			slider.POST("/create", controllers.CreateSlider)
 			slider.GET("/show/:id", controllers.ShowSlider)
-			slider.POST("/update", controllers.UpdateSlider)
+			slider.POST("/update/*id", controllers.UpdateSlider)
 			slider.POST("/delete/:id", controllers.DeleteSlider)
 		}
 
@@ -121,7 +121,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			post.GET("/list", controllers.IndexPost)
 			post.GET("/show/:id", controllers.ShowPost)
 			post.POST("/create", controllers.CreatePost)
-			post.POST("/update", controllers.UpdatePost)
+			post.POST("/update/*id", controllers.UpdatePost)
 			post.POST("/delete/:id", controllers.DeletePost)
 		}
 		page := user.Group("page")
@@ -129,7 +129,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			page.GET("/list", controllers.IndexPage)
 			page.GET("/show/:id", controllers.ShowPage)
 			page.POST("/create", controllers.CreatePage)
-			page.POST("/update", controllers.UpdatePage)
+			page.POST("/update/*id", controllers.UpdatePage)
 			page.POST("/delete/:id", controllers.DeletePage)
 		}
 		menu := user.Group("menu")
@@ -137,7 +137,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			menu.GET("/list", controllers.IndexMenu)
 			menu.GET("/show/:id", controllers.ShowMenu)
 			menu.POST("/create", controllers.CreateMenu)
-			menu.POST("/update", controllers.UpdateMenu)
+			menu.POST("/update/*id", controllers.UpdateMenu)
 			menu.POST("/delete/:id", controllers.DeleteMenu)
 		}
 		theme := user.Group("theme")
@@ -148,7 +148,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		{
 			category.GET("/list", controllers.IndexCategory)
 			category.GET("/create", controllers.CreateCategory)
-			category.POST("/update", controllers.UpdateCategory)
+			category.POST("/update/*id", controllers.UpdateCategory)
 			category.POST("/delete/:id", controllers.DeleteCategory)
 
 		}

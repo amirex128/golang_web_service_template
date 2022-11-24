@@ -60,7 +60,7 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	err = models.NewMysqlManager(c).CreateProduct(dto, *userID)
+	product, err := models.NewMysqlManager(c).CreateProduct(dto, *userID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
@@ -68,6 +68,7 @@ func CreateProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "محصول با موفقیت ایجاد شد",
+		"data":    product,
 	})
 	return
 }
@@ -76,8 +77,9 @@ func CreateProduct(c *gin.Context) {
 // @Summary ویرایش محصول
 // @description محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد
 // @Tags product
-// @Router       /user/product/update [post]
+// @Router       /user/product/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdateProduct  	true "ورودی"
 func UpdateProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateProduct", "request")

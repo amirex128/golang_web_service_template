@@ -29,7 +29,7 @@ func initMenu(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) error {
+func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) (*Menu, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")
 	defer span.End()
 
@@ -50,9 +50,9 @@ func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) error {
 	}
 	err = m.GetConn().Create(&menu).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد کد منو", "model", err)
+		return menu, errorx.New("خطا در ایجاد کد منو", "model", err)
 	}
-	return nil
+	return menu, nil
 }
 func (m *MysqlManager) UpdateMenu(dto DTOs.UpdateMenu) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showMenu", "model")

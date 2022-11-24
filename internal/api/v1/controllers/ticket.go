@@ -30,13 +30,14 @@ func CreateTicket(c *gin.Context) {
 	if dto.GuestMobile == "" {
 		userID = *models.GetUser(c)
 	}
-	err = models.NewMysqlManager(c).CreateTicket(dto, userID)
+	ticket, err := models.NewMysqlManager(c).CreateTicket(dto, userID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "تیکت شما با موفقیت ثبت شد و همکاران ما به زودی با شما تماس خواهد گرفت",
+		"data":    ticket,
 	})
 }
 

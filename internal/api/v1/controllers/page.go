@@ -25,13 +25,14 @@ func CreatePage(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreatePage(dto)
+	page, err := models.NewMysqlManager(c).CreatePage(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "صفحه با موفقیت ایجاد شد",
+		"data":    page,
 	})
 }
 
@@ -39,8 +40,9 @@ func CreatePage(c *gin.Context) {
 // @Summary ویرایش صفحه
 // @description هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود
 // @Tags page
-// @Router       /user/page/update [post]
+// @Router       /user/page/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdatePage  	true "ورودی"
 func UpdatePage(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updatePage", "request")

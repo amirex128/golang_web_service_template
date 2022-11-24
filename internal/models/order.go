@@ -38,14 +38,14 @@ func initOrder(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Order{})
 }
 
-func (m *MysqlManager) CreateOrder(order Order) (uint64, error) {
+func (m *MysqlManager) CreateOrder(order *Order) (*Order, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateOrder", "model")
 	defer span.End()
-	err := m.GetConn().Create(&order).Error
+	err := m.GetConn().Create(order).Error
 	if err != nil {
-		return 0, errorx.New("خطا در ثبت سفارش", "model", err)
+		return nil, errorx.New("خطا در ثبت سفارش", "model", err)
 	}
-	return order.ID, nil
+	return order, nil
 }
 
 func (m *MysqlManager) GetOrders(userID uint64, orderStatus []string) ([]*Order, error) {

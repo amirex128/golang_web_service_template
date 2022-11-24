@@ -46,10 +46,10 @@ func (m *MysqlManager) CheckSlug(slug string) error {
 	return nil
 }
 
-func (m *MysqlManager) CreatePost(dto DTOs.CreatePost, userID uint64) error {
+func (m *MysqlManager) CreatePost(dto DTOs.CreatePost, userID uint64) (*Post, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePost", "model")
 	defer span.End()
-	post := Post{
+	post := &Post{
 		Title: dto.Title,
 		Body:  dto.Body,
 		Slug:  dto.Slug,
@@ -65,9 +65,9 @@ func (m *MysqlManager) CreatePost(dto DTOs.CreatePost, userID uint64) error {
 	}
 	err := m.GetConn().Create(&post).Error
 	if err != nil {
-		return errorx.New("مشکلی در ایجاد پست پیش آمده است", "model", err)
+		return post, errorx.New("مشکلی در ایجاد پست پیش آمده است", "model", err)
 	}
-	return nil
+	return post, nil
 }
 
 func (m *MysqlManager) UpdatePost(dto DTOs.UpdatePost) (err error) {

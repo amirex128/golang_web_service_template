@@ -126,7 +126,7 @@ func CreateOrder(c *gin.Context) {
 		Type:    discount.Type,
 	})
 
-	var order models.Order
+	var order *models.Order
 	for _, dis := range calculateDiscountProduct {
 		order.TotalProductPrice += dis.RawPrice
 		order.TotalDiscountPrice += dis.OffPrice
@@ -147,13 +147,13 @@ func CreateOrder(c *gin.Context) {
 	order.LastUpdateStatusAt = utils.NowTime()
 	order.CreatedAt = utils.NowTime()
 
-	orderID, err := models.NewMysqlManager(c).CreateOrder(order)
+	order, err = models.NewMysqlManager(c).CreateOrder(order)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 
-	err = models.NewMysqlManager(c).CreateOrderItem(dto.OrderItems, orderID)
+	err = models.NewMysqlManager(c).CreateOrderItem(dto.OrderItems, order.ID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
@@ -161,13 +161,14 @@ func CreateOrder(c *gin.Context) {
 
 	err = utils.SadadPayRequest(c, 10000000, 10000.0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "خطایی در ارتباط با درگاه پرداخت رخ داده است",
-			"error":   err.Error(),
-		})
+		errorx.ResponseErrorx(c, errorx.New("خطایی در ارتباط با درگاه پرداخت رخ داده است", "request", err))
 		return
 	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"message": "سفارش با موفقیت ثبت شد",
+		"data":    order,
+	})
 }
 
 func extractProductIDs(dto DTOs.CreateOrder) []uint64 {

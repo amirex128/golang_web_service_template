@@ -8,9 +8,7 @@ import (
 )
 
 func TestCreateAddress(t *testing.T) {
-
-	recorder := httptest.NewRecorder()
-	callApi([]byte(`
+	recorder := callApi([]byte(`
 
 		{
 		 "address": "ادرس کامل",
@@ -26,29 +24,67 @@ func TestCreateAddress(t *testing.T) {
 
 	`),
 		"user/address/create",
-		"POST", recorder)
+		"POST")
 
-	if !assert.Equal(t, http.StatusOK, recorder.Code) || !assert.NotContains(t, recorder.Body.String(), "error") {
-		parse(t, recorder)
-		return
-	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "error")
+	parseErr(recorder)
 
 }
 
 func TestDeleteAddress(t *testing.T) {
+	id := getID(callApi([]byte(`
+
+		{
+		 "address": "ادرس کامل",
+		 "city_id": 1,
+		 "full_name": "نام گیرنده",
+		 "lat": "35.5",
+		 "long": "36.5",
+		 "mobile": "09024809750",
+		 "postal_code": "1111111111",
+		 "province_id": 1,
+		 "title": "عنوان"
+		}
+
+	`),
+		"user/address/create",
+		"POST"))
+	if !assert.NotNilf(t, id, "Create model failed for get id") {
+		return
+	}
 
 	recorder := httptest.NewRecorder()
 	callApi([]byte(``),
-		"user/address/delete/1",
-		"POST", recorder)
+		"user/address/delete/"+*id,
+		"POST")
 
-	if !assert.Equal(t, http.StatusOK, recorder.Code) || !assert.NotContains(t, recorder.Body.String(), "error") {
-		parse(t, recorder)
-		return
-	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "error")
+	parseErr(recorder)
 }
 
 func TestUpdateAddress(t *testing.T) {
+	id := getID(callApi([]byte(`
+
+		{
+		 "address": "ادرس کامل",
+		 "city_id": 1,
+		 "full_name": "نام گیرنده",
+		 "lat": "35.5",
+		 "long": "36.5",
+		 "mobile": "09024809750",
+		 "postal_code": "1111111111",
+		 "province_id": 1,
+		 "title": "عنوان"
+		}
+
+	`),
+		"user/address/create",
+		"POST"))
+	if !assert.NotNilf(t, id, "Create model failed for get id") {
+		return
+	}
 
 	recorder := httptest.NewRecorder()
 	callApi([]byte(`
@@ -67,13 +103,12 @@ func TestUpdateAddress(t *testing.T) {
 		}
 
 	`),
-		"user/address/update",
-		"POST", recorder)
+		"user/address/update/"+*id,
+		"POST")
 
-	if !assert.Equal(t, http.StatusOK, recorder.Code) || !assert.NotContains(t, recorder.Body.String(), "error") {
-		parse(t, recorder)
-		return
-	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "error")
+	parseErr(recorder)
 }
 
 func TestIndexAddress(t *testing.T) {
@@ -81,23 +116,41 @@ func TestIndexAddress(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	callApi([]byte(``),
 		"user/address/list",
-		"GET", recorder)
+		"GET")
 
-	if !assert.Equal(t, http.StatusOK, recorder.Code) || !assert.NotContains(t, recorder.Body.String(), "error") {
-		parse(t, recorder)
-		return
-	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "error")
+	parseErr(recorder)
 }
 
 func TestShowAddress(t *testing.T) {
+	id := getID(callApi([]byte(`
+
+		{
+		 "address": "ادرس کامل",
+		 "city_id": 1,
+		 "full_name": "نام گیرنده",
+		 "lat": "35.5",
+		 "long": "36.5",
+		 "mobile": "09024809750",
+		 "postal_code": "1111111111",
+		 "province_id": 1,
+		 "title": "عنوان"
+		}
+
+	`),
+		"user/address/create",
+		"POST"))
+	if !assert.NotNilf(t, id, "Create model failed for get id") {
+		return
+	}
 
 	recorder := httptest.NewRecorder()
 	callApi([]byte(``),
-		"user/address/show/2",
-		"GET", recorder)
+		"user/address/show/"+*id,
+		"GET")
 
-	if !assert.Equal(t, http.StatusOK, recorder.Code) || !assert.NotContains(t, recorder.Body.String(), "error") {
-		parse(t, recorder)
-		return
-	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "error")
+	parseErr(recorder)
 }

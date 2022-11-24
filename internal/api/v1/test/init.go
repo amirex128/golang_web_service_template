@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/amirex128/selloora_backend/internal/api"
 	"github.com/amirex128/selloora_backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/k0kubun/pp/v3"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testing"
+	"strings"
 )
 
 var (
@@ -30,7 +30,8 @@ func init() {
 
 }
 
-func callApi(body []byte, api string, method string, recorder *httptest.ResponseRecorder) *httptest.ResponseRecorder {
+func callApi(body []byte, api string, method string) *httptest.ResponseRecorder {
+	recorder := httptest.NewRecorder()
 	req, _ := http.NewRequest(method, host+api, bytes.NewBuffer(body))
 	req.Header.Set("Authorization", token)
 	req.Header.Set("Content-Type", "application/json")
@@ -38,12 +39,42 @@ func callApi(body []byte, api string, method string, recorder *httptest.Response
 	return recorder
 }
 
-func parse(t *testing.T, recorder *httptest.ResponseRecorder) {
+func parse(recorder *httptest.ResponseRecorder) map[string]interface{} {
 	var response map[string]interface{}
 	err := json.Unmarshal(recorder.Body.Bytes(), &response)
 	if err != nil {
-		assert.Errorf(t, err, "error in unmarshal response")
+		return nil
 	}
-	pp.Println("------------------Error Response-------------------")
-	pp.Println(response)
+	return response
+}
+func parseErr(recorder *httptest.ResponseRecorder) {
+	if http.StatusOK != recorder.Code || strings.Contains(recorder.Body.String(), "error") {
+		res := parse(recorder)
+		pp.Println(res)
+	}
+}
+
+func getID(recorder *httptest.ResponseRecorder) *string {
+	var body map[string]interface{}
+	if http.StatusOK != recorder.Code || strings.Contains(recorder.Body.String(), "error") {
+		parse(recorder)
+		return nil
+	} else {
+		body = parse(recorder)
+		if body == nil {
+			return nil
+		}
+	}
+
+	var id string
+	if res, ok := body["data"].(map[string]interface{}); ok {
+		if resID, ok := res["id"]; ok {
+			id = fmt.Sprintf("%v", uint64(resID.(float64)))
+		} else {
+			return nil
+		}
+	} else {
+		return nil
+	}
+	return &id
 }

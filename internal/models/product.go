@@ -74,11 +74,11 @@ func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs
 	return pagination, nil
 }
 
-func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct, userID uint64) error {
+func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct, userID uint64) (*Product, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateProduct", "model")
 	defer span.End()
 
-	var product = Product{
+	var product = &Product{
 		UserID:      userID,
 		ShopID:      dto.ShopID,
 		Description: dto.Description,
@@ -97,15 +97,15 @@ func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct, userID uint64) erro
 		galleryIDs = append(galleryIDs, Gallery{ID: dto.GalleryIDs[i]})
 
 	}
-	err := m.GetConn().Create(&product).Error
+	err := m.GetConn().Create(product).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد محصول", "model", err)
+		return nil, errorx.New("خطا در ایجاد محصول", "model", err)
 	}
-	err = m.GetConn().Model(&product).Association("Galleries").Append(galleryIDs)
+	err = m.GetConn().Model(product).Association("Galleries").Append(galleryIDs)
 	if err != nil {
-		return errorx.New("خطا در ایجاد محصول", "model", err)
+		return product, errorx.New("خطا در ایجاد محصول", "model", err)
 	}
-	return nil
+	return product, nil
 }
 
 func (m *MysqlManager) UpdateProduct(dto DTOs.UpdateProduct) error {

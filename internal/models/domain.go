@@ -44,19 +44,20 @@ func initDomain(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) CreateDomain(dto DTOs.CreateDomain) error {
+func (m *MysqlManager) CreateDomain(dto DTOs.CreateDomain) (*Domain, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateDomain", "model")
 	defer span.End()
-	err := m.GetConn().Create(&Domain{
+	domain := &Domain{
 		ShopID:    &dto.ShopID,
 		Name:      dto.Name,
 		Type:      dto.Type,
 		DnsStatus: "pending",
-	}).Error
-	if err != nil {
-		return errorx.New("خطایی در سرور رخ داده است", "model", err)
 	}
-	return nil
+	err := m.GetConn().Create(domain).Error
+	if err != nil {
+		return domain, errorx.New("خطایی در سرور رخ داده است", "model", err)
+	}
+	return domain, nil
 }
 
 func (m *MysqlManager) FindDomainByName(name string) (*Domain, error) {

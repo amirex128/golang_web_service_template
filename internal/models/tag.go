@@ -25,18 +25,18 @@ func initTag(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateTag(dto DTOs.CreateTag) (err error) {
+func (m *MysqlManager) CreateTag(dto DTOs.CreateTag) (*Tag, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateTag", "model")
 	defer span.End()
-	tag := Tag{
+	tag := &Tag{
 		Name: dto.Name,
 		Slug: dto.Slug,
 	}
-	err = m.GetConn().Create(&tag).Error
+	err := m.GetConn().Create(tag).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد تگ", "model", err)
+		return tag, errorx.New("خطا در ایجاد تگ", "model", err)
 	}
-	return
+	return tag, nil
 }
 
 func (m *MysqlManager) GetAllTagsWithPagination(dto DTOs.IndexTag) (pagination *DTOs.Pagination, err error) {

@@ -56,13 +56,14 @@ func CreateCategory(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateCategory(dto)
+	category, err := models.NewMysqlManager(c).CreateCategory(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "دسته بندی با موفقیت ایجاد شد",
+		"data":    category,
 	})
 }
 
@@ -70,8 +71,9 @@ func CreateCategory(c *gin.Context) {
 // @Summary ویرایش دسته بندی ها
 // @description کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند
 // @Tags category
-// @Router       /user/category/update [post]
+// @Router       /user/category/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param message body DTOs.UpdateCategory true "ورودی"
 func UpdateCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateCategory", "request")
@@ -98,7 +100,7 @@ func UpdateCategory(c *gin.Context) {
 // @Tags category
 // @Router       /user/category/delete/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
-// @Param	id			 path   string	true "شناسه آدرس" SchemaExample(1)
+// @Param	id			 path   string	true "شناسه دسته بندی" SchemaExample(1)
 func DeleteCategory(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteCategory", "request")
 	c.Request.WithContext(ctx)

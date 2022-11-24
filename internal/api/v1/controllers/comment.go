@@ -25,13 +25,14 @@ func CreateComment(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateComment(dto)
+	comment, err := models.NewMysqlManager(c).CreateComment(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "نظر شما با موفقیت ثبت شد و پس از تایید مدیر نمایش داده خواهد شد",
+		"data":    comment,
 	})
 }
 

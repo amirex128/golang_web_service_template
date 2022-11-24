@@ -32,7 +32,7 @@ func initSlider(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) error {
+func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) (*Slider, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")
 	defer span.End()
 
@@ -52,11 +52,11 @@ func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) error {
 		Position:    dto.Position,
 		Sort:        lastSort.Sort + 1,
 	}
-	err = m.GetConn().Create(&slider).Error
+	err = m.GetConn().Create(slider).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد کد اسلایدر", "model", err)
+		return slider, errorx.New("خطا در ایجاد کد اسلایدر", "model", err)
 	}
-	return nil
+	return slider, nil
 }
 func (m *MysqlManager) UpdateSlider(dto DTOs.UpdateSlider) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showSlider", "model")

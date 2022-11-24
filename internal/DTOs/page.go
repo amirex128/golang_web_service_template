@@ -13,7 +13,7 @@ type CreatePage struct {
 	ShopID uint `form:"shop_id" json:"shop_id" validate:"required" example:"1"`
 }
 type UpdatePage struct {
-	ID uint `form:"id" json:"id" validate:"required" example:"1"`
+	ID uint64 `form:"id" json:"id" validate:"required" example:"1"`
 	//عنوان صفحه
 	Title string `form:"title" json:"title" validate:"omitempty" example:"تماس با ما"`
 	//محتوا صفحه که میتواند از اچ تی ام ال تشکیل شده باشد

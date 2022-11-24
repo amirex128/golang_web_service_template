@@ -31,21 +31,21 @@ func InitComment(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateComment(dto DTOs.CreateComment) (err error) {
+func (m *MysqlManager) CreateComment(dto DTOs.CreateComment) (*Comment, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateComment", "model")
 	defer span.End()
-	comment := Comment{
+	comment := &Comment{
 		PostID:    dto.PostID,
 		Name:      dto.Name,
 		Body:      dto.Body,
 		Email:     dto.Email,
 		CreatedAt: utils.NowTime(),
 	}
-	err = m.GetConn().Create(&comment).Error
+	err := m.GetConn().Create(comment).Error
 	if err != nil {
-		return errorx.New("خطا در ایجاد دیدگاه", "model", err)
+		return comment, errorx.New("خطا در ایجاد دیدگاه", "model", err)
 	}
-	return
+	return comment, nil
 }
 
 func (m *MysqlManager) GetAllCommentWithPagination(dto DTOs.IndexComment) (pagination *DTOs.Pagination, err error) {

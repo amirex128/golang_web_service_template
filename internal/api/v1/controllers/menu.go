@@ -26,13 +26,14 @@ func CreateMenu(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	err = models.NewMysqlManager(c).CreateMenu(dto)
+	menu, err := models.NewMysqlManager(c).CreateMenu(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "صفحه با موفقیت ایجاد شد",
+		"data":    menu,
 	})
 }
 
@@ -40,8 +41,9 @@ func CreateMenu(c *gin.Context) {
 // @Summary ویرایش منو
 // @description با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید
 // @Tags menu
-// @Router       /user/menu/update [post]
+// @Router       /user/menu/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdateMenu  	true "ورودی"
 func UpdateMenu(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updateMenu", "request")

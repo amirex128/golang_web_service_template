@@ -35,13 +35,14 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	err = models.NewMysqlManager(c).CreatePost(dto, *userID)
+	post, err := models.NewMysqlManager(c).CreatePost(dto, *userID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "مقاله شما با موفقیت ایجاد شد",
+		"data":    post,
 	})
 }
 
@@ -49,8 +50,9 @@ func CreatePost(c *gin.Context) {
 // @Summary ویرایش مقاله
 // @description فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند
 // @Tags post
-// @Router       /user/post/update [post]
+// @Router       /user/post/update/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	false "شناسه " SchemaExample(1)
 // @Param	message	 body   DTOs.UpdatePost  	true "ورودی"
 func UpdatePost(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:updatePost", "request")

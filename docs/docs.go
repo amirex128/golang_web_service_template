@@ -200,7 +200,33 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/address/update": {
+        "/user/address/show/{id}": {
+            "get": {
+                "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
+                "tags": [
+                    "post"
+                ],
+                "summary": "نمایش آدرس",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/address/update/{id}": {
             "post": {
                 "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
                 "tags": [
@@ -214,6 +240,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه آدرس",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -316,7 +348,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "شناسه آدرس",
+                        "description": "شناسه دسته بندی",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -325,7 +357,33 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/category/update": {
+        "/user/category/show/{id}": {
+            "get": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "post"
+                ],
+                "summary": "نمایش دسته بندی",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/category/update/{id}": {
             "post": {
                 "description": "کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته بندی ها استفاده میکنند که دو نوع میباشد نوع اول برای محصولات و نوع دوم ان برای مقالات این دو نوع از هم جدا هستن ولی از یک ای پی ای ساخته می شوند و نمایش داده میشوند",
                 "tags": [
@@ -339,6 +397,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -698,7 +762,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/discount/update": {
+        "/user/discount/update/{id}": {
             "post": {
                 "description": "ویرایش تخفیف",
                 "tags": [
@@ -712,6 +776,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه تخفیف",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -815,6 +885,32 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "شناسه دامنه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/domain/show/{id}": {
+            "get": {
+                "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه دامنه در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
+                "tags": [
+                    "post"
+                ],
+                "summary": "نمایش دامنه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1000,7 +1096,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/menu/update": {
+        "/user/menu/update/{id}": {
             "post": {
                 "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
                 "tags": [
@@ -1014,6 +1110,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -1408,7 +1510,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/page/update": {
+        "/user/page/update/{id}": {
             "post": {
                 "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
                 "tags": [
@@ -1422,6 +1524,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -1559,7 +1667,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/post/update": {
+        "/user/post/update/{id}": {
             "post": {
                 "description": "فروشگاه ها میتوانند برای خود مقاله بسازند تا در سئو بهتر باشند",
                 "tags": [
@@ -1573,6 +1681,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -1710,7 +1824,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/product/update": {
+        "/user/product/update/{id}": {
             "post": {
                 "description": "محصولات میتوانند خصوصیات مختلفی داشته باشند که این خصوصیت ها شامل رنگ و اندازه میباشد",
                 "tags": [
@@ -1724,6 +1838,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -1917,7 +2037,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/shop/update": {
+        "/user/shop/update/{id}": {
             "post": {
                 "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
                 "tags": [
@@ -1931,6 +2051,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",
@@ -2068,7 +2194,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/slider/update": {
+        "/user/slider/update/{id}": {
             "post": {
                 "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
                 "tags": [
@@ -2082,6 +2208,12 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path"
                     },
                     {
                         "description": "ورودی",

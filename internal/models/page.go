@@ -39,7 +39,7 @@ func initPage(manager *MysqlManager) {
 						panic(err)
 					}
 					body = string(readFile)
-					err = manager.CreatePage(DTOs.CreatePage{
+					_, err = manager.CreatePage(DTOs.CreatePage{
 						Title:  dir.Name(),
 						Body:   body,
 						Type:   "blank",
@@ -56,7 +56,7 @@ func initPage(manager *MysqlManager) {
 
 }
 
-func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) error {
+func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) (*Page, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePage", "model")
 	defer span.End()
 	page := &Page{
@@ -70,9 +70,9 @@ func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) error {
 	}
 	err := m.GetConn().Create(page).Error
 	if err != nil {
-		return errorx.New("خطایی در ایجاد صفحه رخ داده است", "model", err)
+		return page, errorx.New("خطایی در ایجاد صفحه رخ داده است", "model", err)
 	}
-	return nil
+	return page, nil
 }
 
 func (m *MysqlManager) UpdatePage(dto DTOs.UpdatePage) error {

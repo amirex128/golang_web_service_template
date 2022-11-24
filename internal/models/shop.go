@@ -46,7 +46,7 @@ func initShop(manager *MysqlManager) {
 	}
 }
 
-func (m *MysqlManager) CreateShop(dto DTOs.CreateShop, userID uint64) error {
+func (m *MysqlManager) CreateShop(dto DTOs.CreateShop, userID uint64) (*Shop, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateShop", "model")
 	defer span.End()
 	shop := &Shop{
@@ -75,9 +75,9 @@ func (m *MysqlManager) CreateShop(dto DTOs.CreateShop, userID uint64) error {
 	}
 	err := m.GetConn().Create(shop).Error
 	if err != nil {
-		return errorx.New("خطایی در ایجاد فروشگاه رخ داده است", "model", err)
+		return shop, errorx.New("خطایی در ایجاد فروشگاه رخ داده است", "model", err)
 	}
-	return nil
+	return shop, nil
 }
 
 func (m *MysqlManager) FindShopByID(shopID uint64) (*Shop, error) {
