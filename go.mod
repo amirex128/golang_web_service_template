@@ -28,7 +28,6 @@ require (
 	github.com/swaggo/swag v1.8.1
 	github.com/tiaguinho/gosoap v1.4.4
 	github.com/yaa110/go-persian-calendar v1.1.3
-	go.elastic.co/apm v1.15.0
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.2.0
 	go.elastic.co/apm/module/apmgin/v2 v2.2.0
 	go.elastic.co/apm/module/apmgoredisv8 v1.15.0
@@ -36,7 +35,6 @@ require (
 	go.elastic.co/apm/module/apmlogrus v1.15.0
 	go.elastic.co/apm/v2 v2.2.0
 	gopkg.in/sohlich/elogrus.v7 v7.0.0
-	gorm.io/driver/mysql v1.3.6
 	gorm.io/gorm v1.23.8
 )
 
@@ -92,6 +90,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
+	go.elastic.co/apm v1.15.0 // indirect
 	go.elastic.co/apm/module/apmhttp/v2 v2.2.0 // indirect
 	go.elastic.co/apm/module/apmsql/v2 v2.2.0 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
@@ -107,5 +106,6 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/mysql v1.3.6 // indirect
 	howett.net/plist v1.0.0 // indirect
 )

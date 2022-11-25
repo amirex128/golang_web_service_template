@@ -33,7 +33,7 @@ type CreateDiscount struct {
 	//شناسه محصولات
 	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
 	//وضعیت تخفیف
-	Status bool `form:"status" json:"status" validate:"required,numeric" example:"true"`
+	Status bool `form:"status" json:"status" validate:"required" example:"true"`
 }
 
 type UpdateDiscount struct {
@@ -56,7 +56,7 @@ type UpdateDiscount struct {
 	//شناسه محصولات
 	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
 	//وضعیت تخفیف
-	Status bool `form:"status" json:"status" validate:"omitempty,numeric" example:"true"`
+	Status bool `form:"status" json:"status" validate:"omitempty" example:"true"`
 }
 type IndexDiscount struct {
 	Index

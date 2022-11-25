@@ -63,7 +63,7 @@ func UpdateSlider(c *gin.Context) (DTOs.UpdateSlider, error) {
 		return dto, err
 	}
 	id := strings.Replace(c.Param("id"), "/", "", -1)
-	if dto.ID == 0 && id != "" {
+	if id != "" {
 		dto.ID = utils.StringToUint64(id)
 	}
 	return dto, nil

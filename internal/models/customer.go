@@ -14,7 +14,7 @@ type Customer struct {
 	ProvinceID    uint32 `json:"province_id"`
 	CityID        uint32 `json:"city_id"`
 	Address       string `json:"address"`
-	PostalCode    uint64 `json:"postal_code"`
+	PostalCode    string `json:"postal_code"`
 	VerifyCode    string `json:"verify_code"`
 	CreatedAt     string `json:"created_at"`
 	UpdatedAt     string `json:"updated_at"`
@@ -31,10 +31,11 @@ func initCustomer(manager *MysqlManager) {
 		ProvinceID:    1,
 		CityID:        1,
 		Address:       "تهران",
-		PostalCode:    1234567890,
+		PostalCode:    "9234567890",
 		LastSendSMSAt: "2020-01-01 00:00:00",
 	})
 }
+
 func (m *MysqlManager) FindCustomerById(customerID uint64) (*Customer, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindCustomerById", "model")
 	defer span.End()
@@ -45,6 +46,7 @@ func (m *MysqlManager) FindCustomerById(customerID uint64) (*Customer, error) {
 	}
 	return customer, nil
 }
+
 func (m *MysqlManager) FindCustomerByMobile(mobile string) (*Customer, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindCustomerByMobile", "model")
 	defer span.End()
@@ -66,6 +68,7 @@ func (m *MysqlManager) FindCustomerByMobileAndVerifyCode(mobile, verifyCode stri
 	}
 	return customer, nil
 }
+
 func (m *MysqlManager) CreateCustomer(dto DTOs.CreateUpdateCustomer) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateCustomer", "model")
 	defer span.End()
@@ -84,25 +87,27 @@ func (m *MysqlManager) CreateCustomer(dto DTOs.CreateUpdateCustomer) error {
 	}
 	return nil
 }
-func (m *MysqlManager) CreateCodeCustomer(dto DTOs.RequestCreateLoginCustomer, encryptPassword string) error {
+
+func (m *MysqlManager) CreateCodeCustomer(dto DTOs.RequestCreateLoginCustomer, encryptPassword string) (*Customer, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateCodeCustomer", "model")
 	defer span.End()
 	rowsAffected := m.GetConn().Where("mobile = ?", dto.Mobile).First(&Customer{}).RowsAffected
 	if rowsAffected > 0 {
-		return errorx.New("شماره موبایل قبلا ثبت شده است", "model", nil)
+		return nil, errorx.New("شماره موبایل قبلا ثبت شده است", "model", nil)
 	}
 
-	customer := Customer{
+	customer := &Customer{
 		Mobile:        dto.Mobile,
 		VerifyCode:    encryptPassword,
 		LastSendSMSAt: utils.NowTime(),
 	}
-	err := m.GetConn().Create(&customer).Error
+	err := m.GetConn().Create(customer).Error
 	if err != nil {
-		return errorx.New("مشکلی در ثبت نام شما پیش آمده است", "model", err)
+		return customer, errorx.New("مشکلی در ثبت نام شما پیش آمده است", "model", err)
 	}
-	return nil
+	return customer, nil
 }
+
 func (m *MysqlManager) UpdateCustomer(dto DTOs.CreateUpdateCustomer) (*Customer, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateCustomer", "model")
 	defer span.End()
@@ -123,7 +128,7 @@ func (m *MysqlManager) UpdateCustomer(dto DTOs.CreateUpdateCustomer) (*Customer,
 	if dto.Address != "" {
 		customer.Address = dto.Address
 	}
-	if dto.PostalCode != 0 {
+	if dto.PostalCode != "" {
 		customer.PostalCode = dto.PostalCode
 	}
 	if dto.VerifyCode != "" {
@@ -132,6 +137,52 @@ func (m *MysqlManager) UpdateCustomer(dto DTOs.CreateUpdateCustomer) (*Customer,
 	err = m.GetConn().Save(&customer).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در ویرایش اطلاعات شما پیش آمده است", "model", err)
+	}
+	return customer, nil
+}
+
+func (m *MysqlManager) DeleteCustomer(customerID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showCustomer", "model")
+	defer span.End()
+	customer := Customer{}
+	err := m.GetConn().Where("id = ?", customerID).First(&customer).Error
+	if err != nil {
+		return errorx.New("مشتری یافت نشد", "model", err)
+	}
+
+	err = m.GetConn().Delete(&customer).Error
+	if err != nil {
+		return errorx.New("خطا در حذف مشتری", "model", err)
+	}
+	return nil
+}
+
+func (m *MysqlManager) GetAllCustomerWithPagination(dto DTOs.IndexCustomer) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showCustomer", "model")
+	defer span.End()
+	conn := m.GetConn()
+	var customers []Customer
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	conn = conn.Scopes(DTOs.Paginate("customers", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+	}
+	err := conn.Find(&customers).Error
+	if err != nil {
+		return nil, errorx.New("خطا در دریافت مشتری ها", "model", err)
+	}
+	pagination.Data = customers
+	return pagination, nil
+}
+
+func (m *MysqlManager) FindCustomerByID(customerID uint64) (*Customer, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindCustomerByID", "model")
+	defer span.End()
+	customer := &Customer{}
+	err := m.GetConn().Where("id = ?", customerID).First(customer).Error
+	if err != nil {
+		return nil, errorx.New("مشکلی در یافتن مشتری پیش آمده است", "model", err)
 	}
 	return customer, nil
 }

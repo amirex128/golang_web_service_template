@@ -31,9 +31,9 @@ func ResponseErrorx(c *gin.Context, err error) {
 	}
 
 	if e.Err != nil {
-		if strings.Contains(e.Error(), "record not found") {
-			e.Message = "موردی یافت نشد"
-		}
+		//if strings.Contains(e.Error(), "record not found") {
+		//	e.Message = "موردی یافت نشد"
+		//}
 
 		logrus.Errorf("Errorx: %s, %s, %s, %s", e.Message, e.Type, e.Args, e.Error())
 		logrusProvider.Log.WithFields(logrus.Fields{

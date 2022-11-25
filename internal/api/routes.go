@@ -1,7 +1,26 @@
 package api
 
 import (
-	"github.com/amirex128/selloora_backend/internal/api/v1/controllers"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/address"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/auth"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/category"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/comment"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/customer"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/discount"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/domain"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/gallery"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/landing"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/menu"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/order"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/page"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/post"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/product"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/shop"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/slider"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/tag"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/theme"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/ticket"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/user"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -10,13 +29,13 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
 	root := r.Group("/")
 	{
-		root.GET("/", controllers.IndexLanding)
-		root.GET("blog", controllers.BlogLanding)
-		root.GET("category/:id", controllers.CategoryLanding)
-		root.GET("tag/:slug", controllers.TagLanding)
-		root.GET("blog/:slug", controllers.DetailsLanding)
-		root.GET("search/:search", controllers.SearchLanding)
-		root.GET("page/:slug", controllers.PageLanding)
+		root.GET("/", landing.IndexLanding)
+		root.GET("blog", landing.BlogLanding)
+		root.GET("category/:id", landing.CategoryLanding)
+		root.GET("tag/:slug", landing.TagLanding)
+		root.GET("blog/:slug", landing.DetailsLanding)
+		root.GET("search/:search", landing.SearchLanding)
+		root.GET("page/:slug", landing.PageLanding)
 
 		//root.GET("contact", controllers.ContactLanding)
 		//root.GET("faq", controllers.FaqLanding)
@@ -29,141 +48,151 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	}
 	v1 := r.Group("api/v1")
 	v1.POST("/verify", authMiddleware.LoginHandler)
-	v1.POST("/login/register", controllers.RegisterLogin)
-	v1.POST("/forget", controllers.ForgetPassword)
+	v1.POST("/login/register", auth.RegisterLogin)
+	v1.POST("/forget", auth.ForgetPassword)
 
-	v1.POST("/user/ticket/create", controllers.CreateTicket)
-	v1.POST("user/comment/create", controllers.CreateComment)
+	v1.POST("/user/ticket/create", ticket.CreateTicket)
+	v1.POST("user/comment/create", comment.CreateComment)
 
-	user := v1.Group("user")
-	user.Use(authMiddleware.MiddlewareFunc())
+	_user := v1.Group("user")
+	_user.Use(authMiddleware.MiddlewareFunc())
 	{
-		profile := user.Group("profile")
+		profile := _user.Group("profile")
 		{
-			profile.POST("/update", controllers.UpdateProfile)
-			profile.POST("/change-password", controllers.ChangePassword)
+			profile.POST("/update", user.UpdateUser)
+			profile.POST("/change-password", auth.ChangePassword)
 		}
-		product := user.Group("product")
+		_product := _user.Group("product")
 		{
-			product.GET("/list", controllers.IndexProduct)
-			product.GET("/show/:id", controllers.ShowProduct)
-			product.POST("/create", controllers.CreateProduct)
-			product.POST("/update/*id", controllers.UpdateProduct)
-			product.POST("/delete/:id", controllers.DeleteProduct)
+			_product.GET("/list", product.IndexProduct)
+			_product.GET("/show/:id", product.ShowProduct)
+			_product.POST("/create", product.CreateProduct)
+			_product.POST("/update/*id", product.UpdateProduct)
+			_product.POST("/delete/:id", product.DeleteProduct)
 		}
-		ticket := user.Group("ticket")
+		_ticket := _user.Group("ticket")
 		{
-			ticket.GET("/list", controllers.IndexTicket)
-			ticket.GET("/show/:id", controllers.ShowTicket)
+			_ticket.GET("/list", ticket.IndexTicket)
+			_ticket.GET("/show/:id", ticket.ShowTicket)
 		}
-		gallery := user.Group("gallery")
+		_gallery := _user.Group("gallery")
 		{
-			gallery.POST("/create", controllers.CreateGallery)
-			gallery.POST("/delete/:id", controllers.DeleteGallery)
+			_gallery.POST("/create", gallery.CreateGallery)
+			_gallery.GET("/show/:id", gallery.ShowGallery)
+			_gallery.GET("/list", gallery.IndexGallery)
+			_gallery.POST("/delete/:id", gallery.DeleteGallery)
 		}
-		discount := user.Group("discount")
+		_discount := _user.Group("discount")
 		{
-			discount.GET("/list", controllers.IndexDiscount)
-			discount.GET("/show/:id", controllers.ShowDiscount)
-			discount.POST("/create", controllers.CreateDiscount)
-			discount.POST("/update/*id", controllers.UpdateDiscount)
-			discount.POST("/delete/:id", controllers.DeleteDiscount)
+			_discount.GET("/list", discount.IndexDiscount)
+			_discount.GET("/show/:id", discount.ShowDiscount)
+			_discount.POST("/create", discount.CreateDiscount)
+			_discount.POST("/update/*id", discount.UpdateDiscount)
+			_discount.POST("/delete/:id", discount.DeleteDiscount)
 		}
-		address := user.Group("address")
+		_address := _user.Group("address")
 		{
-			address.GET("/list", controllers.IndexAddress)
-			address.POST("/create", controllers.CreateAddress)
-			address.POST("/update/*id", controllers.UpdateAddress)
-			address.GET("/show/:id", controllers.ShowAddress)
-			address.POST("/delete/:id", controllers.DeleteAddress)
+			_address.GET("/list", address.IndexAddress)
+			_address.POST("/create", address.CreateAddress)
+			_address.POST("/update/*id", address.UpdateAddress)
+			_address.GET("/show/:id", address.ShowAddress)
+			_address.POST("/delete/:id", address.DeleteAddress)
 		}
-		domain := user.Group("domain")
+		_domain := _user.Group("domain")
 		{
-			domain.GET("/list", controllers.IndexDomain)
-			domain.POST("/create", controllers.CreateDomain)
-			domain.GET("/show/:id", controllers.ShowDomain)
-			domain.POST("/delete/:id", controllers.DeleteDomain)
+			_domain.GET("/list", domain.IndexDomain)
+			_domain.POST("/create", domain.CreateDomain)
+			_domain.GET("/show/:id", domain.ShowDomain)
+			_domain.POST("/delete/:id", domain.DeleteDomain)
 		}
-		order := user.Group("order")
+		_order := _user.Group("order")
 		{
-			order.POST("/send", controllers.SendOrder)
-			order.GET("/list", controllers.IndexOrder)
-			order.POST("/approve/:id", controllers.ApproveOrder)
-			order.POST("/cancel/:id", controllers.CancelOrder)
-			order.POST("/calculate", controllers.CalculateSendPrice)
-			order.POST("/returned", controllers.ReturnedOrder)
-			order.POST("/returned/accept", controllers.AcceptReturnedOrder)
-			order.GET("/show/:id", controllers.ShowOrder)
-			order.GET("/tracking/:id", controllers.TrackingOrder)
+			_order.POST("/send", order.SendOrder)
+			_order.GET("/list", order.IndexOrder)
+			_order.POST("/approve/:id", order.ApproveOrder)
+			_order.POST("/cancel/:id", order.CancelOrder)
+			_order.POST("/calculate", order.CalculateSendPrice)
+			_order.POST("/returned", order.ReturnedOrder)
+			_order.POST("/returned/accept", order.AcceptReturnedOrder)
+			_order.GET("/show/:id", order.ShowOrder)
+			_order.GET("/tracking/:id", order.TrackingOrder)
 		}
-		shop := user.Group("shop")
+		_shop := _user.Group("shop")
 		{
-			shop.GET("list", controllers.IndexShop)
-			shop.POST("/create", controllers.CreateShop)
-			shop.POST("/update/*id", controllers.UpdateShop)
-			shop.GET("/show/:id", controllers.ShowShop)
-			shop.POST("/delete/:id", controllers.DeleteShop)
-			shop.POST("/send-price", controllers.SendPrice)
-			shop.GET("/instagram", controllers.GetInstagramPost)
-		}
-
-		slider := user.Group("slider")
-		{
-			slider.GET("/list", controllers.IndexSlider)
-			slider.POST("/create", controllers.CreateSlider)
-			slider.GET("/show/:id", controllers.ShowSlider)
-			slider.POST("/update/*id", controllers.UpdateSlider)
-			slider.POST("/delete/:id", controllers.DeleteSlider)
+			_shop.GET("list", shop.IndexShop)
+			_shop.POST("/create", shop.CreateShop)
+			_shop.POST("/update/*id", shop.UpdateShop)
+			_shop.GET("/show/:id", shop.ShowShop)
+			_shop.POST("/delete/:id", shop.DeleteShop)
+			_shop.POST("/send-price", shop.SendPrice)
+			_shop.GET("/instagram", shop.GetInstagramPost)
 		}
 
-		post := user.Group("post")
+		_slider := _user.Group("slider")
 		{
-			post.GET("/list", controllers.IndexPost)
-			post.GET("/show/:id", controllers.ShowPost)
-			post.POST("/create", controllers.CreatePost)
-			post.POST("/update/*id", controllers.UpdatePost)
-			post.POST("/delete/:id", controllers.DeletePost)
+			_slider.GET("/list", slider.IndexSlider)
+			_slider.POST("/create", slider.CreateSlider)
+			_slider.GET("/show/:id", slider.ShowSlider)
+			_slider.POST("/update/*id", slider.UpdateSlider)
+			_slider.POST("/delete/:id", slider.DeleteSlider)
 		}
-		page := user.Group("page")
+
+		_post := _user.Group("post")
 		{
-			page.GET("/list", controllers.IndexPage)
-			page.GET("/show/:id", controllers.ShowPage)
-			page.POST("/create", controllers.CreatePage)
-			page.POST("/update/*id", controllers.UpdatePage)
-			page.POST("/delete/:id", controllers.DeletePage)
+			_post.GET("/list", post.IndexPost)
+			_post.GET("/show/:id", post.ShowPost)
+			_post.POST("/create", post.CreatePost)
+			_post.POST("/update/*id", post.UpdatePost)
+			_post.POST("/delete/:id", post.DeletePost)
 		}
-		menu := user.Group("menu")
+		_page := _user.Group("page")
 		{
-			menu.GET("/list", controllers.IndexMenu)
-			menu.GET("/show/:id", controllers.ShowMenu)
-			menu.POST("/create", controllers.CreateMenu)
-			menu.POST("/update/*id", controllers.UpdateMenu)
-			menu.POST("/delete/:id", controllers.DeleteMenu)
+			_page.GET("/list", page.IndexPage)
+			_page.GET("/show/:id", page.ShowPage)
+			_page.POST("/create", page.CreatePage)
+			_page.POST("/update/*id", page.UpdatePage)
+			_page.POST("/delete/:id", page.DeletePage)
 		}
-		theme := user.Group("theme")
+		_customer := _user.Group("customer")
 		{
-			theme.GET("/list", controllers.IndexTheme)
+			_customer.GET("/list", customer.IndexCustomer)
+			_customer.GET("/show/:id", customer.ShowCustomer)
+			_customer.POST("/delete/:id", customer.DeleteCustomer)
 		}
-		category := user.Group("category")
+		_menu := _user.Group("menu")
 		{
-			category.GET("/list", controllers.IndexCategory)
-			category.GET("/create", controllers.CreateCategory)
-			category.POST("/update/*id", controllers.UpdateCategory)
-			category.POST("/delete/:id", controllers.DeleteCategory)
+			_menu.GET("/list", menu.IndexMenu)
+			_menu.GET("/show/:id", menu.ShowMenu)
+			_menu.POST("/create", menu.CreateMenu)
+			_menu.POST("/update/*id", menu.UpdateMenu)
+			_menu.POST("/delete/:id", menu.DeleteMenu)
+		}
+		_theme := _user.Group("theme")
+		{
+			_theme.GET("/list", theme.IndexTheme)
+		}
+		_category := _user.Group("category")
+		{
+			_category.GET("/list", category.IndexCategory)
+			_category.GET("/show/:id", category.ShowCategory)
+			_category.POST("/create", category.CreateCategory)
+			_category.POST("/update/*id", category.UpdateCategory)
+			_category.POST("/delete/:id", category.DeleteCategory)
 
 		}
-		comment := user.Group("comment")
+		_comment := _user.Group("comment")
 		{
-			comment.GET("/list", controllers.IndexCommentAdmin)
-			comment.POST("/delete/:id", controllers.DeleteCommentAdmin)
-			comment.POST("/approve/:id", controllers.ApproveCommentAdmin)
+			_comment.GET("/list", comment.IndexComment)
+			_comment.GET("/show/:id", comment.ShowComment)
+			_comment.POST("/delete/:id", comment.DeleteComment)
+			_comment.POST("/approve/:id", comment.ApproveComment)
 		}
-		tag := user.Group("tag")
+		_tag := _user.Group("tag")
 		{
-			tag.GET("/list", controllers.IndexTag)
-			tag.POST("/create", controllers.CreateTag)
-			tag.POST("/delete/:id", controllers.DeleteTag)
-			tag.POST("/add", controllers.AddTag)
+			_tag.GET("/list", tag.IndexTag)
+			_tag.POST("/create", tag.CreateTag)
+			_tag.POST("/delete/:id", tag.DeleteTag)
+			_tag.POST("/add", tag.AddTag)
 		}
 	}
 
@@ -173,13 +202,13 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
 	}
 
-	customer := v1.Group("customer")
+	_customer := v1.Group("customer")
 	{
-		customer.POST("login/register", controllers.RequestCreateLoginCustomer)
-		customer.POST("verify", controllers.VerifyCreateLoginCustomer)
-		customer.POST("orders", controllers.IndexCustomerOrders)
-		customer.POST("/sadad/verify", controllers.SadadPaymentVerify)
-		customer.POST("/order/create", controllers.CreateOrder)
-		customer.POST("/discount/check", controllers.CheckDiscount)
+		_customer.POST("login/register", customer.RequestCreateLoginCustomer)
+		_customer.POST("verify", customer.VerifyCreateLoginUpdateCustomer)
+		_customer.POST("orders", order.IndexCustomerOrders)
+		_customer.POST("/sadad/verify", order.SadadPaymentVerify)
+		_customer.POST("/order/create", order.CreateOrder)
+		_customer.POST("/discount/check", discount.CheckDiscount)
 	}
 }

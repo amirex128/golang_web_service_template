@@ -9,3 +9,7 @@ type CreateGallery struct {
 	//طول تصویر
 	Height uint32 `form:"height" json:"height" validate:"required" example:"300"`
 }
+
+type IndexGallery struct {
+	Index
+}

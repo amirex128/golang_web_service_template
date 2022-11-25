@@ -8,7 +8,7 @@ type IndexProduct struct {
 
 type CreateProduct struct {
 	//شناسه فروشگاه
-	ShopID uint64 `form:"shop_id" validate:"required" example:"0"`
+	ShopID uint64 `form:"shop_id" validate:"required" example:"1"`
 	//برند محصول
 	Manufacturer string `form:"manufacturer_id" validate:"omitempty" example:"سامسونگ"`
 	//توضیحات محصول

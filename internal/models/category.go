@@ -5,7 +5,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/sirupsen/logrus"
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 )
 
 type Category struct {

@@ -2,10 +2,12 @@ package providers
 
 import (
 	"context"
+	"flag"
 	"github.com/amirex128/selloora_backend/internal/providers/safe"
 	"github.com/samber/do"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/sohlich/elogrus.v7"
+	"io/ioutil"
 	"time"
 )
 
@@ -26,7 +28,11 @@ func NewLogrus(i *do.Injector, ctx context.Context) (*LogrusProvider, error) {
 			return err
 		}
 		log.Hooks.Add(hook)
+		if flag.Lookup("test.v") != nil {
+			log.Out = ioutil.Discard
+		}
 		logrusIns.Log = log
+
 		return nil
 	}, 30*time.Second)
 	logrus.Infof("logrus service is registered")

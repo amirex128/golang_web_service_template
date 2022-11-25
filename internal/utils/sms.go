@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -41,7 +42,9 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 func SendSMS(c *gin.Context, ctx context.Context, to string, text string, isFlash bool) error {
 	span, ctx := apm.StartSpan(ctx, "SendSMS", "request")
 	defer span.End()
-
+	if flag.Lookup("test.v") != nil {
+		return nil
+	}
 	jsonData := map[string]string{
 		"username": username,
 		"password": password,

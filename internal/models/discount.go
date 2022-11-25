@@ -73,7 +73,7 @@ func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error
 	}
 	err := m.GetConn().Create(discount).Error
 	if err != nil {
-		return discount, errorx.New("خطا در ایجاد کد تخفیف", "model", err)
+		return nil, errorx.New("خطا در ایجاد کد تخفیف", "model", err)
 	}
 	return discount, nil
 }
@@ -184,14 +184,13 @@ func (m *MysqlManager) FindDiscountById(discountID uint64) (Discount, error) {
 	return discount, nil
 }
 
-func (m *MysqlManager) FindDiscountByCodeAndUserID(code string) (Discount, error) {
+func (m *MysqlManager) FindDiscountByCodeAndUserID(code string, userOwnerID uint64) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
-	discount := Discount{}
-	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userID).First(&discount).Error
+	discount := &Discount{}
+	err := m.GetConn().Where("code = ?", code).Where("user_id = ?", userOwnerID).Find(discount).Error
 	if err != nil {
-		return discount, errorx.New("کد تخفیف یافت نشد", "model", err)
+		return nil, errorx.New("کد تخفیف یافت نشد", "model", err)
 	}
 	return discount, nil
 }

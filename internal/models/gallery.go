@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/spf13/viper"
 	"go.elastic.co/apm/v2"
@@ -31,15 +32,15 @@ func initGallery(manager *MysqlManager) {
 	})
 }
 
-func (m *MysqlManager) UploadImage(gallery *Gallery) (uint64, error) {
+func (m *MysqlManager) UploadImage(gallery *Gallery) (*Gallery, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UploadImage", "model")
 	defer span.End()
 	gallery.FullPath = viper.GetString("server_url") + gallery.Path
 	err := m.GetConn().Create(gallery).Error
 	if err != nil {
-		return 0, errorx.New("خطا در آپلود تصویر", "model", err)
+		return nil, errorx.New("خطا در آپلود تصویر", "model", err)
 	}
-	return gallery.ID, nil
+	return gallery, nil
 }
 
 func (m *MysqlManager) DeleteGallery(galleryID uint64) error {
@@ -74,4 +75,23 @@ func (m *MysqlManager) FindGalleryByID(galleryID uint64) (*Gallery, error) {
 		return nil, errorx.New("شما اجازه حذف این تصویر را ندارید", "model", err)
 	}
 	return &gallery, nil
+}
+func (m *MysqlManager) GetAllGalleryWithPagination(dto DTOs.IndexGallery) (*DTOs.Pagination, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showGallery", "model")
+	defer span.End()
+	conn := m.GetConn()
+	var galleries []Gallery
+	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
+
+	userID := GetUser(m.Ctx)
+	conn = conn.Scopes(DTOs.Paginate("galleries", pagination, conn))
+	if dto.Search != "" {
+		conn = conn.Where("user_id = ? ", userID).Order("id DESC")
+	}
+	err := conn.Find(&galleries).Error
+	if err != nil {
+		return nil, errorx.New("خطا در دریافت تصاویر", "model", err)
+	}
+	pagination.Data = galleries
+	return pagination, nil
 }

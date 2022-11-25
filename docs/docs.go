@@ -569,6 +569,31 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/user/customer/delete/{id}": {
+            "post": {
+                "tags": [
+                    "customer"
+                ],
+                "summary": "حذف مشتری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه مشتری",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/customer/discount/check": {
             "post": {
                 "description": "کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود را وارد نمایید تا بر روی محصولات اش اعمال شوند",
@@ -613,6 +638,31 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/DTOs.RequestCreateLoginCustomer"
                         }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/customer/show/{id}": {
+            "get": {
+                "tags": [
+                    "customer"
+                ],
+                "summary": "نمایش مشتری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}

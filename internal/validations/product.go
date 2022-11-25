@@ -92,7 +92,7 @@ func CreateProduct(c *gin.Context) (DTOs.CreateProduct, error) {
 			"numeric": "شناسه آیتم گزینه محصول باید عددی باشد",
 		},
 	}
-	err := c.BindWith(&dto, binding.FormMultipart)
+	err := c.Bind(&dto)
 	if err != nil {
 		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
 	}
@@ -175,7 +175,7 @@ func UpdateProduct(c *gin.Context) (DTOs.UpdateProduct, error) {
 		return dto, err
 	}
 	id := strings.Replace(c.Param("id"), "/", "", -1)
-	if dto.ID == 0 && id != "" {
+	if id != "" {
 		dto.ID = utils.StringToUint64(id)
 	}
 	return dto, nil

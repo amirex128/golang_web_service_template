@@ -1623,6 +1623,23 @@ paths:
       summary: نمایش لیست سفارشات مشتری
       tags:
       - order
+  /user/customer/delete/{id}:
+    post:
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه مشتری
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف مشتری
+      tags:
+      - customer
   /user/customer/discount/check:
     post:
       description: کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود
@@ -1656,6 +1673,23 @@ paths:
           $ref: '#/definitions/DTOs.RequestCreateLoginCustomer'
       responses: {}
       summary: ثبت نام یا ورود کاربر با ارسال کد
+      tags:
+      - customer
+  /user/customer/show/{id}:
+    get:
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 'شناسه '
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش مشتری
       tags:
       - customer
   /user/customer/verify:

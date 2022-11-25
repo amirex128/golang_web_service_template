@@ -4,7 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 )
 
 type User struct {

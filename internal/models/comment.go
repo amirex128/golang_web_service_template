@@ -101,3 +101,13 @@ func (m *MysqlManager) ApproveComment(id uint64) error {
 	return nil
 
 }
+func (m *MysqlManager) FindCommentByID(id uint64) (*Comment, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindCommentByID", "model")
+	defer span.End()
+	menu := &Comment{}
+	err := m.GetConn().Where("id = ?", id).First(menu).Error
+	if err != nil {
+		return menu, errorx.New("دیدگاه مورد نظر یافت نشد", "model", err)
+	}
+	return menu, nil
+}

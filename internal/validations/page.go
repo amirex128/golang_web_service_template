@@ -64,7 +64,7 @@ func UpdatePage(c *gin.Context) (DTOs.UpdatePage, error) {
 	}
 
 	id := strings.Replace(c.Param("id"), "/", "", -1)
-	if dto.ID == 0 && id != "" {
+	if id != "" {
 		dto.ID = utils.StringToUint64(id)
 	}
 	return dto, nil

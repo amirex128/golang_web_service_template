@@ -157,8 +157,8 @@ func (m *MysqlManager) DeleteProduct(id uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteProduct", "model")
 	defer span.End()
 	userID := GetUser(m.Ctx)
-	var product Product
-	err := m.GetConn().Where("id = ?", id).First(&product).Error
+	product := &Product{}
+	err := m.GetConn().Where("id = ?", id).Find(&product).Error
 	if err != nil {
 		return errorx.New("خطا در حذف محصول", "model", err)
 	}
@@ -175,8 +175,8 @@ func (m *MysqlManager) DeleteProduct(id uint64) error {
 func (m *MysqlManager) FindProductById(id uint64) (*Product, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindProductById", "model")
 	defer span.End()
-	var product *Product
-	err := m.GetConn().Where("id = ?", id).First(product).Error
+	product := &Product{}
+	err := m.GetConn().Where("id = ?", id).Find(product).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت محصول", "model", err)
 	}
