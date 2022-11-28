@@ -38,12 +38,12 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            cd /home/selloora/selloora-backend
-            cat /home/selloora//dockerpassword | docker login -u amirex128 --password-stdin
+            cd /root/docker-stack
+            cat /root/dockerpassword | docker login -u amirex128 --password-stdin
             rm /etc/resolv.conf
             echo -e "nameserver 178.22.122.100 \n nameserver 185.51.200.2 \n options edns0" >> /etc/resolv.conf
-            docker-compose pull
-            docker-compose up -d
+            docker compose -f docker-compose-server.yml pull
+            docker compose -f docker-compose-server.yml up -d
             docker image prune
             rm /etc/resolv.conf
             echo -e "nameserver 8.8.8.8 \n nameserver 8.8.4.4 \n options edns0" >> /etc/resolv.conf
