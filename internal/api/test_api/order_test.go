@@ -22,7 +22,7 @@ func TestCreateOrder(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/order/create",
+		"/api/v1/user/order/create",
 		"POST")
 	orderID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -32,24 +32,11 @@ func TestCreateOrder(t *testing.T) {
 
 }
 
-func TestUpdateOrder(t *testing.T) {
+func TestShowOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
-	recorder := callApi([]byte(`
-{
-  "order": "ادرس کامل",
-  "city_id": 1,
-  "full_name": "نام گیرنده",
-  "id": 1,
-  "lat": "35.123456",
-  "long": "35.123456",
-  "mobile": "09024809750",
-  "postal_code": "1111111111",
-  "province_id": 1,
-  "title": "عنوان"
-}
-	`),
-		"user/order/update/"+*orderID,
-		"POST")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/show/"+*orderID,
+		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
 	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
@@ -57,10 +44,9 @@ func TestUpdateOrder(t *testing.T) {
 	parseErr(recorder)
 }
 
-func TestShowOrder(t *testing.T) {
-	assert.NotNilf(t, orderID, "order id is nil")
+func TestIndexCustomerOrders(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/order/show/"+*orderID,
+		"/api/v1/user/order/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,8 +57,92 @@ func TestShowOrder(t *testing.T) {
 
 func TestIndexOrder(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/order/list",
+		"/api/v1/user/order/list",
 		"GET")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestTrackingOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestSendOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestReturnedOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestCalculateSendPrice(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestAcceptReturnedOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestCancelOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestApproveOrder(t *testing.T) {
+	assert.NotNilf(t, orderID, "order id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/order/delete/"+*orderID,
+		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
 	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
@@ -83,7 +153,7 @@ func TestIndexOrder(t *testing.T) {
 func TestDeleteOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"user/order/delete/"+*orderID,
+		"/api/v1/user/order/delete/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

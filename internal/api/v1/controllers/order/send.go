@@ -15,8 +15,9 @@ import (
 // @Summary دریافت اطلاعات ارسال و انتخاب ارسال کننده
 // @description بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
 // @Tags order
-// @Router       /user/order/send [post]
+// @Router       /user/order/send/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
+// @Param	id			 path   string	true "شناسه" SchemaExample(1)
 // @Param	message	 body   DTOs.SendOrder  	true "ورودی"
 func SendOrder(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:sendOrder", "request")

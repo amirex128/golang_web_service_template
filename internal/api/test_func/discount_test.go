@@ -24,7 +24,7 @@ func TestCreateDiscount(t *testing.T) {
   "type": "percent"
 }
 	`),
-		"user/discount/create",
+		"/api/v1/user/discount/create",
 		"POST")
 	discountID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -52,7 +52,7 @@ func TestUpdateDiscount(t *testing.T) {
   "type": "percent"
 }
 	`),
-		"user/discount/update/"+*discountID,
+		"/api/v1/user/discount/update/"+*discountID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -64,7 +64,7 @@ func TestUpdateDiscount(t *testing.T) {
 func TestShowDiscount(t *testing.T) {
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(``),
-		"user/discount/show/"+*discountID,
+		"/api/v1/user/discount/show/"+*discountID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -87,7 +87,7 @@ func TestCheckDiscount(t *testing.T) {
   "user_id": 1
 }
 	`),
-		"customer/discount/check",
+		"/api/v1/customer/discount/check",
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -99,7 +99,7 @@ func TestCheckDiscount(t *testing.T) {
 
 func TestIndexDiscount(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/discount/list",
+		"/api/v1/user/discount/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -111,7 +111,7 @@ func TestIndexDiscount(t *testing.T) {
 func TestDeleteDiscount(t *testing.T) {
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(``),
-		"user/discount/delete/"+*discountID,
+		"/api/v1/user/discount/delete/"+*discountID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

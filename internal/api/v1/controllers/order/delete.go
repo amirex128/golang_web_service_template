@@ -9,24 +9,24 @@ import (
 	"net/http"
 )
 
-// ShowOrder
-// @Summary نمایش جزئیات سفارش
-// @description مشتری نیاز دارد سفارش خود را از طریق پنل مشتری مشاهده نماید
+// DeleteOrder
+// @Summary حذف سفارش
+// @description با ایجاد سفارش کاربر میتواند سفارش های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید
 // @Tags order
-// @Router       /user/order/show/{id} [get]
+// @Router       /user/order/delete/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه" SchemaExample(1)
-func ShowOrder(c *gin.Context) {
-	span, ctx := apm.StartSpan(c.Request.Context(), "controller:showOrder", "request")
+func DeleteOrder(c *gin.Context) {
+	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteOrder", "request")
 	c.Request.WithContext(ctx)
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
-	order, err := models.NewMysqlManager(c).FindOrderWithItemByID(orderID)
+	err := models.NewMysqlManager(c).DeleteOrder(orderID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"order": order,
+		"message": "صفحه با موفقیت حذف شد",
 	})
 }

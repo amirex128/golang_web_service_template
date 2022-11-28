@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/sirupsen/logrus"
 	"go.elastic.co/apm/v2"
 )
@@ -42,15 +43,13 @@ func initCategory(manager *MysqlManager) bool {
 	categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
 	manager.CreateAllCategoryRelated(categoryRelated)
 
-	for i := 0; i < 10; i++ {
-		manager.CreateCategory(DTOs.CreateCategory{
-			Name:        "دسته بندی " + utils.IntToString(i),
-			Type:        "post",
-			GalleryID:   0,
-			Equivalent:  "کلمه مترادف" + utils.IntToString(i),
-			Description: "توضیحات دسته بندی " + utils.IntToString(i),
-		})
+	for i := 0; i < 100; i++ {
+		model := new(DTOs.CreateCategory)
+		gofakeit.Struct(model)
+
+		manager.CreateCategory(*model)
 	}
+
 	return true
 
 }

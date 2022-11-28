@@ -2,33 +2,33 @@ package DTOs
 
 type CreateShop struct {
 	//نام فروشگاه
-	Name string `form:"name" json:"name" validate:"required" example:"فروشگاه امیر"`
+	Name string `form:"name" json:"name" validate:"required" example:"فروشگاه امیر" fake:"{name}"`
 	//تصویر لوگو فروشگاه
-	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty" example:"1"`
+	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validate:"omitempty" example:"1" fake:"{number:1,100}"`
 	//نوع فروشگاه که میتواند به صورت اینستاگرامی باشد یا وبسایتی باشد یا روبیکا یا ربات تلگرام
-	Type string `form:"type" json:"type" validate:"required,oneof=instagram telegram website rubika" example:"instagram" enums:"instagram,telegram,website,rubika"`
+	Type string `form:"type" json:"type" validate:"required,oneof=instagram telegram website rubika" example:"instagram" enums:"instagram,telegram,website,rubika" fake:"{custom_enum:instagram,telegram,website,rubika}"`
 	//آدرس شبکه اجتماعیی که میخواهید متصل کنید به فروشگاه برای دریافت محصولات از ان
-	SocialAddress string `form:"social_address" json:"social_address" validate:"required" example:"amirex_dev"`
+	SocialAddress string `form:"social_address" json:"social_address" validate:"required" example:"amirex_dev" fake:"{username}"`
 	//توضیحات فروشگاه
-	Description string `form:"description" json:"description" validate:"omitempty" example:"توضیحات فروشگاه"`
+	Description string `form:"description" json:"description" validate:"omitempty" example:"توضیحات فروشگاه" fake:"{lorem_ipsum_sentence:10}"`
 	//شماره تلفن برای نمایش در فروشگاه برای پشتیبانی
-	Phone string `form:"phone" json:"phone" validate:"omitempty" example:"05136643278"`
+	Phone string `form:"phone" json:"phone" validate:"omitempty" example:"05136643278" fake:"{phone}"`
 	//شماره موبایل برای نمایش در فروشگاه برای پشتیبانی
-	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,numeric,startswith=09" example:"09024809750"`
+	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,numeric,startswith=09" example:"09024809750" fake:"{phone}"`
 	//آیدی تلگرام برای نمایش در فروشگاه برای پشتیبانی
-	TelegramID string `form:"telegram_id" json:"telegram_id" validate:"omitempty" example:"amirex128"`
+	TelegramID string `form:"telegram_id" json:"telegram_id" validate:"omitempty" example:"amirex128" fake:"{username}"`
 	//آیدی اینستاگرام برای نمایش در فروشگاه برای پشتیبانی
-	InstagramID string `form:"instagram_id" json:"instagram_id" validate:"omitempty" example:"amirex_dev"`
+	InstagramID string `form:"instagram_id" json:"instagram_id" validate:"omitempty" example:"amirex_dev" fake:"{username}"`
 	//آیدی واتس آپ برای نمایش در فروشگاه برای پشتیبانی
-	WhatsappID string `form:"whatsapp_id" json:"whatsapp_id" validate:"omitempty" example:"amirex128"`
+	WhatsappID string `form:"whatsapp_id" json:"whatsapp_id" validate:"omitempty" example:"amirex128" fake:"{username}"`
 	//ایمیل برای نمایش در فروشگاه برای پشتیبانی
-	Email string `form:"email" json:"email" validate:"omitempty,email" example:"amirex128@gmail.com"`
+	Email string `form:"email" json:"email" validate:"omitempty,email" example:"amirex128@gmail.com" fake:"{email}"`
 	//وبسایت شخصی برای نمایش در فروشگاه برای پشتیبانی
-	Website string `form:"website" json:"website" validate:"omitempty" example:"https://amirshirdel.ir"`
+	Website string `form:"website" json:"website" validate:"omitempty" example:"https://amirshirdel.ir" fake:"{url}"`
 	//هزینه ارسال تومان
-	SendPrice float32 `form:"send_price" json:"send_price" validate:"omitempty" example:"20000"`
+	SendPrice float32 `form:"send_price" json:"send_price" validate:"omitempty" example:"20000" fake:"{number:10000,100000}"`
 	//شناسه قالب
-	ThemeID uint64 `form:"theme_id" json:"theme_id" validate:"omitempty" example:"1"`
+	ThemeID uint64 `form:"theme_id" json:"theme_id" validate:"omitempty" example:"1" fake:"{number:1,4}"`
 }
 
 type UpdateShop struct {
@@ -79,7 +79,7 @@ type CheckSocial struct {
 	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required,numeric" example:"1"`
 }
 
-type SendPrice struct {
+type SendPriceShop struct {
 	//هزینه ارسال تومان
 	SendPrice float32 `form:"send_price" json:"send_price" validate:"required,numeric" example:"30000"`
 	//شناسه فروشگاه

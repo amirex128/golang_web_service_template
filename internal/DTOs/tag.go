@@ -2,9 +2,9 @@ package DTOs
 
 type CreateTag struct {
 	//عنوان تگ
-	Name string `form:"name" json:"name" binding:"required,min=3,max=40" example:"عنوان تگ"`
+	Name string `form:"name" json:"name" binding:"required,min=3,max=40" example:"عنوان تگ" fake:"{word}"`
 	//آدرس تگ
-	Slug string `form:"slug" json:"slug" binding:"required,min=3,max=40" example:"slug-tag"`
+	Slug string `form:"slug" json:"slug" binding:"required,min=3,max=40" example:"slug-tag" fake:"{word}"`
 }
 
 type IndexTag struct {

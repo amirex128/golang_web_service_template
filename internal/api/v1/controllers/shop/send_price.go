@@ -10,18 +10,18 @@ import (
 	"net/http"
 )
 
-// SendPrice
+// SendPriceShop
 // @Summary ویرایش هزینه ارسال سفارشات به صورت جدا
 // @description هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
 // @Tags shop
-// @Router       /user/shop/send-price [post]
+// @Router       /user/shop/send-price/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
-// @Param	message	 body   DTOs.SendPrice  	true "ورودی"
-func SendPrice(c *gin.Context) {
+// @Param	message	 body   DTOs.SendPriceShop  	true "ورودی"
+func SendPriceShop(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:sendPrice", "request")
 	c.Request.WithContext(ctx)
 	defer span.End()
-	dto, err := validations.SendPrice(c)
+	dto, err := validations.SendPriceShop(c)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

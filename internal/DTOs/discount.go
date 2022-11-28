@@ -17,23 +17,23 @@ type CheckDiscount struct {
 
 type CreateDiscount struct {
 	//کد تخفیف
-	Code string `form:"code" json:"code" validate:"required" example:"asdf"`
+	Code string `form:"code" json:"code" validate:"required" example:"asdf" fake:"{word}"`
 	//تاریخ شروع تخفیف
-	StartedAt string `form:"started_at" json:"started_at" validate:"required" example:"2021-01-01 00:00:00"`
+	StartedAt string `form:"started_at" json:"started_at" validate:"required" example:"2021-01-01 00:00:00" fake:"{date}"`
 	//تاریخ پایان تخفیف
-	EndedAt string `form:"ended_at" json:"ended_at" validate:"required" example:"2025-01-01 00:00:00"`
+	EndedAt string `form:"ended_at" json:"ended_at" validate:"required" example:"2025-01-01 00:00:00" fake:"{date}"`
 	//تعداد تخفیف
-	Count uint32 `form:"count" json:"count" validate:"required,numeric" example:"10"`
+	Count uint32 `form:"count" json:"count" validate:"required,numeric" example:"10" fake:"{number:1,100}"`
 	//نوع تخفیف
-	Type string `form:"type" json:"type" validate:"required,oneof=percent amount" example:"percent" Enums:"percent,amount"`
+	Type string `form:"type" json:"type" validate:"required,oneof=percent amount" example:"percent" Enums:"percent,amount" fake:"{custom_enum:percent,amount}"`
 	//مقدار تخفیف
-	Amount float32 `form:"amount" json:"amount" validate:"omitempty,numeric" example:"0.0"`
+	Amount float32 `form:"amount" json:"amount" validate:"omitempty,numeric" example:"0.0" fake:"{number:1,100}"`
 	//درصد تخفیف
-	Percent float32 `form:"percent" json:"percent" validate:"omitempty,numeric" example:"50.0"`
+	Percent float32 `form:"percent" json:"percent" validate:"omitempty,numeric" example:"50.0" fake:"{number:1,100}"`
 	//شناسه محصولات
-	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
+	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric" fakesize:"2"`
 	//وضعیت تخفیف
-	Status bool `form:"status" json:"status" validate:"required" example:"true"`
+	Status bool `form:"status" json:"status" validate:"required" example:"true" fake:"{bool}"`
 }
 
 type UpdateDiscount struct {

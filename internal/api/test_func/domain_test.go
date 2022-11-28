@@ -16,7 +16,7 @@ func TestCreateDomain(t *testing.T) {
   "type": "domain"
 }
 	`),
-		"user/domain/create",
+		"/api/v1/user/domain/create",
 		"POST")
 	domainID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -29,7 +29,7 @@ func TestCreateDomain(t *testing.T) {
 func TestShowDomain(t *testing.T) {
 	assert.NotNilf(t, domainID, "domain id is nil")
 	recorder := callApi([]byte(``),
-		"user/domain/show/"+*domainID,
+		"/api/v1/user/domain/show/"+*domainID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -40,7 +40,7 @@ func TestShowDomain(t *testing.T) {
 
 func TestIndexDomain(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/domain/list",
+		"/api/v1/user/domain/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -52,7 +52,7 @@ func TestIndexDomain(t *testing.T) {
 func TestDeleteDomain(t *testing.T) {
 	assert.NotNilf(t, domainID, "domain id is nil")
 	recorder := callApi([]byte(``),
-		"user/domain/delete/"+*domainID,
+		"/api/v1/user/domain/delete/"+*domainID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

@@ -443,7 +443,7 @@ definitions:
         type: integer
       shopID:
         description: شناسه فروشگاه
-        example: 0
+        example: 1
         type: integer
       startedAt:
         description: تاریخ شروع فروش
@@ -629,8 +629,8 @@ definitions:
         type: string
       postal_code:
         description: کد پستی
-        example: 1111111111
-        type: integer
+        example: "9111111111"
+        type: string
       province_id:
         description: شناسه استان
         example: 1
@@ -745,7 +745,7 @@ definitions:
     - value
     - weight
     type: object
-  DTOs.SendPrice:
+  DTOs.SendPriceShop:
     properties:
       send_price:
         description: هزینه ارسال تومان
@@ -1222,6 +1222,65 @@ info:
   title: Selloora Backend API
   version: "1.0"
 paths:
+  /comment/create:
+    post:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: ورودی
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CreateComment'
+      responses: {}
+      summary: ایجاد دیدگاه
+      tags:
+      - comment
+  /customer/discount/check:
+    post:
+      description: کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود
+        را وارد نمایید تا بر روی محصولات اش اعمال شوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.CheckDiscount'
+      responses: {}
+      summary: بررسی تخفیف
+      tags:
+      - discount
+  /customer/orders:
+    get:
+      description: مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد
+      parameters:
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: نمایش لیست سفارشات مشتری
+      tags:
+      - order
   /forget:
     post:
       description: در صورتی که کاربر پسورد خود را فراموش کرده باشد با استفاده از این
@@ -1371,7 +1430,7 @@ paths:
       responses: {}
       summary: نمایش آدرس
       tags:
-      - post
+      - address
   /user/address/update/{id}:
     post:
       description: کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا
@@ -1489,7 +1548,7 @@ paths:
       responses: {}
       summary: نمایش دسته بندی
       tags:
-      - post
+      - category
   /user/category/update/{id}:
     post:
       description: کاربران برای دسته بندی کردن محصولات خود و مقالات خود از این دسته
@@ -1565,21 +1624,6 @@ paths:
       summary: تائید دیدگاه
       tags:
       - comment
-  /user/comment/create:
-    post:
-      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
-        ثبتند
-      parameters:
-      - description: ورودی
-        in: body
-        name: comment
-        required: true
-        schema:
-          $ref: '#/definitions/DTOs.CreateComment'
-      responses: {}
-      summary: ایجاد دیدگاه
-      tags:
-      - comment
   /user/comment/delete/{id}:
     post:
       description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
@@ -1599,30 +1643,53 @@ paths:
       summary: حذف دیدگاه
       tags:
       - comment
+  /user/comment/show/{id}:
+    get:
+      description: مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می
+        ثبتند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش نظر
+      tags:
+      - comment
   /user/customer:
     get:
-      description: مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد
       parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: متن جستجو
         in: query
         name: search
         type: string
-      - description: شماره صفحه
+      - description: شماره مشتری
         in: query
-        name: page
+        name: customer
         type: string
-      - description: تعداد صفحه
+      - description: تعداد مشتری
         in: query
-        name: page_size
+        name: customer_size
         type: string
       - description: مرتب سازی براساس desc/asc
         in: query
         name: sort
         type: string
       responses: {}
-      summary: نمایش لیست سفارشات مشتری
+      summary: لیست مشتری
       tags:
-      - order
+      - customer
   /user/customer/delete/{id}:
     post:
       parameters:
@@ -1640,26 +1707,6 @@ paths:
       summary: حذف مشتری
       tags:
       - customer
-  /user/customer/discount/check:
-    post:
-      description: کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود
-        را وارد نمایید تا بر روی محصولات اش اعمال شوند
-      parameters:
-      - description: Authentication
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: ورودی
-        in: body
-        name: message
-        required: true
-        schema:
-          $ref: '#/definitions/DTOs.CheckDiscount'
-      responses: {}
-      summary: بررسی تخفیف
-      tags:
-      - discount
   /user/customer/login/register:
     post:
       description: مشتریان میتوانند با ارسال شماره موبایل و کد تایید به سیستم وارد
@@ -1899,7 +1946,38 @@ paths:
       responses: {}
       summary: نمایش دامنه
       tags:
-      - post
+      - domain
+  /user/gallery:
+    get:
+      description: با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده
+        نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر
+        به فرمت وب پی تبدیل میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: متن جستجو
+        in: query
+        name: search
+        type: string
+      - description: شماره صفحه
+        in: query
+        name: page
+        type: string
+      - description: تعداد صفحه
+        in: query
+        name: page_size
+        type: string
+      - description: مرتب سازی براساس desc/asc
+        in: query
+        name: sort
+        type: string
+      responses: {}
+      summary: لیست منو ها
+      tags:
+      - gallery
   /user/gallery/create:
     post:
       description: با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده
@@ -1937,6 +2015,26 @@ paths:
         type: string
       responses: {}
       summary: حذف گالری
+      tags:
+      - gallery
+  /user/gallery/show/{id}:
+    get:
+      description: با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده
+        نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر
+        به فرمت وب پی تبدیل میشوند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: نمایش منو
       tags:
       - gallery
   /user/menu:
@@ -1999,7 +2097,7 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: شناسه منو
+      - description: شناسه
         in: path
         name: id
         required: true
@@ -2026,7 +2124,7 @@ paths:
       responses: {}
       summary: نمایش منو
       tags:
-      - post
+      - menu
   /user/menu/update/{id}:
     post:
       description: با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط
@@ -2162,22 +2260,63 @@ paths:
       summary: ایجاد سفارش جدید
       tags:
       - order
-  /user/order/returned:
+  /user/order/delete/{id}:
+    post:
+      description: با ایجاد سفارش کاربر میتواند سفارش های بالای صفحه و پاین صفحه مربوط
+        به قالب خود را کم و زیاد نماید
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف سفارش
+      tags:
+      - order
+  /user/order/returned/{id}:
     post:
       description: مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
       responses: {}
       summary: ثبت درخواست مرجوعی توسط مشتری
       tags:
       - order
-  /user/order/returned/accept:
+  /user/order/returned/accept/{id}:
     post:
       description: بعد از درخواست مرجوعی با این درخواست توسط ادمین بررسی شود و در
         صورت تائید سفارش مرجوع شود و سرویس دهنده قبلی جهت جمع آوری ارسال شود
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
       responses: {}
       summary: تائید درخواست مرجوعی توسط مدیر
       tags:
       - order
-  /user/order/send:
+  /user/order/send/{id}:
     post:
       description: بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه
         ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال
@@ -2185,6 +2324,11 @@ paths:
       - description: Authentication
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
         required: true
         type: string
       - description: ورودی
@@ -2206,7 +2350,7 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: شناسه سفارش
+      - description: شناسه
         in: path
         name: id
         required: true
@@ -2285,6 +2429,7 @@ paths:
         schema:
           $ref: '#/definitions/DTOs.CreatePage'
       responses: {}
+      summary: ایجاد صفحه
       tags:
       - page
   /user/page/delete/{id}:
@@ -2328,7 +2473,7 @@ paths:
       responses: {}
       summary: نمایش صفحه
       tags:
-      - post
+      - page
   /user/page/update/{id}:
     post:
       description: هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت
@@ -2665,7 +2810,22 @@ paths:
       summary: حذف فروشگاه
       tags:
       - shop
-  /user/shop/send-price:
+  /user/shop/instagram:
+    get:
+      description: هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته
+        باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند
+        ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses: {}
+      summary: دریافت پست های اینتستاگرام فروشگاه و تبدیل آن ها به محصول
+      tags:
+      - shop
+  /user/shop/send-price/{id}:
     post:
       description: هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته
         باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند
@@ -2681,7 +2841,7 @@ paths:
         name: message
         required: true
         schema:
-          $ref: '#/definitions/DTOs.SendPrice'
+          $ref: '#/definitions/DTOs.SendPriceShop'
       responses: {}
       summary: ویرایش هزینه ارسال سفارشات به صورت جدا
       tags:
@@ -2818,7 +2978,7 @@ paths:
       responses: {}
       summary: نمایش اسلایدر
       tags:
-      - post
+      - slider
   /user/slider/update/{id}:
     post:
       description: هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های
@@ -2994,6 +3154,25 @@ paths:
           $ref: '#/definitions/DTOs.CreateTicket'
       responses: {}
       summary: ایجاد تیکت
+      tags:
+      - ticket
+  /user/ticket/delete/{id}:
+    post:
+      description: کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و
+        تیم پشتیبانی ما تیکت ارسال نماییند
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: شناسه
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: حذف تیکت
       tags:
       - ticket
   /user/ticket/show/{id}:

@@ -22,7 +22,7 @@ func TestCreateShop(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/shop/create",
+		"/api/v1/user/shop/create",
 		"POST")
 	shopID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -48,7 +48,7 @@ func TestUpdateShop(t *testing.T) {
   "title": "عنوان"
 }
 	`),
-		"user/shop/update/"+*shopID,
+		"/api/v1/user/shop/update/"+*shopID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -60,7 +60,7 @@ func TestUpdateShop(t *testing.T) {
 func TestShowShop(t *testing.T) {
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
-		"user/shop/show/"+*shopID,
+		"/api/v1/user/shop/show/"+*shopID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestShowShop(t *testing.T) {
 
 func TestIndexShop(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/shop/list",
+		"/api/v1/user/shop/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexShop(t *testing.T) {
 func TestDeleteShop(t *testing.T) {
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
-		"user/shop/delete/"+*shopID,
+		"/api/v1/user/shop/delete/"+*shopID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

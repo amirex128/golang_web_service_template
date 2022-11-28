@@ -13,7 +13,7 @@ import (
 // @Summary نمایش لیست سفارشات مشتری
 // @description مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد
 // @Tags order
-// @Router       /user/customer [get]
+// @Router       /customer/orders [get]
 // @Param	search			 query   string	false "متن جستجو"
 // @Param	page			 query   string	false "شماره صفحه"
 // @Param	page_size		 query   string	false "تعداد صفحه"

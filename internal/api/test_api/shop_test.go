@@ -11,18 +11,23 @@ var shopID *string
 func TestCreateShop(t *testing.T) {
 	recorder := callApi([]byte(`
 {
- "shop": "ادرس کامل",
- "city_id": 1,
- "full_name": "نام گیرنده",
- "lat": "35.5",
- "long": "36.5",
- "mobile": "09024809750",
- "postal_code": "1111111111",
- "province_id": 1,
- "title": "عنوان"
+  "description": "توضیحات فروشگاه",
+  "email": "amirex128@gmail.com",
+  "gallery_id": 1,
+  "instagram_id": "amirex_dev",
+  "mobile": "09024809750",
+  "name": "فروشگاه امیر",
+  "phone": "05136643278",
+  "send_price": 20000,
+  "social_address": "amirex_dev",
+  "telegram_id": "amirex128",
+  "theme_id": 1,
+  "type": "instagram",
+  "website": "https://amirshirdel.ir",
+  "whatsapp_id": "amirex128"
 }
 	`),
-		"user/shop/create",
+		"/api/v1/user/shop/create",
 		"POST")
 	shopID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -36,20 +41,54 @@ func TestUpdateShop(t *testing.T) {
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(`
 {
-  "shop": "ادرس کامل",
-  "city_id": 1,
-  "full_name": "نام گیرنده",
+  "description": "توضیحات فروشگاه",
+  "email": "amirex128@gmail.com",
+  "gallery_id": 1,
   "id": 1,
-  "lat": "35.123456",
-  "long": "35.123456",
+  "instagram_id": "amirex_dev",
   "mobile": "09024809750",
-  "postal_code": "1111111111",
-  "province_id": 1,
-  "title": "عنوان"
+  "name": "فروشگاه امیر",
+  "phone": "05136643278",
+  "send_price": 25000,
+  "social_address": "amirex_dev",
+  "telegram_id": "amirex128",
+  "theme_id": 1,
+  "type": "instagram",
+  "website": "https://amirshirdel.ir",
+  "whatsapp_id": "amirex128"
 }
 	`),
-		"user/shop/update/"+*shopID,
+		"/api/v1/user/shop/update/"+*shopID,
 		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestSendPriceShop(t *testing.T) {
+	assert.NotNilf(t, shopID, "shop id is nil")
+	recorder := callApi([]byte(`
+{
+  "send_price": 30000,
+  "shop_id": 1
+}
+	`),
+		"/api/v1/user/shop/send-price/"+*shopID,
+		"POST")
+
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
+
+	parseErr(recorder)
+}
+
+func TestGetInstagramPost(t *testing.T) {
+	assert.NotNilf(t, shopID, "shop id is nil")
+	recorder := callApi([]byte(``),
+		"/api/v1/user/shop/instagram",
+		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
 	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
@@ -60,7 +99,7 @@ func TestUpdateShop(t *testing.T) {
 func TestShowShop(t *testing.T) {
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
-		"user/shop/show/"+*shopID,
+		"/api/v1/user/shop/show/"+*shopID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +110,7 @@ func TestShowShop(t *testing.T) {
 
 func TestIndexShop(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/shop/list",
+		"/api/v1/user/shop/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +122,7 @@ func TestIndexShop(t *testing.T) {
 func TestDeleteShop(t *testing.T) {
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
-		"user/shop/delete/"+*shopID,
+		"/api/v1/user/shop/delete/"+*shopID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

@@ -120,10 +120,10 @@ func CheckSocial(c *gin.Context) (DTOs.CheckSocial, error) {
 	return dto, nil
 }
 
-func SendPrice(c *gin.Context) (DTOs.SendPrice, error) {
-	var dto DTOs.SendPrice
+func SendPriceShop(c *gin.Context) (DTOs.SendPriceShop, error) {
+	var dto DTOs.SendPriceShop
 	tags := ValidationTags{
-		"SendPrice": {
+		"SendPriceShop": {
 			"required": "مبلغ ارسال را وارد کنید",
 			"numeric":  "مبلغ ارسال باید عدد باشد",
 		},
@@ -141,6 +141,10 @@ func SendPrice(c *gin.Context) (DTOs.SendPrice, error) {
 	err = validateTags(tags, err, c)
 	if err != nil {
 		return dto, err
+	}
+	id := strings.Replace(c.Param("id"), "/", "", -1)
+	if id != "" {
+		dto.ShopID = utils.StringToUint64(id)
 	}
 	return dto, nil
 }

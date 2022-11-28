@@ -18,7 +18,7 @@ func TestCreateMenu(t *testing.T) {
   "shop_id": 1
 }
 	`),
-		"user/menu/create",
+		"/api/v1/user/menu/create",
 		"POST")
 	menuID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -40,7 +40,7 @@ func TestUpdateMenu(t *testing.T) {
   "sort": 1
 }
 	`),
-		"user/menu/update/"+*menuID,
+		"/api/v1/user/menu/update/"+*menuID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -52,7 +52,7 @@ func TestUpdateMenu(t *testing.T) {
 func TestShowMenu(t *testing.T) {
 	assert.NotNilf(t, menuID, "menu id is nil")
 	recorder := callApi([]byte(``),
-		"user/menu/show/"+*menuID,
+		"/api/v1/user/menu/show/"+*menuID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -63,7 +63,7 @@ func TestShowMenu(t *testing.T) {
 
 func TestIndexMenu(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/menu/list",
+		"/api/v1/user/menu/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -75,7 +75,7 @@ func TestIndexMenu(t *testing.T) {
 func TestDeleteMenu(t *testing.T) {
 	assert.NotNilf(t, menuID, "menu id is nil")
 	recorder := callApi([]byte(``),
-		"user/menu/delete/"+*menuID,
+		"/api/v1/user/menu/delete/"+*menuID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

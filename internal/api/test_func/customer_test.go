@@ -18,7 +18,7 @@ func TestRequestCreateLoginCustomer(t *testing.T) {
   "shop_id": 1
 }
 	`),
-		"customer/login/register",
+		"/api/v1/customer/login/register",
 		"POST")
 	customerID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -31,7 +31,7 @@ func TestRequestCreateLoginCustomer(t *testing.T) {
 func TestShowCustomer(t *testing.T) {
 	assert.NotNilf(t, customerID, "customer id is nil")
 	recorder := callApi([]byte(``),
-		"user/customer/show/"+*customerID,
+		"/api/v1/user/customer/show/"+*customerID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestVerifyCreateLoginCustomer(t *testing.T) {
 
 func TestIndexCustomer(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/customer/list",
+		"/api/v1/user/customer/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexCustomer(t *testing.T) {
 func TestDeleteCustomer(t *testing.T) {
 	assert.NotNilf(t, customerID, "customer id is nil")
 	recorder := callApi([]byte(``),
-		"user/customer/delete/"+*customerID,
+		"/api/v1/user/customer/delete/"+*customerID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

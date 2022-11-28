@@ -22,7 +22,7 @@ func TestCreateOrder(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/order/create",
+		"/api/v1/user/order/create",
 		"POST")
 	orderID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -48,7 +48,7 @@ func TestUpdateOrder(t *testing.T) {
   "title": "عنوان"
 }
 	`),
-		"user/order/update/"+*orderID,
+		"/api/v1/user/order/update/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -60,7 +60,7 @@ func TestUpdateOrder(t *testing.T) {
 func TestShowOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"user/order/show/"+*orderID,
+		"/api/v1/user/order/show/"+*orderID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestShowOrder(t *testing.T) {
 
 func TestIndexOrder(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/order/list",
+		"/api/v1/user/order/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexOrder(t *testing.T) {
 func TestDeleteOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"user/order/delete/"+*orderID,
+		"/api/v1/user/order/delete/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

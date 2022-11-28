@@ -11,13 +11,13 @@ type OrderItem struct {
 
 type CreateOrder struct {
 	//شناسه مالک فروشگاه
-	UserID uint64 `form:"user_id" json:"user_id" validate:"required,numeric" example:"1"`
+	UserID uint64 `form:"user_id" json:"user_id" validate:"required,numeric" example:"1" `
 	//شناسه فروشگاه
-	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required,numeric" example:"1"`
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required,numeric" example:"1" `
 	//لیست اقلام داخل سفارش
-	OrderItems []OrderItem `form:"order_items" json:"order_items" validate:"required,dive"`
+	OrderItems []OrderItem `form:"order_items" json:"order_items" validate:"required,dive" `
 	//شناسه مشتری
-	CustomerID uint64 `form:"customer_id" json:"customer_id" validate:"required,numeric" example:"1"`
+	CustomerID uint64 `form:"customer_id" json:"customer_id" validate:"required,numeric" example:"1" `
 	//کد تخفیف
 	DiscountCode string `form:"discount_code" json:"discount_code" validate:"omitempty" example:"asdf"`
 	//توضیحات سفارش

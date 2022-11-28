@@ -13,7 +13,7 @@ import (
 // @Summary ایجاد دیدگاه
 // @description مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند
 // @Tags comment
-// @Router       /user/comment/create [post]
+// @Router       /comment/create [post]
 // @Param comment body DTOs.CreateComment true "ورودی"
 func CreateComment(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createComment", "request")

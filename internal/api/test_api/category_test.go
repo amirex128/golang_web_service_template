@@ -21,7 +21,7 @@ func TestCreateCategory(t *testing.T) {
 		}
 
 	`),
-		"user/category/create",
+		"/api/v1/user/category/create",
 		"POST")
 	categoryID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -44,7 +44,7 @@ func TestUpdateCategory(t *testing.T) {
 		  "sort": 1
 		}
 	`),
-		"user/category/update/"+*categoryID,
+		"/api/v1/user/category/update/"+*categoryID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -56,7 +56,7 @@ func TestUpdateCategory(t *testing.T) {
 func TestShowCategory(t *testing.T) {
 	assert.NotNilf(t, categoryID, "categoryID is nil")
 	recorder := callApi([]byte(``),
-		"user/category/show/"+*categoryID,
+		"/api/v1/user/category/show/"+*categoryID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -67,7 +67,7 @@ func TestShowCategory(t *testing.T) {
 
 func TestIndexCategory(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/category/list",
+		"/api/v1/user/category/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -79,7 +79,7 @@ func TestIndexCategory(t *testing.T) {
 func TestDeleteCategory(t *testing.T) {
 	assert.NotNilf(t, categoryID, "categoryID is nil")
 	recorder := callApi([]byte(``),
-		"user/category/delete/"+*categoryID,
+		"/api/v1/user/category/delete/"+*categoryID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

@@ -2,15 +2,15 @@ package DTOs
 
 type CreatePage struct {
 	//عنوان صفحه
-	Title string `form:"title" json:"title" validate:"required" example:"درباره ما"`
+	Title string `form:"title" json:"title" validate:"required" example:"درباره ما" fake:"{lorem_ipsum_sentence:1}"`
 	//محتوا صفحه که میتواند از اچ تی ام ال تشکیل شده باشد
-	Body string `form:"body" json:"body" validate:"required" example:"<p>متن صفحه درباره ما</p>"`
+	Body string `form:"body" json:"body" validate:"required" example:"<p>متن صفحه درباره ما</p>" fake:"{lorem_ipsum_paragraph:10}"`
 	//آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد
-	Slug string `form:"slug" json:"slug" validate:"required" example:"about-us"`
+	Slug string `form:"slug" json:"slug" validate:"required" example:"about-us" fake:"{word}"`
 	//نوع صفحه که همراه با چارچوب قالب باشد یا صفحه کاملا خالی
-	Type string `form:"type" json:"type" validate:"required" example:"normal" enums:"normal,blank"`
+	Type string `form:"type" json:"type" validate:"required" example:"normal" enums:"normal,blank" fake:"{custom_enum:normal,blank}"`
 	//شناسه فروشگاه
-	ShopID uint `form:"shop_id" json:"shop_id" validate:"required" example:"1"`
+	ShopID uint `form:"shop_id" json:"shop_id" validate:"required" example:"1" fake:"{number:1,100}"`
 }
 type UpdatePage struct {
 	ID uint64 `form:"id" json:"id" validate:"required" example:"1"`

@@ -27,7 +27,7 @@ func TestCreateProduct(t *testing.T) {
   "startedAt": "2020-01-01 00:00:00"
 }
 	`),
-		"user/product/create",
+		"/api/v1/user/product/create",
 		"POST")
 	productID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -59,7 +59,7 @@ func TestUpdateProduct(t *testing.T) {
   "startedAt": "2020-01-01 00:00:00"
 }
 	`),
-		"user/product/update/"+*productID,
+		"/api/v1/user/product/update/"+*productID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestUpdateProduct(t *testing.T) {
 func TestShowProduct(t *testing.T) {
 	assert.NotNilf(t, productID, "product id is nil")
 	recorder := callApi([]byte(``),
-		"user/product/show/"+*productID,
+		"/api/v1/user/product/show/"+*productID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -82,7 +82,7 @@ func TestShowProduct(t *testing.T) {
 
 func TestIndexProduct(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/product/list",
+		"/api/v1/user/product/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -94,7 +94,7 @@ func TestIndexProduct(t *testing.T) {
 func TestDeleteProduct(t *testing.T) {
 	assert.NotNilf(t, productID, "product id is nil")
 	recorder := callApi([]byte(``),
-		"user/product/delete/"+*productID,
+		"/api/v1/user/product/delete/"+*productID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

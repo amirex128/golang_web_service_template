@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 )
 
 // StringInArray try to find string in array
@@ -96,4 +97,56 @@ func CheckFullStringIntersection(a []string, b []string) bool { // a eshterake b
 	b = UniqueString(b)
 	inter := IntersectionString(a, b)
 	return len(inter) == len(a)
+}
+
+func MergeUint(a []uint, b []uint) []uint {
+	for _, val := range b {
+		a = append(a, val)
+	}
+
+	return a
+}
+
+func DiffUInt(a []uint, b []uint) []uint {
+	diff := make([]uint, 0)
+	for _, val := range a {
+		if !ContainsUInt(b, val) {
+			diff = append(diff, val)
+		}
+	}
+
+	return diff
+}
+
+func ContainsUInt(s []uint, val uint) bool {
+	for _, v := range s {
+		if v == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func Contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
+func UintsToString(numbers []uint, delim string) string {
+	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(numbers)), delim), "[]")
+}
+
+func SliceToMapS(s []string) map[string]bool {
+	setMap := make(map[string]bool)
+	for _, s := range s {
+		setMap[s] = true
+	}
+
+	return setMap
 }

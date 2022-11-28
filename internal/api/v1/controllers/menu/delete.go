@@ -15,7 +15,7 @@ import (
 // @Tags menu
 // @Router       /user/menu/delete/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
-// @Param	id			 path   string	true "شناسه منو" SchemaExample(1)
+// @Param	id			 path   string	true "شناسه" SchemaExample(1)
 func DeleteMenu(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:deleteMenu", "request")
 	c.Request.WithContext(ctx)
@@ -27,6 +27,6 @@ func DeleteMenu(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "صفحه با موفقیت حذف شد",
+		"message": "منو با موفقیت حذف شد",
 	})
 }

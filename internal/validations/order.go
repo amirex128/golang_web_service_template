@@ -2,8 +2,10 @@ package validations
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 func CreateOrder(c *gin.Context) (DTOs.CreateOrder, error) {
@@ -84,6 +86,10 @@ func SendOrder(c *gin.Context) (DTOs.SendOrder, error) {
 	err = validateTags(tags, err, c)
 	if err != nil {
 		return dto, err
+	}
+	id := strings.Replace(c.Param("id"), "/", "", -1)
+	if id != "" {
+		dto.OrderID = utils.StringToUint64(id)
 	}
 	return dto, nil
 }

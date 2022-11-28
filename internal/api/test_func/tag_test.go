@@ -22,7 +22,7 @@ func TestCreateTag(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/tag/create",
+		"/api/v1/user/tag/create",
 		"POST")
 	tagID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -48,7 +48,7 @@ func TestUpdateTag(t *testing.T) {
   "title": "عنوان"
 }
 	`),
-		"user/tag/update/"+*tagID,
+		"/api/v1/user/tag/update/"+*tagID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -60,7 +60,7 @@ func TestUpdateTag(t *testing.T) {
 func TestShowTag(t *testing.T) {
 	assert.NotNilf(t, tagID, "tag id is nil")
 	recorder := callApi([]byte(``),
-		"user/tag/show/"+*tagID,
+		"/api/v1/user/tag/show/"+*tagID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestShowTag(t *testing.T) {
 
 func TestIndexTag(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/tag/list",
+		"/api/v1/user/tag/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexTag(t *testing.T) {
 func TestDeleteTag(t *testing.T) {
 	assert.NotNilf(t, tagID, "tag id is nil")
 	recorder := callApi([]byte(``),
-		"user/tag/delete/"+*tagID,
+		"/api/v1/user/tag/delete/"+*tagID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

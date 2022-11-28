@@ -2,17 +2,17 @@ package DTOs
 
 type CreateSlider struct {
 	//شناسه فروشگاه
-	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"required" example:"1"`
+	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"required" example:"1" fake:"{number:1,100}"`
 	//لینک اسلایدر
-	Link string `form:"link" json:"link" validation:"omitempty" example:"https://google.com"`
+	Link string `form:"link" json:"link" validation:"omitempty" example:"https://google.com" fake:"{url}"`
 	//عنوان اسلایدر
-	Title string `form:"title" json:"title" validation:"required" example:"عنوان اسلایدر"`
+	Title string `form:"title" json:"title" validation:"required" example:"عنوان اسلایدر" fake:"{word}"`
 	//توضیحات اسلایدر
-	Description string `form:"description" json:"description" validation:"omitempty" example:"توضیحات اسلایدر"`
+	Description string `form:"description" json:"description" validation:"omitempty" example:"توضیحات اسلایدر" fake:"{sentence:2}"`
 	//تصویر اسلایدر
-	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validation:"required" example:"1"`
+	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validation:"required" example:"1" fake:"{number:1,100}"`
 	//محل قرار گیری اسلایدر
-	Position string `form:"position" json:"position" validation:"required" example:"top" enums:"top,bottom,right,left"`
+	Position string `form:"position" json:"position" validation:"required" example:"top" enums:"top,bottom,right,left" fake:"{custom_enum:top,bottom,right,left}"`
 }
 
 type UpdateSlider struct {

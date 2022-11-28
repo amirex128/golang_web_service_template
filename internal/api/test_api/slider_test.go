@@ -19,7 +19,7 @@ func TestCreateSlider(t *testing.T) {
   "title": "عنوان اسلایدر"
 }
 	`),
-		"user/slider/create",
+		"/api/v1/user/slider/create",
 		"POST")
 	sliderID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -43,7 +43,7 @@ func TestUpdateSlider(t *testing.T) {
   "title": "عنوان اسلایدر"
 }
 	`),
-		"user/slider/update/"+*sliderID,
+		"/api/v1/user/slider/update/"+*sliderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -55,7 +55,7 @@ func TestUpdateSlider(t *testing.T) {
 func TestShowSlider(t *testing.T) {
 	assert.NotNilf(t, sliderID, "slider id is nil")
 	recorder := callApi([]byte(``),
-		"user/slider/show/"+*sliderID,
+		"/api/v1/user/slider/show/"+*sliderID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -66,7 +66,7 @@ func TestShowSlider(t *testing.T) {
 
 func TestIndexSlider(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/slider/list",
+		"/api/v1/user/slider/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -78,11 +78,11 @@ func TestIndexSlider(t *testing.T) {
 func TestDeleteSlider(t *testing.T) {
 	assert.NotNilf(t, sliderID, "slider id is nil")
 	recorder := callApi([]byte(``),
-		"user/slider/delete/"+*sliderID,
+		"/api/v1/user/slider/delete/"+*sliderID,
 		"POST")
 
-	assert.Equalf(t, http.StatusOK, recorder.Code,"status code is not ok")
-	assert.NotContainsf(t, recorder.Body.String(), "error","error found in response")
+	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
+	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
 
 	parseErr(recorder)
 }

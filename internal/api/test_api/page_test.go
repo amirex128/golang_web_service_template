@@ -18,7 +18,7 @@ func TestCreatePage(t *testing.T) {
   "type": "normal"
 }
 	`),
-		"user/page/create",
+		"/api/v1/user/page/create",
 		"POST")
 	pageID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -39,7 +39,7 @@ func TestUpdatePage(t *testing.T) {
   "type": "normal"
 }
 	`),
-		"user/page/update/"+*pageID,
+		"/api/v1/user/page/update/"+*pageID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -51,7 +51,7 @@ func TestUpdatePage(t *testing.T) {
 func TestShowPage(t *testing.T) {
 	assert.NotNilf(t, pageID, "page id is nil")
 	recorder := callApi([]byte(``),
-		"user/page/show/"+*pageID,
+		"/api/v1/user/page/show/"+*pageID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -62,7 +62,7 @@ func TestShowPage(t *testing.T) {
 
 func TestIndexPage(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/page/list",
+		"/api/v1/user/page/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -74,7 +74,7 @@ func TestIndexPage(t *testing.T) {
 func TestDeletePage(t *testing.T) {
 	assert.NotNilf(t, pageID, "page id is nil")
 	recorder := callApi([]byte(``),
-		"user/page/delete/"+*pageID,
+		"/api/v1/user/page/delete/"+*pageID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

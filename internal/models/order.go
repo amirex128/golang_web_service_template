@@ -101,3 +101,35 @@ func (m *MysqlManager) FindOrderWithItemByID(orderID uint64) (*Order, error) {
 	}
 	return order, nil
 }
+func (m *MysqlManager) DeleteOrder(orderID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showOrder", "model")
+	defer span.End()
+
+	order := Order{}
+	err := m.GetConn().Where("id = ?", orderID).First(&order).Error
+	if err != nil {
+		return errorx.New("منو یافت نشد", "model", err)
+	}
+
+	err = m.DeleteOrderItem(orderID)
+	if err != nil {
+		return err
+	}
+
+	err = m.GetConn().Delete(&order).Error
+	if err != nil {
+		return errorx.New("خطا در حذف منو", "model", err)
+	}
+	return nil
+}
+
+func (m *MysqlManager) DeleteOrderItem(orderID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showOrderItem", "model")
+	defer span.End()
+
+	err := m.GetConn().Where("order_id=?", orderID).Delete(&OrderItem{}).Error
+	if err != nil {
+		return errorx.New("خطا در حذف منو", "model", err)
+	}
+	return nil
+}

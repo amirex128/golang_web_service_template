@@ -6,6 +6,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/category"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/comment"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/customer"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/dev_ops"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/discount"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/domain"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/gallery"
@@ -36,23 +37,17 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		root.GET("blog/:slug", landing.DetailsLanding)
 		root.GET("search/:search", landing.SearchLanding)
 		root.GET("page/:slug", landing.PageLanding)
-
-		//root.GET("contact", controllers.ContactLanding)
-		//root.GET("faq", controllers.FaqLanding)
-		//root.GET("pricing", controllers.PricingLanding)
-		//root.GET("services", controllers.ServicesLanding)
-		//root.GET("testimonial", controllers.TestimonialLanding)
-		//root.GET("learn", controllers.LearnLanding)
-		//root.GET("rules", controllers.RulesLanding)
-		//root.GET("return-rules", controllers.ReturnRulesLanding)
 	}
 	v1 := r.Group("api/v1")
 	v1.POST("/verify", authMiddleware.LoginHandler)
 	v1.POST("/login/register", auth.RegisterLogin)
 	v1.POST("/forget", auth.ForgetPassword)
 
-	v1.POST("/user/ticket/create", ticket.CreateTicket)
-	v1.POST("user/comment/create", comment.CreateComment)
+	v1.POST("/ticket/create", ticket.CreateTicket)
+	v1.POST("/comment/create", comment.CreateComment)
+
+	v1.GET("/healthcheck", dev_ops.HealthCheck)
+	v1.GET("/metrics", dev_ops.Metrics)
 
 	_user := v1.Group("user")
 	_user.Use(authMiddleware.MiddlewareFunc())
@@ -72,7 +67,9 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		}
 		_ticket := _user.Group("ticket")
 		{
+			_ticket.POST("/create", ticket.CreateTicket)
 			_ticket.GET("/list", ticket.IndexTicket)
+			_ticket.POST("/delete/:id", ticket.DeleteTicket)
 			_ticket.GET("/show/:id", ticket.ShowTicket)
 		}
 		_gallery := _user.Group("gallery")
@@ -107,15 +104,17 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		}
 		_order := _user.Group("order")
 		{
-			_order.POST("/send", order.SendOrder)
+			_order.POST("/send/:id", order.SendOrder)
 			_order.GET("/list", order.IndexOrder)
 			_order.POST("/approve/:id", order.ApproveOrder)
 			_order.POST("/cancel/:id", order.CancelOrder)
 			_order.POST("/calculate", order.CalculateSendPrice)
-			_order.POST("/returned", order.ReturnedOrder)
-			_order.POST("/returned/accept", order.AcceptReturnedOrder)
+			_order.POST("/returned/:id", order.ReturnedOrder)
+			_order.POST("/returned/accept/:id", order.AcceptReturnedOrder)
 			_order.GET("/show/:id", order.ShowOrder)
 			_order.GET("/tracking/:id", order.TrackingOrder)
+			_order.POST("/delete/:id", order.DeleteOrder)
+
 		}
 		_shop := _user.Group("shop")
 		{
@@ -124,7 +123,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_shop.POST("/update/*id", shop.UpdateShop)
 			_shop.GET("/show/:id", shop.ShowShop)
 			_shop.POST("/delete/:id", shop.DeleteShop)
-			_shop.POST("/send-price", shop.SendPrice)
+			_shop.POST("/send-price/:id", shop.SendPriceShop)
 			_shop.GET("/instagram", shop.GetInstagramPost)
 		}
 

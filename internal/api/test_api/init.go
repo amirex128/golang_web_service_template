@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	host = "http://localhost:8585/api/v1/"
+	host = "http://localhost:8585"
 	token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74"
 	gin.SetMode(gin.TestMode)
 	runner = api.Runner()

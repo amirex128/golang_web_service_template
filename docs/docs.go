@@ -20,6 +20,91 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/comment/create": {
+            "post": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "ایجاد دیدگاه",
+                "parameters": [
+                    {
+                        "description": "ورودی",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CreateComment"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/customer/discount/check": {
+            "post": {
+                "description": "کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود را وارد نمایید تا بر روی محصولات اش اعمال شوند",
+                "tags": [
+                    "discount"
+                ],
+                "summary": "بررسی تخفیف",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.CheckDiscount"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/customer/orders": {
+            "get": {
+                "description": "مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد",
+                "tags": [
+                    "order"
+                ],
+                "summary": "نمایش لیست سفارشات مشتری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/forget": {
             "post": {
                 "description": "در صورتی که کاربر پسورد خود را فراموش کرده باشد با استفاده از این وبسرویس درخواست کد تائید میتواند برای شماره همراه خود بدهد و بعد از دریافت کد تائید میتواند به وبسرویس ورود برود و در آنجا پسورد خود را با استفاده از توکن دریافتی عوض کند",
@@ -204,7 +289,7 @@ const docTemplate = `{
             "get": {
                 "description": "کاربران میتوانند برای خود لیستی از ادرس های مختلف ایجاد کنند تا هر بار به راحتی مشخص کنند محصول خود را میخواند از کدام ادرس ارسال نمایید",
                 "tags": [
-                    "post"
+                    "address"
                 ],
                 "summary": "نمایش آدرس",
                 "parameters": [
@@ -361,7 +446,7 @@ const docTemplate = `{
             "get": {
                 "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
                 "tags": [
-                    "post"
+                    "category"
                 ],
                 "summary": "نمایش دسته بندی",
                 "parameters": [
@@ -486,27 +571,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/comment/create": {
-            "post": {
-                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
-                "tags": [
-                    "comment"
-                ],
-                "summary": "ایجاد دیدگاه",
-                "parameters": [
-                    {
-                        "description": "ورودی",
-                        "name": "comment",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/DTOs.CreateComment"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/user/comment/delete/{id}": {
             "post": {
                 "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
@@ -533,14 +597,46 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/user/comment/show/{id}": {
+            "get": {
+                "description": "مدیریت نظرات و دیدگه هایی که کاربران در مورد محصولات و مقالات می ثبتند",
+                "tags": [
+                    "comment"
+                ],
+                "summary": "نمایش نظر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/customer": {
             "get": {
-                "description": "مشتری میتواند سفارشات خود را در یک پنل ساده مشاهده نمیاد",
                 "tags": [
-                    "order"
+                    "customer"
                 ],
-                "summary": "نمایش لیست سفارشات مشتری",
+                "summary": "لیست مشتری",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "متن جستجو",
@@ -549,14 +645,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "شماره صفحه",
-                        "name": "page",
+                        "description": "شماره مشتری",
+                        "name": "customer",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "تعداد صفحه",
-                        "name": "page_size",
+                        "description": "تعداد مشتری",
+                        "name": "customer_size",
                         "in": "query"
                     },
                     {
@@ -589,34 +685,6 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/user/customer/discount/check": {
-            "post": {
-                "description": "کاربر بعد از وارد کردن محصولات به سبد خرید خود باید کد تخفیف خود را وارد نمایید تا بر روی محصولات اش اعمال شوند",
-                "tags": [
-                    "discount"
-                ],
-                "summary": "بررسی تخفیف",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Authentication",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "ورودی",
-                        "name": "message",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/DTOs.CheckDiscount"
-                        }
                     }
                 ],
                 "responses": {}
@@ -947,7 +1015,7 @@ const docTemplate = `{
             "get": {
                 "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه دامنه در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
                 "tags": [
-                    "post"
+                    "domain"
                 ],
                 "summary": "نمایش دامنه",
                 "parameters": [
@@ -964,6 +1032,49 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/gallery": {
+            "get": {
+                "description": "با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر به فرمت وب پی تبدیل میشوند",
+                "tags": [
+                    "gallery"
+                ],
+                "summary": "لیست منو ها",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "متن جستجو",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "شماره صفحه",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "تعداد صفحه",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "مرتب سازی براساس desc/asc",
+                        "name": "sort",
+                        "in": "query"
                     }
                 ],
                 "responses": {}
@@ -1015,6 +1126,32 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "شناسه گالری",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/gallery/show/{id}": {
+            "get": {
+                "description": "با آپلود یک تصویر میتوانید شناسه آن را در بخش های مختلف استفاده نمایید و در آینده بر اساس همین شناسه تصویر را حذف نمایید همچنین تمامی تصاویر به فرمت وب پی تبدیل میشوند",
+                "tags": [
+                    "gallery"
+                ],
+                "summary": "نمایش منو",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1111,7 +1248,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "شناسه منو",
+                        "description": "شناسه",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1124,7 +1261,7 @@ const docTemplate = `{
             "get": {
                 "description": "با ایجاد منو کاربر میتواند منو های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
                 "tags": [
-                    "post"
+                    "menu"
                 ],
                 "summary": "نمایش منو",
                 "parameters": [
@@ -1338,27 +1475,85 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/order/returned": {
+        "/user/order/delete/{id}": {
             "post": {
-                "description": "مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند",
+                "description": "با ایجاد سفارش کاربر میتواند سفارش های بالای صفحه و پاین صفحه مربوط به قالب خود را کم و زیاد نماید",
                 "tags": [
                     "order"
                 ],
-                "summary": "ثبت درخواست مرجوعی توسط مشتری",
+                "summary": "حذف سفارش",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {}
             }
         },
-        "/user/order/returned/accept": {
+        "/user/order/returned/accept/{id}": {
             "post": {
                 "description": "بعد از درخواست مرجوعی با این درخواست توسط ادمین بررسی شود و در صورت تائید سفارش مرجوع شود و سرویس دهنده قبلی جهت جمع آوری ارسال شود",
                 "tags": [
                     "order"
                 ],
                 "summary": "تائید درخواست مرجوعی توسط مدیر",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {}
             }
         },
-        "/user/order/send": {
+        "/user/order/returned/{id}": {
+            "post": {
+                "description": "مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند",
+                "tags": [
+                    "order"
+                ],
+                "summary": "ثبت درخواست مرجوعی توسط مشتری",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/order/send/{id}": {
             "post": {
                 "description": "بعد از تائید سفارش باید اطلاعات سفارش از قبلی وزن وارد شود و هزینه ارسال هر سرویس دهنده محاسبه شود و توسط ادمین انتخاب شود سرویس دهنده جهت ارسال",
                 "tags": [
@@ -1371,6 +1566,13 @@ const docTemplate = `{
                         "description": "Authentication",
                         "name": "Authorization",
                         "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -1403,7 +1605,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "شناسه سفارش",
+                        "description": "شناسه",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1487,6 +1689,7 @@ const docTemplate = `{
                 "tags": [
                     "page"
                 ],
+                "summary": "ایجاد صفحه",
                 "parameters": [
                     {
                         "type": "string",
@@ -1538,7 +1741,7 @@ const docTemplate = `{
             "get": {
                 "description": "هر فروشگاه میتواند به تعداد دلخواه صفحه ایجاد کند صفحات از دو حالت معمولی و خالی تشکیل میشوند که در حالت معمولی کاربر میتواند کل یک اچ تی ام ال را ذخیره نماید تا بدون چارچوب های قالب نمایش داده شود و در حالت معمولی همراه با چهار چوب ها نمایش داده شود",
                 "tags": [
-                    "post"
+                    "page"
                 ],
                 "summary": "نمایش صفحه",
                 "parameters": [
@@ -2033,7 +2236,26 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/user/shop/send-price": {
+        "/user/shop/instagram": {
+            "get": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "دریافت پست های اینتستاگرام فروشگاه و تبدیل آن ها به محصول",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/shop/send-price/{id}": {
             "post": {
                 "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
                 "tags": [
@@ -2054,7 +2276,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/DTOs.SendPrice"
+                            "$ref": "#/definitions/DTOs.SendPriceShop"
                         }
                     }
                 ],
@@ -2222,7 +2444,7 @@ const docTemplate = `{
             "get": {
                 "description": "هر فروشگاه برای خود میتواند به تعداد دلخواه اسلایدر در موقعیت های مختلف مثل بالای صفحه و پایین صفحه ایجاد نماید",
                 "tags": [
-                    "post"
+                    "slider"
                 ],
                 "summary": "نمایش اسلایدر",
                 "parameters": [
@@ -2488,6 +2710,32 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/DTOs.CreateTicket"
                         }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/user/ticket/delete/{id}": {
+            "post": {
+                "description": "کاربران میتوانند در صورت بروزمشکل از طریق پنل خود برای مدیریت و تیم پشتیبانی ما تیکت ارسال نماییند",
+                "tags": [
+                    "ticket"
+                ],
+                "summary": "حذف تیکت",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -3090,7 +3338,7 @@ const docTemplate = `{
                 "shopID": {
                     "description": "شناسه فروشگاه",
                     "type": "integer",
-                    "example": 0
+                    "example": 1
                 },
                 "startedAt": {
                     "description": "تاریخ شروع فروش",
@@ -3318,8 +3566,8 @@ const docTemplate = `{
                 },
                 "postal_code": {
                     "description": "کد پستی",
-                    "type": "integer",
-                    "example": 1111111111
+                    "type": "string",
+                    "example": "9111111111"
                 },
                 "province_id": {
                     "description": "شناسه استان",
@@ -3467,7 +3715,7 @@ const docTemplate = `{
                 }
             }
         },
-        "DTOs.SendPrice": {
+        "DTOs.SendPriceShop": {
             "type": "object",
             "required": [
                 "send_price",

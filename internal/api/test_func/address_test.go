@@ -22,7 +22,7 @@ func TestCreateAddress(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/address/create",
+		"/api/v1/user/address/create",
 		"POST")
 	addressID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -48,7 +48,7 @@ func TestUpdateAddress(t *testing.T) {
   "title": "عنوان"
 }
 	`),
-		"user/address/update/"+*addressID,
+		"/api/v1/user/address/update/"+*addressID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -60,7 +60,7 @@ func TestUpdateAddress(t *testing.T) {
 func TestShowAddress(t *testing.T) {
 	assert.NotNilf(t, addressID, "address id is nil")
 	recorder := callApi([]byte(``),
-		"user/address/show/"+*addressID,
+		"/api/v1/user/address/show/"+*addressID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestShowAddress(t *testing.T) {
 
 func TestIndexAddress(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/address/list",
+		"/api/v1/user/address/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexAddress(t *testing.T) {
 func TestDeleteAddress(t *testing.T) {
 	assert.NotNilf(t, addressID, "address id is nil")
 	recorder := callApi([]byte(``),
-		"user/address/delete/"+*addressID,
+		"/api/v1/user/address/delete/"+*addressID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

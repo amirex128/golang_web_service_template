@@ -3,33 +3,32 @@ package models
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/spf13/viper"
 	"go.elastic.co/apm/v2"
 )
 
 type Gallery struct {
 	ID       uint64  `gorm:"primary_key;auto_increment" json:"id"`
-	Path     string  `json:"path"`
-	FullPath string  `json:"full_path"`
-	UserID   uint64  `gorm:"default:null" json:"user_id"`
-	MimeType string  `json:"mime_type"`
-	Size     float64 `json:"size"`
-	Width    uint32  `json:"width"`
-	Height   uint32  `json:"height"`
+	Path     string  `json:"path" fake:"{imageurl}"`
+	FullPath string  `json:"full_path" fake:"{imageurl}"`
+	UserID   uint64  `gorm:"default:null" json:"user_id" fake:"{number:1,100}"`
+	MimeType string  `json:"mime_type" fake:"{custom_string:image/webp}"`
+	Size     float64 `json:"size" fake:"{number:1000,2000}"`
+	Width    uint32  `json:"width" fake:"{number:100,200}"`
+	Height   uint32  `json:"height" fake:"{number:100,200}"`
 }
 
 func initGallery(manager *MysqlManager) {
 	manager.GetConn().AutoMigrate(&Gallery{})
-	manager.GetConn().Create(&Gallery{
-		ID:       1,
-		Path:     "https://montiego.ir/wp-content/uploads/2020/03/75af01aff54b42a.jpg",
-		FullPath: "https://montiego.ir/wp-content/uploads/2020/03/75af01aff54b42a.jpg",
-		UserID:   1,
-		MimeType: "image/jpeg",
-		Size:     0,
-		Width:    0,
-		Height:   0,
-	})
+
+	for i := 0; i < 100; i++ {
+		model := new(Gallery)
+		gofakeit.Struct(model)
+
+		manager.GetConn().Create(model)
+	}
+
 }
 
 func (m *MysqlManager) UploadImage(gallery *Gallery) (*Gallery, error) {

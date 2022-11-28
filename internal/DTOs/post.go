@@ -2,15 +2,15 @@ package DTOs
 
 type CreatePost struct {
 	//عنوان مقاله
-	Title string `form:"title" json:"title" validate:"required" example:"آموزش برنامه نویسی"`
+	Title string `form:"title" json:"title" validate:"required" example:"آموزش برنامه نویسی" fake:"{lorem_ipsum_sentence:1}"`
 	//محتوای مقاله که میتواند از اچ تی ام ال تشکیل شده باشد
-	Body string `form:"body" json:"body" validate:"required" example:"<p>متن مقاله</p>"`
+	Body string `form:"body" json:"body" validate:"required" example:"<p>متن مقاله</p>" fake:"{lorem_ipsum_paragraph:10}"`
 	//شناسه تصویر شاخص مقاله
-	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validate:"required" example:"1"`
+	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validate:"required" example:"1" fake:"{number:1,100}"`
 	//آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد
-	Slug string `form:"slug" json:"slug" validate:"required" example:"amoozesh-barnamenevisi"`
+	Slug string `form:"slug" json:"slug" validate:"required" example:"amoozesh-barnamenevisi" fake:"{word}"`
 	//شناسه دسته بندی مقاله
-	CategoryID uint64 `form:"category_id" json:"category_id" validate:"required" example:"1"`
+	CategoryID uint64 `form:"category_id" json:"category_id" validate:"required" example:"1" fake:"{number:1,100}"`
 }
 
 type UpdatePost struct {

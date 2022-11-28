@@ -106,3 +106,19 @@ func (m *MysqlManager) GetTicketWithChildren(ticketID uint64) ([]Ticket, error) 
 	tickets = append([]Ticket{mainTicket}, tickets...)
 	return tickets, nil
 }
+
+func (m *MysqlManager) DeleteTicket(ticketID uint64) error {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showTicket", "model")
+	defer span.End()
+	ticket := Ticket{}
+	err := m.GetConn().Where("id = ?", ticketID).First(&ticket).Error
+	if err != nil {
+		return errorx.New("تیکت یافت نشد", "model", err)
+	}
+
+	err = m.GetConn().Delete(&ticket).Error
+	if err != nil {
+		return errorx.New("خطا در حذف تیکت", "model", err)
+	}
+	return nil
+}

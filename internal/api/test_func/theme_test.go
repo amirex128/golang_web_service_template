@@ -22,7 +22,7 @@ func TestCreateTheme(t *testing.T) {
  "title": "عنوان"
 }
 	`),
-		"user/theme/create",
+		"/api/v1/user/theme/create",
 		"POST")
 	themeID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -48,7 +48,7 @@ func TestUpdateTheme(t *testing.T) {
   "title": "عنوان"
 }
 	`),
-		"user/theme/update/"+*themeID,
+		"/api/v1/user/theme/update/"+*themeID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -60,7 +60,7 @@ func TestUpdateTheme(t *testing.T) {
 func TestShowTheme(t *testing.T) {
 	assert.NotNilf(t, themeID, "theme id is nil")
 	recorder := callApi([]byte(``),
-		"user/theme/show/"+*themeID,
+		"/api/v1/user/theme/show/"+*themeID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -71,7 +71,7 @@ func TestShowTheme(t *testing.T) {
 
 func TestIndexTheme(t *testing.T) {
 	recorder := callApi([]byte(``),
-		"user/theme/list",
+		"/api/v1/user/theme/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -83,7 +83,7 @@ func TestIndexTheme(t *testing.T) {
 func TestDeleteTheme(t *testing.T) {
 	assert.NotNilf(t, themeID, "theme id is nil")
 	recorder := callApi([]byte(``),
-		"user/theme/delete/"+*themeID,
+		"/api/v1/user/theme/delete/"+*themeID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
