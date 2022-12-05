@@ -4,6 +4,8 @@ name: ci_selloora
 #  push:
 #    tags:
 #      - 'release-*'
+on: push
+
 
 jobs:
   build:
