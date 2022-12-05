@@ -10,5 +10,7 @@ type Option struct {
 }
 
 func initOption(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Option{})
+	if !manager.GetConn().Migrator().HasTable(&Option{}) {
+		manager.GetConn().AutoMigrate(&Option{})
+	}
 }

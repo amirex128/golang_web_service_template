@@ -12,7 +12,7 @@ type CreateCategory struct {
 	//نام دسته بندی
 	Name string `form:"name" json:"name" validate:"required" example:"نام دسته بندی" fake:"{name}"`
 	//کلمات مترادف که با کاما از هم جدا شده اند
-	Equivalent string `form:"equivalent" json:"equivalent" validate:"omitempty" example:"آموزش,یادگیری" fake:"{lorem_ipsum_sentence:10}"`
+	Equivalent string `form:"equivalent" json:"equivalent" validate:"omitempty" example:"آموزش,یادگیری" fake:"{sentence:10}"`
 	//توضیحات دسته بندی
 	Description string `form:"description" json:"description" validate:"omitempty" example:"توضیحات دسته بندی" fake:"{paragraph}"`
 	//شناسه تصویر آپلود شده

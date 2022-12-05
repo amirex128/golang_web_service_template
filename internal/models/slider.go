@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -19,17 +20,17 @@ type Slider struct {
 }
 
 func initSlider(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Slider{})
-	for i := 0; i < 20; i++ {
-		manager.CreateSlider(DTOs.CreateSlider{
-			Title:       "ِسشیبش",
-			GalleryID:   1,
-			Description: "fdfsdf",
-			Link:        "DSADSA",
-			ShopID:      1,
-			Position:    "top",
-		})
+	if !manager.GetConn().Migrator().HasTable(&Slider{}) {
+		manager.GetConn().AutoMigrate(&Slider{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateSlider)
+			gofakeit.Struct(model)
+
+			manager.CreateSlider(*model)
+		}
+
 	}
+
 }
 
 func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) (*Slider, error) {

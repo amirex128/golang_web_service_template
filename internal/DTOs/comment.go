@@ -6,7 +6,7 @@ type CreateComment struct {
 	//نام کاربر
 	Name string `form:"name" json:"name" validate:"required" example:"نام" fake:"{name}"`
 	//متن نظر
-	Body string `form:"body" json:"body" validate:"required" example:"متن نظر" fake:"{lorem_ipsum_sentence:10}"`
+	Body string `form:"body" json:"body" validate:"required" example:"متن نظر" fake:"{sentence:10}"`
 	//ایمیل
 	Email string `form:"email" json:"email" validate:"required" example:"amirex128@gmail.com" fake:"{email}"`
 }

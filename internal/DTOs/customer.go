@@ -9,21 +9,21 @@ type RequestCreateLoginCustomer struct {
 
 type CreateUpdateCustomer struct {
 	//شناسه فروشگاه
-	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required" example:"1"`
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required" example:"1" fake:"{number:1,100}"`
 	//شماره همراه
-	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,min=11,max=11,startswith=09" example:"09024809750"`
+	Mobile string `form:"mobile" json:"mobile" validate:"omitempty,min=11,max=11,startswith=09" example:"09024809750" fake:"{phone}"`
 	//کد تائید
-	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4" example:"1234"`
+	VerifyCode string `form:"verify_code" json:"verify_code" validate:"omitempty,min=4,max=4" example:"1234" fake:"{number:1000,9999}"`
 	//نام کامل
-	FullName string `form:"full_name" json:"full_name" validate:"omitempty" example:"نام"`
+	FullName string `form:"full_name" json:"full_name" validate:"omitempty" example:"نام" fake:"{name}"`
 	//شناسه استان
-	ProvinceID uint32 `form:"province_id" json:"province_id" validate:"omitempty,numeric" example:"1"`
+	ProvinceID uint32 `form:"province_id" json:"province_id" validate:"omitempty,numeric" example:"1" fake:"{number:1,100}"`
 	//شناسه شهر
-	CityID uint32 `form:"city_id" json:"city_id" validate:"omitempty,numeric" example:"1"`
+	CityID uint32 `form:"city_id" json:"city_id" validate:"omitempty,numeric" example:"1" fake:"{number:1,100}"`
 	//آدرس
-	Address string `form:"address" json:"address" validate:"omitempty" example:"آدرس"`
+	Address string `form:"address" json:"address" validate:"omitempty" example:"آدرس" fake:"{address}"`
 	//کد پستی
-	PostalCode    string `form:"postal_code" json:"postal_code" validate:"omitempty,startswith=9" example:"9111111111"`
+	PostalCode    string `form:"postal_code" json:"postal_code" validate:"omitempty,startswith=9" example:"9111111111" fake:"{number:1000000000,9999999999}"`
 	LastSendSMSAt string `form:"-" json:"-"`
 }
 

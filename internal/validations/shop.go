@@ -149,6 +149,31 @@ func SendPriceShop(c *gin.Context) (DTOs.SendPriceShop, error) {
 	return dto, nil
 }
 
+func SelectThemeShop(c *gin.Context) (DTOs.SelectThemeShop, error) {
+	var dto DTOs.SelectThemeShop
+	tags := ValidationTags{
+		"ThemeID": {
+			"required": "شناسه قالب را وارد کنید",
+			"numeric":  "شناسه قالب باید عددی باشد",
+		},
+		"ShopID": {
+			"required": "شناسه فروشگاه را وارد کنید",
+			"numeric":  "شناسه فروشگاه باید عدد باشد",
+		},
+	}
+	err := c.Bind(&dto)
+	if err != nil {
+		return dto, errorx.New("مقادیر ارسال شده نا درست میباشد", "validation", err)
+	}
+
+	err = validate.Struct(dto)
+	err = validateTags(tags, err, c)
+	if err != nil {
+		return dto, err
+	}
+
+	return dto, nil
+}
 func DeleteShop(c *gin.Context) (DTOs.DeleteShop, error) {
 	var dto DTOs.DeleteShop
 	tags := ValidationTags{

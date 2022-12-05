@@ -18,10 +18,18 @@ type ProductProvince struct {
 }
 
 func initProvince(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Province{})
-	manager.GetConn().AutoMigrate(&ProductProvince{})
-	provinces := utils.ReadCsvFile("./csv/provinces.csv")
-	manager.CreateAllProvinces(provinces)
+
+	if !manager.GetConn().Migrator().HasTable(&Province{}) {
+		manager.GetConn().AutoMigrate(&Province{})
+		provinces := utils.ReadCsvFile("./csv/provinces.csv")
+		manager.CreateAllProvinces(provinces)
+
+	}
+
+	if !manager.GetConn().Migrator().HasTable(&ProductProvince{}) {
+		manager.GetConn().AutoMigrate(&ProductProvince{})
+
+	}
 
 }
 func (m *MysqlManager) CreateAllProvinces(files [][]string) {

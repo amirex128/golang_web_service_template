@@ -12,9 +12,9 @@ type CreateProduct struct {
 	//برند محصول
 	Manufacturer string `form:"manufacturer_id" validate:"omitempty" example:"سامسونگ" fake:"{company}"`
 	//توضیحات محصول
-	Description string `form:"description" validate:"omitempty" example:"توضیحات محصول" fake:"{lorem_ipsum_sentence:2}"`
+	Description string `form:"description" validate:"omitempty" example:"توضیحات محصول" fake:"{sentence:2}"`
 	//نام محصول
-	Name string `form:"name" validate:"required,min=3,max=100" example:"گوشی موبایل گلگسی نوت ۱۰" fake:"{lorem_ipsum_sentence:1}"`
+	Name string `form:"name" validate:"required,min=3,max=100" example:"گوشی موبایل گلگسی نوت ۱۰" fake:"{sentence:1}"`
 	//تعداد موجودی
 	Quantity uint32 `form:"quantity" validate:"required,numeric" example:"10" fake:"{number:1,100}"`
 	//قیمت محصول
@@ -30,7 +30,7 @@ type CreateProduct struct {
 	//شناسه دسته بندی
 	CategoryID uint64 `form:"category_id" validate:"required,numeric" example:"1" fake:"{number:1,100}"`
 	//شناسه تصاویر انتخاب شده برای این محصول
-	GalleryIDs []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"required,dive,numeric" example:"[1,2,3]" fakesize:"3"`
+	GalleryIDs []uint64 `form:"gallery_ids" json:"gallery_ids" validate:"required,dive,numeric" example:"[1,2,3]" fake:"{skip}"`
 }
 
 type UpdateProduct struct {

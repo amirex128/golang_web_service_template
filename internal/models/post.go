@@ -1,10 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -26,15 +26,17 @@ type Post struct {
 }
 
 func InitPost(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Post{})
-	for i := 0; i < 10; i++ {
-		manager.CreatePost(DTOs.CreatePost{
-			Title:     "آموزش برنامه نویس گولنگ" + fmt.Sprintf("%d", i),
-			Body:      "این یک پست آموزشی برنامه نویسی گولنگ است" + fmt.Sprintf("%d", i),
-			Slug:      "amoozesh-barnamenevis-golang" + fmt.Sprintf("%d", i),
-			GalleryID: 1,
-		}, 1)
+	if !manager.GetConn().Migrator().HasTable(&Post{}) {
+		manager.GetConn().AutoMigrate(&Post{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreatePost)
+			gofakeit.Struct(model)
+
+			manager.CreatePost(*model)
+		}
+
 	}
+
 }
 func (m *MysqlManager) CheckSlug(slug string) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CheckSlug", "model")
@@ -46,9 +48,10 @@ func (m *MysqlManager) CheckSlug(slug string) error {
 	return nil
 }
 
-func (m *MysqlManager) CreatePost(dto DTOs.CreatePost, userID uint64) (*Post, error) {
+func (m *MysqlManager) CreatePost(dto DTOs.CreatePost) (*Post, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePost", "model")
 	defer span.End()
+	userID := GetUser(m.Ctx)
 	post := &Post{
 		Title: dto.Title,
 		Body:  dto.Body,
@@ -59,7 +62,7 @@ func (m *MysqlManager) CreatePost(dto DTOs.CreatePost, userID uint64) (*Post, er
 			}
 			return nil
 		}(),
-		UserID:    &userID,
+		UserID:    userID,
 		CreatedAt: utils.NowTime(),
 		UpdatedAt: utils.NowTime(),
 	}

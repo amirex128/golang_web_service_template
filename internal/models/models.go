@@ -57,20 +57,19 @@ func (m *MysqlManager) initializeTables() {
 	defer logrus.Info("mysql initialized finished")
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request = httptest.NewRequest("GET", "/", nil)
+
 	manager := NewMysqlManager(c)
-	if !initCategory(manager) {
-		return
-	}
+
+	initUser(manager)
 	initGallery(manager)
+	initCategory(manager)
 	initProvince(manager)
 	initCity(manager)
-	initUser(manager)
 	initTheme(manager)
 	initShop(manager)
 	initPage(manager)
 	initMenu(manager)
 	initSlider(manager)
-	initPage(manager)
 	initDomain(manager)
 	initCustomer(manager)
 	InitProduct(manager)

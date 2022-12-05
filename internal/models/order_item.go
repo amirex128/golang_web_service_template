@@ -17,7 +17,11 @@ type OrderItem struct {
 }
 
 func initOrderItem(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&OrderItem{})
+	if !manager.GetConn().Migrator().HasTable(&OrderItem{}) {
+		manager.GetConn().AutoMigrate(&OrderItem{})
+
+	}
+
 }
 
 func (m *MysqlManager) CreateOrderItem(dto []DTOs.OrderItem, orderID uint64) error {

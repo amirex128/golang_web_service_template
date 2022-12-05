@@ -31,7 +31,8 @@ type CreateDiscount struct {
 	//درصد تخفیف
 	Percent float32 `form:"percent" json:"percent" validate:"omitempty,numeric" example:"50.0" fake:"{number:1,100}"`
 	//شناسه محصولات
-	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric" fakesize:"2"`
+	// fake array products
+	ProductIDs []uint64 `form:"product_ids[]" json:"product_ids" validate:"omitempty,dive,numeric"`
 	//وضعیت تخفیف
 	Status bool `form:"status" json:"status" validate:"required" example:"true" fake:"{bool}"`
 }

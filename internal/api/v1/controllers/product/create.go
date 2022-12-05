@@ -20,7 +20,6 @@ func CreateProduct(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:createProduct", "request")
 	c.Request.WithContext(ctx)
 	defer span.End()
-	userID := models.GetUser(c)
 
 	dto, err := validations.CreateProduct(c)
 	if err != nil {
@@ -28,7 +27,7 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	product, err := models.NewMysqlManager(c).CreateProduct(dto, *userID)
+	product, err := models.NewMysqlManager(c).CreateProduct(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -17,16 +18,16 @@ type Menu struct {
 }
 
 func initMenu(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Menu{})
-	for i := 0; i < 20; i++ {
-		manager.CreateMenu(DTOs.CreateMenu{
-			Name:     "dsaD",
-			Link:     "DSADSA",
-			ShopID:   1,
-			ParentID: 0,
-			Position: "top",
-		})
+	if !manager.GetConn().Migrator().HasTable(&Menu{}) {
+		manager.GetConn().AutoMigrate(&Menu{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateMenu)
+			gofakeit.Struct(model)
+
+			manager.CreateMenu(*model)
+		}
 	}
+
 }
 
 func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) (*Menu, error) {

@@ -1,9 +1,9 @@
-name: ci
+name: ci_selloora
 
-on:
-  push:
-    tags:
-      - 'release-*'
+#on:
+#  push:
+#    tags:
+#      - 'release-*'
 
 jobs:
   build:

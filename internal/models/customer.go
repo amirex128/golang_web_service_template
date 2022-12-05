@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -22,18 +23,17 @@ type Customer struct {
 }
 
 func initCustomer(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Customer{})
-	manager.CreateCustomer(DTOs.CreateUpdateCustomer{
-		ShopID:        1,
-		Mobile:        "09123456789",
-		VerifyCode:    "1234",
-		FullName:      "محمد محمدی",
-		ProvinceID:    1,
-		CityID:        1,
-		Address:       "تهران",
-		PostalCode:    "9234567890",
-		LastSendSMSAt: "2020-01-01 00:00:00",
-	})
+	if !manager.GetConn().Migrator().HasTable(&Customer{}) {
+		manager.GetConn().AutoMigrate(&Customer{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateUpdateCustomer)
+			gofakeit.Struct(model)
+
+			manager.CreateCustomer(*model)
+		}
+
+	}
+
 }
 
 func (m *MysqlManager) FindCustomerById(customerID uint64) (*Customer, error) {

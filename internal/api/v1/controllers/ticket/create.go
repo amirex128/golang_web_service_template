@@ -25,11 +25,8 @@ func CreateTicket(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	var userID uint64
-	if dto.GuestMobile == "" {
-		userID = *models.GetUser(c)
-	}
-	ticket, err := models.NewMysqlManager(c).CreateTicket(dto, userID)
+
+	ticket, err := models.NewMysqlManager(c).CreateTicket(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

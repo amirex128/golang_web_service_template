@@ -5,53 +5,23 @@ import (
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
-	"os"
 )
 
 type Page struct {
-	ID        uint64 `json:"id" gorm:"primary_key"`
-	Title     string `json:"title"`
-	Body      string `json:"body"`
-	Slug      string `json:"slug"`
-	Type      string `json:"type" sql:"type:ENUM('blank','normal')"`
-	ShopID    *uint  `gorm:"default:null" json:"shop_id"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID        uint64  `json:"id" gorm:"primary_key"`
+	Title     string  `json:"title"`
+	Body      string  `json:"body"`
+	Slug      string  `json:"slug"`
+	Type      string  `json:"type" sql:"type:ENUM('blank','normal')"`
+	ShopID    *uint64 `gorm:"default:null" json:"shop_id"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
 }
 
 func initPage(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Page{})
-	dirs, err := os.ReadDir("./csv/themes")
-	if err != nil {
-		panic(err)
-	}
-	for _, dir := range dirs {
-		if dir.IsDir() {
-			files, err := os.ReadDir("./csv/themes/" + dir.Name())
-			if err != nil {
-				panic(err)
-			}
-			for _, file := range files {
-				if !file.IsDir() {
-					var body string
-					readFile, err := os.ReadFile("./csv/themes/" + dir.Name() + "/" + file.Name())
-					if err != nil {
-						panic(err)
-					}
-					body = string(readFile)
-					_, err = manager.CreatePage(DTOs.CreatePage{
-						Title:  dir.Name(),
-						Body:   body,
-						Type:   "blank",
-						Slug:   dir.Name(),
-						ShopID: 1,
-					})
-					if err != nil {
-						panic(err)
-					}
-				}
-			}
-		}
+	if !manager.GetConn().Migrator().HasTable(&Page{}) {
+		manager.GetConn().AutoMigrate(&Page{})
+
 	}
 
 }
@@ -122,7 +92,16 @@ func (m *MysqlManager) FindPageByID(id uint64) (*Page, error) {
 	}
 	return page, nil
 }
-
+func (m *MysqlManager) FindPageByShopID(id uint64) ([]*Page, error) {
+	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindPageByID", "model")
+	defer span.End()
+	pages := make([]*Page, 0)
+	err := m.GetConn().Where("shop_id = ?", id).Find(pages).Error
+	if err != nil {
+		return nil, errorx.New("صفحه مورد نظر یافت نشد", "model", err)
+	}
+	return pages, nil
+}
 func (m *MysqlManager) DeletePage(pageID uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showPage", "model")
 	defer span.End()

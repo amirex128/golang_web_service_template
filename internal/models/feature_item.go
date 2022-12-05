@@ -19,10 +19,13 @@ type FeatureItem struct {
 }
 
 func initFeatureItem(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&FeatureItem{})
-	initFeatureItemProduct(manager)
-	featureItems := utils.ReadCsvFile("./csv/feature_items.csv")
-	manager.CreateAllFeatureItems(featureItems)
+	if !manager.GetConn().Migrator().HasTable(&FeatureItem{}) {
+		manager.GetConn().AutoMigrate(&FeatureItem{})
+		initFeatureItemProduct(manager)
+		featureItems := utils.ReadCsvFile("./csv/feature_items.csv")
+		manager.CreateAllFeatureItems(featureItems)
+
+	}
 }
 
 func (m *MysqlManager) CreateAllFeatureItems(files [][]string) {

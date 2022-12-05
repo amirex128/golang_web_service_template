@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -24,30 +25,38 @@ type Ticket struct {
 }
 
 func InitTicket(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Ticket{})
+	if !manager.GetConn().Migrator().HasTable(&Ticket{}) {
+		manager.GetConn().AutoMigrate(&Ticket{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateTicket)
+			gofakeit.Struct(model)
+
+			manager.CreateTicket(*model)
+		}
+	}
+
 }
 
-func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket, userID uint64) (*Ticket, error) {
+func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket) (*Ticket, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateTicket", "model")
 	defer span.End()
+	var userID *uint64
+	if dto.GuestMobile == "" {
+		userID = GetUser(m.Ctx)
+	}
 	var parentTicket Ticket
 	if dto.ParentID != 0 {
 		err := m.GetConn().Model(&parentTicket).Where("id = ?", dto.ParentID).Update("is_answer", true).First(&parentTicket).Error
 		if err != nil {
 			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
-		if *parentTicket.UserID != userID && IsAdmin(m.Ctx) == false {
+		if *parentTicket.UserID != *userID && IsAdmin(m.Ctx) == false {
 			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
 	}
 
 	ticket := &Ticket{
-		UserID: func() *uint64 {
-			if userID == 0 {
-				return nil
-			}
-			return &userID
-		}(),
+		UserID:      userID,
 		ParentID:    dto.ParentID,
 		IsAnswer:    false,
 		GuestName:   dto.GuestName,

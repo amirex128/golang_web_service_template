@@ -4,70 +4,44 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
 type User struct {
-	ID            uint64      `gorm:"primary_key;auto_increment" json:"id"`
-	Gender        string      `json:"gender" sql:"type:ENUM('man','woman')"`
-	Firstname     string      `json:"firstname"`
-	Lastname      string      `json:"lastname"`
-	Email         string      `json:"email"`
-	Mobile        string      `json:"mobile"`
-	ExpireAt      string      `json:"expire_at"`
-	Status        string      `json:"status" sql:"type:ENUM('ok','block')"`
-	VerifyCode    string      `json:"verify_code"`
+	ID            uint64      `gorm:"primary_key;auto_increment" json:"id"  fake:"{custom_uint64:0}"`
+	Gender        string      `json:"gender" sql:"type:ENUM('man','woman')" fake:"{custom_enum:man,woman}"`
+	Firstname     string      `json:"firstname" fake:"{firstname}"`
+	Lastname      string      `json:"lastname" fake:"{lastname}"`
+	Email         string      `json:"email" fake:"{email}"`
+	Mobile        string      `json:"mobile" fake:"{phone}"`
+	ExpireAt      string      `json:"expire_at" fake:"{date}"`
+	Status        string      `json:"status" sql:"type:ENUM('ok','block')" fake:"{custom_enum:ok,block}"`
+	VerifyCode    string      `json:"verify_code" fake:"{number:1000,9999}"`
 	CartNumber    string      `json:"cart_number"`
 	Shaba         string      `json:"shaba"`
-	IsAdmin       bool        `json:"is_admin"`
-	Financial     []Financial `gorm:"foreignKey:user_id" json:"financial"`
-	Address       Address     `gorm:"foreignKey:user_id" json:"address"`
-	LastSendSMSAt string      `json:"last_send_sms_at"`
-	Password      string      `json:"password"`
-	GalleryID     *uint64     `gorm:"default:null" json:"gallery_id"`
-	Gallery       *Gallery    `gorm:"foreignKey:gallery_id" json:"gallery"`
-	UpdatedAt     string      `json:"updated_at"`
-	CreatedAt     string      `json:"created_at"`
+	IsAdmin       bool        `json:"is_admin" fake:"{bool}"`
+	Financial     []Financial `gorm:"foreignKey:user_id" json:"financial" fake:"skip"`
+	LastSendSMSAt string      `json:"last_send_sms_at" fake:"{date}"`
+	Password      string      `json:"password" fake:"{password:true,false,false,true,false,10}"`
+	GalleryID     *uint64     `gorm:"default:null" json:"gallery_id" fake:"skip"`
+	Gallery       *Gallery    `gorm:"foreignKey:gallery_id" json:"gallery" fake:"skip"`
+	UpdatedAt     string      `json:"updated_at" fake:"{date}"`
+	CreatedAt     string      `json:"created_at" fake:"{date}"`
 }
 
 func initUser(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&User{})
-	manager.CreateUser(&User{
-		ID:         1,
-		Gender:     "man",
-		Firstname:  "امیر",
-		Lastname:   "شیردلی",
-		Email:      "amirex128@gmail.com",
-		Mobile:     "09024809750",
-		ExpireAt:   "",
-		Status:     "",
-		VerifyCode: "",
-		CartNumber: "",
-		Shaba:      "",
-		IsAdmin:    true,
-		Financial:  nil,
-		GalleryID:  nil,
-		UpdatedAt:  utils.NowTime(),
-		CreatedAt:  utils.NowTime(),
-	})
-	manager.CreateUser(&User{
-		ID:         2,
-		Gender:     "man",
-		Firstname:  "امیر",
-		Lastname:   "شیردلی",
-		Email:      "amirex128@gmail.com",
-		Mobile:     "09024809750",
-		ExpireAt:   "",
-		Status:     "",
-		VerifyCode: "",
-		CartNumber: "",
-		Shaba:      "",
-		IsAdmin:    true,
-		Financial:  nil,
-		GalleryID:  nil,
-		UpdatedAt:  utils.NowTime(),
-		CreatedAt:  utils.NowTime(),
-	})
+
+	if !manager.GetConn().Migrator().HasTable(&User{}) {
+		manager.GetConn().AutoMigrate(&User{})
+
+		for i := 0; i < 100; i++ {
+			model := new(User)
+			gofakeit.Struct(model)
+
+			manager.CreateUser(model)
+		}
+	}
 }
 
 func (m *MysqlManager) CreateUser(user *User) error {

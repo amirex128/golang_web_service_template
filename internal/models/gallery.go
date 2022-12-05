@@ -9,7 +9,7 @@ import (
 )
 
 type Gallery struct {
-	ID       uint64  `gorm:"primary_key;auto_increment" json:"id"`
+	ID       uint64  `gorm:"primary_key;auto_increment" json:"id" fake:"{custom_uint64:0}"`
 	Path     string  `json:"path" fake:"{imageurl}"`
 	FullPath string  `json:"full_path" fake:"{imageurl}"`
 	UserID   uint64  `gorm:"default:null" json:"user_id" fake:"{number:1,100}"`
@@ -20,13 +20,16 @@ type Gallery struct {
 }
 
 func initGallery(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Gallery{})
 
-	for i := 0; i < 100; i++ {
-		model := new(Gallery)
-		gofakeit.Struct(model)
+	if !manager.GetConn().Migrator().HasTable(&Gallery{}) {
+		manager.GetConn().AutoMigrate(&Gallery{})
 
-		manager.GetConn().Create(model)
+		for i := 0; i < 100; i++ {
+			model := new(Gallery)
+			gofakeit.Struct(model)
+
+			manager.GetConn().Create(model)
+		}
 	}
 
 }

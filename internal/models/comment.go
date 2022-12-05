@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
@@ -20,15 +21,16 @@ type Comment struct {
 }
 
 func InitComment(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Comment{})
-	for i := 0; i < 10; i++ {
-		manager.CreateComment(DTOs.CreateComment{
-			PostID: 1,
-			Name:   "test test test",
-			Body:   "test test test",
-			Email:  "test@test.com",
-		})
+	if !manager.GetConn().Migrator().HasTable(&Comment{}) {
+		manager.GetConn().AutoMigrate(&Comment{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateComment)
+			gofakeit.Struct(model)
+
+			manager.CreateComment(*model)
+		}
 	}
+
 }
 
 func (m *MysqlManager) CreateComment(dto DTOs.CreateComment) (*Comment, error) {

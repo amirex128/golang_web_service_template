@@ -2,9 +2,9 @@ package DTOs
 
 type CreatePost struct {
 	//عنوان مقاله
-	Title string `form:"title" json:"title" validate:"required" example:"آموزش برنامه نویسی" fake:"{lorem_ipsum_sentence:1}"`
+	Title string `form:"title" json:"title" validate:"required" example:"آموزش برنامه نویسی" fake:"{sentence:1}"`
 	//محتوای مقاله که میتواند از اچ تی ام ال تشکیل شده باشد
-	Body string `form:"body" json:"body" validate:"required" example:"<p>متن مقاله</p>" fake:"{lorem_ipsum_paragraph:10}"`
+	Body string `form:"body" json:"body" validate:"required" example:"<p>متن مقاله</p>" fake:"{sentence:30}"`
 	//شناسه تصویر شاخص مقاله
 	GalleryID uint64 `form:"gallery_id" json:"gallery_id" validate:"required" example:"1" fake:"{number:1,100}"`
 	//آدرس صفحه که باید به صورت انگلیسی و منحصر به فرد باشد با دش از هم جدا شده باشد

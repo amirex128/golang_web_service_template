@@ -17,15 +17,18 @@ type Theme struct {
 }
 
 func initTheme(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Theme{})
-	for i := 0; i < 3; i++ {
-		var id uint64 = 1
-		manager.CreateTheme(Theme{
-			Name:        "قالب شماره" + strconv.Itoa(i),
-			Description: "قالب شماره" + strconv.Itoa(i),
-			GalleryID:   &id,
-		})
+	if !manager.GetConn().Migrator().HasTable(&Theme{}) {
+		manager.GetConn().AutoMigrate(&Theme{})
+		for i := 0; i < 4; i++ {
+			var id uint64 = 1
+			manager.CreateTheme(Theme{
+				Name:        "قالب شماره" + strconv.Itoa(i),
+				Description: "قالب شماره" + strconv.Itoa(i),
+				GalleryID:   &id,
+			})
+		}
 	}
+
 }
 
 func (m *MysqlManager) CreateTheme(theme Theme) error {

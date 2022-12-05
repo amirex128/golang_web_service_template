@@ -1,16 +1,16 @@
 package models
 
 import (
-	"fmt"
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 )
 
 type Product struct {
 	ID           uint64     `gorm:"primary_key;auto_increment" json:"id"`
-	UserID       uint64     `json:"user_id"`
+	UserID       *uint64    `json:"user_id"`
 	User         User       `gorm:"foreignKey:user_id" json:"user"`
 	ShopID       uint64     `json:"shop_id"`
 	Shop         Shop       `gorm:"foreignKey:shop_id" json:"shop"`
@@ -36,22 +36,15 @@ func (c Product) GetID() uint64 {
 }
 
 func InitProduct(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Product{})
-	for i := 0; i < 100; i++ {
-		manager.CreateProduct(DTOs.CreateProduct{
-			ShopID:       1,
-			Manufacturer: "سامسونگ",
-			Description:  fmt.Sprintf("توضیحات محصول %d", i),
-			Name:         fmt.Sprintf("محصول %d", i),
-			Quantity:     10,
-			Price:        10000,
-			StartedAt:    "2020-01-01 00:00:00",
-			EndedAt:      "2024-01-01 00:00:00",
-			OptionId:     1,
-			OptionItemID: 1,
-			CategoryID:   1,
-			GalleryIDs:   []uint64{1},
-		}, 1)
+	if !manager.GetConn().Migrator().HasTable(&Product{}) {
+		manager.GetConn().AutoMigrate(&Product{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateProduct)
+			gofakeit.Struct(model)
+
+			manager.CreateProduct(*model)
+		}
+
 	}
 }
 
@@ -74,9 +67,10 @@ func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs
 	return pagination, nil
 }
 
-func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct, userID uint64) (*Product, error) {
+func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct) (*Product, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateProduct", "model")
 	defer span.End()
+	userID := GetUser(m.Ctx)
 
 	var product = &Product{
 		UserID:      userID,
@@ -117,7 +111,7 @@ func (m *MysqlManager) UpdateProduct(dto DTOs.UpdateProduct) error {
 	}
 
 	userID := GetUser(m.Ctx)
-	if product.UserID != *userID {
+	if *product.UserID != *userID {
 		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
 	}
 
@@ -162,7 +156,7 @@ func (m *MysqlManager) DeleteProduct(id uint64) error {
 	if err != nil {
 		return errorx.New("خطا در حذف محصول", "model", err)
 	}
-	if product.UserID != *userID {
+	if *product.UserID != *userID {
 		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
 	}
 	err = m.GetConn().Delete(&Product{}, id).Error

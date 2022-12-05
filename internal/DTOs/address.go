@@ -2,7 +2,7 @@ package DTOs
 
 type CreateAddress struct {
 	//عنوان
-	Title string `form:"title" json:"title" validate:"required" example:"عنوان" fake:"{street_name}"`
+	Title string `form:"title" json:"title" validate:"required" example:"عنوان" fake:"{city}"`
 	//شناسه استان
 	ProvinceID uint64 `form:"province_id" json:"province_id" validate:"required,numeric" example:"1" fake:"{custom_uint64:1}"`
 	//شناسه شهر

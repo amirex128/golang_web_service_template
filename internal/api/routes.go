@@ -124,6 +124,7 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_shop.GET("/show/:id", shop.ShowShop)
 			_shop.POST("/delete/:id", shop.DeleteShop)
 			_shop.POST("/send-price/:id", shop.SendPriceShop)
+			_shop.POST("/select/theme", shop.SelectThemeShop)
 			_shop.GET("/instagram", shop.GetInstagramPost)
 		}
 

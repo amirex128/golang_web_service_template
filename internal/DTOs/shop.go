@@ -10,7 +10,7 @@ type CreateShop struct {
 	//آدرس شبکه اجتماعیی که میخواهید متصل کنید به فروشگاه برای دریافت محصولات از ان
 	SocialAddress string `form:"social_address" json:"social_address" validate:"required" example:"amirex_dev" fake:"{username}"`
 	//توضیحات فروشگاه
-	Description string `form:"description" json:"description" validate:"omitempty" example:"توضیحات فروشگاه" fake:"{lorem_ipsum_sentence:10}"`
+	Description string `form:"description" json:"description" validate:"omitempty" example:"توضیحات فروشگاه" fake:"{sentence:10}"`
 	//شماره تلفن برای نمایش در فروشگاه برای پشتیبانی
 	Phone string `form:"phone" json:"phone" validate:"omitempty" example:"05136643278" fake:"{phone}"`
 	//شماره موبایل برای نمایش در فروشگاه برای پشتیبانی
@@ -27,8 +27,6 @@ type CreateShop struct {
 	Website string `form:"website" json:"website" validate:"omitempty" example:"https://amirshirdel.ir" fake:"{url}"`
 	//هزینه ارسال تومان
 	SendPrice float32 `form:"send_price" json:"send_price" validate:"omitempty" example:"20000" fake:"{number:10000,100000}"`
-	//شناسه قالب
-	ThemeID uint64 `form:"theme_id" json:"theme_id" validate:"omitempty" example:"1" fake:"{number:1,4}"`
 }
 
 type UpdateShop struct {
@@ -85,7 +83,12 @@ type SendPriceShop struct {
 	//شناسه فروشگاه
 	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required,numeric" example:"1"`
 }
-
+type SelectThemeShop struct {
+	// شناسه قالب
+	ThemeID uint64 `form:"theme_id" json:"theme_id" validate:"required,numeric" example:"1"`
+	//شناسه فروشگاه
+	ShopID uint64 `form:"shop_id" json:"shop_id" validate:"required,numeric" example:"1"`
+}
 type IndexShop struct {
 	Index
 }

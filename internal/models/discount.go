@@ -4,6 +4,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
 	"strings"
 )
@@ -26,32 +27,33 @@ type Discount struct {
 }
 
 func initDiscount(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Discount{})
-	manager.CreateDiscount(DTOs.CreateDiscount{
-		Code:       "test",
-		StartedAt:  "2021-01-01 00:00:00",
-		EndedAt:    "2024-01-01 00:00:00",
-		Count:      10,
-		Type:       "percent",
-		Amount:     0,
-		Percent:    20,
-		ProductIDs: []uint64{},
-		Status:     true,
-	})
+	if !manager.GetConn().Migrator().HasTable(&Discount{}) {
+		manager.GetConn().AutoMigrate(&Discount{})
+
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateDiscount)
+			gofakeit.Struct(model)
+
+			manager.CreateDiscount(*model)
+		}
+
+	}
+
 }
 func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 	userID := GetUser(m.Ctx)
-	for _, pId := range dto.ProductIDs {
-		product, err := m.FindProductById(pId)
-		if err != nil {
-			return nil, err
-		}
-		if product.UserID != *userID {
-			return nil, errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
-		}
-	}
+	//for _, pId := range dto.ProductIDs {
+	//	product, err := m.FindProductById(pId)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	if *product.UserID != *userID {
+	//		return nil, errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
+	//	}
+	//}
+	//TODO Authorize
 
 	if m.GetConn().Where("code = ?", dto.Code).First(&Discount{}).RowsAffected > 0 {
 		return nil, errorx.New("کد تخفیف تکراری است", "model", nil)
@@ -87,7 +89,7 @@ func (m *MysqlManager) UpdateDiscount(dto DTOs.UpdateDiscount) error {
 		if err != nil {
 			return errorx.New("محصول یافت نشد", "model", err)
 		}
-		if product.UserID != *userID {
+		if *product.UserID != *userID {
 			return errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", err)
 		}
 	}

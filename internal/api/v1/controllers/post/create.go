@@ -26,7 +26,6 @@ func CreatePost(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	userID := models.GetUser(c)
 	dto.Slug = slug.MakeLang(dto.Slug, "en")
 	err = models.NewMysqlManager(c).CheckSlug(dto.Slug)
 	if err != nil {
@@ -34,7 +33,7 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	post, err := models.NewMysqlManager(c).CreatePost(dto, *userID)
+	post, err := models.NewMysqlManager(c).CreatePost(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

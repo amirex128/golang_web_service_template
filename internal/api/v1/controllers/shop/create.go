@@ -25,9 +25,8 @@ func CreateShop(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	userID := models.GetUser(c)
 
-	shop, err := models.NewMysqlManager(c).CreateShop(dto, *userID)
+	shop, err := models.NewMysqlManager(c).CreateShop(dto)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)
 		return

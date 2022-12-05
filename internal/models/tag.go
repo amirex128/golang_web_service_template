@@ -3,8 +3,8 @@ package models
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
+	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
-	"strconv"
 )
 
 type Tag struct {
@@ -16,13 +16,17 @@ type Tag struct {
 }
 
 func initTag(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Tag{})
-	for i := 0; i < 100; i++ {
-		manager.CreateTag(DTOs.CreateTag{
-			Name: "تگ شماره" + strconv.Itoa(i),
-			Slug: "tag" + strconv.Itoa(i),
-		})
+	if !manager.GetConn().Migrator().HasTable(&Tag{}) {
+		manager.GetConn().AutoMigrate(&Tag{})
+
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateTag)
+			gofakeit.Struct(model)
+
+			manager.CreateTag(*model)
+		}
 	}
+
 }
 
 func (m *MysqlManager) CreateTag(dto DTOs.CreateTag) (*Tag, error) {

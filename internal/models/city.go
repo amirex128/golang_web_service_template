@@ -17,9 +17,13 @@ type City struct {
 }
 
 func initCity(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&City{})
-	cities := utils.ReadCsvFile("./csv/cities.csv")
-	manager.CreateAllCities(cities)
+
+	if !manager.GetConn().Migrator().HasTable(&City{}) {
+		manager.GetConn().AutoMigrate(&City{})
+		cities := utils.ReadCsvFile("./csv/cities.csv")
+		manager.CreateAllCities(cities)
+	}
+
 }
 func (m *MysqlManager) CreateAllCities(files [][]string) {
 	cities := make([]City, 0)

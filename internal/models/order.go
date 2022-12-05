@@ -35,7 +35,11 @@ type Order struct {
 }
 
 func initOrder(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Order{})
+	if !manager.GetConn().Migrator().HasTable(&Order{}) {
+		manager.GetConn().AutoMigrate(&Order{})
+
+	}
+
 }
 
 func (m *MysqlManager) CreateOrder(order *Order) (*Order, error) {

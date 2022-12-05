@@ -24,12 +24,16 @@ type Address struct {
 }
 
 func initAddress(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Address{})
-	for i := 0; i < 100; i++ {
-		model := new(DTOs.CreateAddress)
-		gofakeit.Struct(model)
-		manager.CreateAddress(*model)
+	if !manager.GetConn().Migrator().HasTable(&Address{}) {
+		manager.GetConn().AutoMigrate(&Address{})
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateAddress)
+			gofakeit.Struct(model)
+
+			manager.CreateAddress(*model)
+		}
 	}
+
 }
 
 func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) (*Address, error) {

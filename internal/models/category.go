@@ -30,27 +30,24 @@ type CategoryRelated struct {
 	CategoryRelatedID uint32 `json:"category_related_id"`
 }
 
-func initCategory(manager *MysqlManager) bool {
-	manager.GetConn().AutoMigrate(&Category{})
-	manager.GetConn().AutoMigrate(&CategoryRelated{})
+func initCategory(manager *MysqlManager) {
+	if !manager.GetConn().Migrator().HasTable(&Category{}) {
+		manager.GetConn().AutoMigrate(&Category{})
+		categories := utils.ReadCsvFile("./csv/categories.csv")
+		manager.CreateAllCategories(categories)
 
-	if manager.GetConn().First(&Category{}).Error == nil {
-		return false
+		for i := 0; i < 100; i++ {
+			model := new(DTOs.CreateCategory)
+			gofakeit.Struct(model)
+
+			manager.CreateCategory(*model)
+		}
 	}
-
-	categories := utils.ReadCsvFile("./csv/categories.csv")
-	manager.CreateAllCategories(categories)
-	categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
-	manager.CreateAllCategoryRelated(categoryRelated)
-
-	for i := 0; i < 100; i++ {
-		model := new(DTOs.CreateCategory)
-		gofakeit.Struct(model)
-
-		manager.CreateCategory(*model)
+	if !manager.GetConn().Migrator().HasTable(&CategoryRelated{}) {
+		manager.GetConn().AutoMigrate(&CategoryRelated{})
+		categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
+		manager.CreateAllCategoryRelated(categoryRelated)
 	}
-
-	return true
 
 }
 

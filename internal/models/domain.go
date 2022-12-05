@@ -16,32 +16,35 @@ type Domain struct {
 }
 
 func initDomain(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&Domain{})
-	manager.CreateDomain(DTOs.CreateDomain{
-		Name:   "localhost:8585",
-		ShopID: 1,
-		Type:   "domain",
-	})
-	manager.CreateDomain(DTOs.CreateDomain{
-		Name:   "selloora.test",
-		ShopID: 2,
-		Type:   "domain",
-	})
-	manager.CreateDomain(DTOs.CreateDomain{
-		Name:   "amir.test",
-		ShopID: 3,
-		Type:   "domain",
-	})
-	manager.CreateDomain(DTOs.CreateDomain{
-		Name:   "sell.selloora.test",
-		ShopID: 4,
-		Type:   "subdomain",
-	})
-	manager.CreateDomain(DTOs.CreateDomain{
-		Name:   "amir.selloora.test",
-		ShopID: 5,
-		Type:   "subdomain",
-	})
+	if !manager.GetConn().Migrator().HasTable(&Domain{}) {
+		manager.GetConn().AutoMigrate(&Domain{})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "localhost:8585",
+			ShopID: 1,
+			Type:   "domain",
+		})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "selloora.test",
+			ShopID: 2,
+			Type:   "domain",
+		})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "amir.test",
+			ShopID: 3,
+			Type:   "domain",
+		})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "sell.selloora.test",
+			ShopID: 4,
+			Type:   "subdomain",
+		})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "amir.selloora.test",
+			ShopID: 5,
+			Type:   "subdomain",
+		})
+	}
+
 }
 
 func (m *MysqlManager) CreateDomain(dto DTOs.CreateDomain) (*Domain, error) {
