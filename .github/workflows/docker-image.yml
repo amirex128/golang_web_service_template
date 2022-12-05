@@ -40,15 +40,19 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
+            cd /root
+            git clone git@github.com:amirex128/docker-stack.git
+            git clone git@github.com:amirex128/selloora_frontend.git
+            git clone git@github.com:amirex128/selloora_backend.git
             cd /root/docker-stack
             cat /root/dockerpassword | docker login -u amirex128 --password-stdin
             rm /etc/resolv.conf
-            echo -e "nameserver 178.22.122.100 \n nameserver 185.51.200.2 \n options edns0" >> /etc/resolv.conf
+            echo -e "nameserver 178.22.122.100 \nnameserver 185.51.200.2 \noptions edns0" >> /etc/resolv.conf
             docker compose -f docker-compose-server.yml pull
             docker compose -f docker-compose-server.yml up -d
             docker image prune
             rm /etc/resolv.conf
-            echo -e "nameserver 8.8.8.8 \n nameserver 8.8.4.4 \n options edns0" >> /etc/resolv.conf
+            echo -e "nameserver 8.8.8.8 \nnameserver 8.8.4.4 \noptions edns0" >> /etc/resolv.conf
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:
