@@ -1,4 +1,4 @@
-FROM amirex128/selloora-frontend:latest as front
+FROM selloora-frontend:latest as front
 FROM golang:1.19.3-alpine AS back
 
 RUN apk update
