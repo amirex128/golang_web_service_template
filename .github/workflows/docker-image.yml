@@ -41,6 +41,9 @@ jobs:
           script_stop: true
           script: |
             cd /root
+            rm -rf selloora_backend
+            rm -rf selloora_frontend
+            rm -rf docker-stack
             git clone git@github.com:amirex128/docker-stack.git
             git clone git@github.com:amirex128/selloora_frontend.git
             git clone git@github.com:amirex128/selloora_backend.git
