@@ -27,7 +27,7 @@ type Post struct {
 
 func InitPost(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Post{}) {
-		manager.GetConn().AutoMigrate(&Post{})
+		manager.GetConn().Migrator().CreateTable(&Post{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreatePost)
 			gofakeit.Struct(model)

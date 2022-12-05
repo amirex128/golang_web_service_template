@@ -18,7 +18,7 @@ type OrderItem struct {
 
 func initOrderItem(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&OrderItem{}) {
-		manager.GetConn().AutoMigrate(&OrderItem{})
+		manager.GetConn().Migrator().CreateTable(&OrderItem{})
 
 	}
 

@@ -21,7 +21,7 @@ type Slider struct {
 
 func initSlider(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Slider{}) {
-		manager.GetConn().AutoMigrate(&Slider{})
+		manager.GetConn().Migrator().CreateTable(&Slider{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateSlider)
 			gofakeit.Struct(model)

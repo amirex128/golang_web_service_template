@@ -20,14 +20,14 @@ type ProductProvince struct {
 func initProvince(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&Province{}) {
-		manager.GetConn().AutoMigrate(&Province{})
+		manager.GetConn().Migrator().CreateTable(&Province{})
 		provinces := utils.ReadCsvFile("./csv/provinces.csv")
 		manager.CreateAllProvinces(provinces)
 
 	}
 
 	if !manager.GetConn().Migrator().HasTable(&ProductProvince{}) {
-		manager.GetConn().AutoMigrate(&ProductProvince{})
+		manager.GetConn().Migrator().CreateTable(&ProductProvince{})
 
 	}
 

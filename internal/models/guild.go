@@ -21,8 +21,8 @@ type GuildProduct struct {
 
 func initGuild(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Guild{}) {
-		manager.GetConn().AutoMigrate(&Guild{})
-		manager.GetConn().AutoMigrate(&GuildProduct{})
+		manager.GetConn().Migrator().CreateTable(&Guild{})
+		manager.GetConn().Migrator().CreateTable(&GuildProduct{})
 		guilds := utils.ReadCsvFile("./csv/guilds.csv")
 		manager.CreateAllGuilds(guilds)
 

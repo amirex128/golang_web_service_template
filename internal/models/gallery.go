@@ -22,7 +22,7 @@ type Gallery struct {
 func initGallery(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&Gallery{}) {
-		manager.GetConn().AutoMigrate(&Gallery{})
+		manager.GetConn().Migrator().CreateTable(&Gallery{})
 
 		for i := 0; i < 100; i++ {
 			model := new(Gallery)

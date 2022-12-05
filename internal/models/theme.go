@@ -18,7 +18,7 @@ type Theme struct {
 
 func initTheme(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Theme{}) {
-		manager.GetConn().AutoMigrate(&Theme{})
+		manager.GetConn().Migrator().CreateTable(&Theme{})
 		for i := 0; i < 4; i++ {
 			var id uint64 = 1
 			manager.CreateTheme(Theme{

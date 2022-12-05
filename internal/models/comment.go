@@ -22,7 +22,7 @@ type Comment struct {
 
 func InitComment(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Comment{}) {
-		manager.GetConn().AutoMigrate(&Comment{})
+		manager.GetConn().Migrator().CreateTable(&Comment{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateComment)
 			gofakeit.Struct(model)

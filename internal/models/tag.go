@@ -17,7 +17,7 @@ type Tag struct {
 
 func initTag(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Tag{}) {
-		manager.GetConn().AutoMigrate(&Tag{})
+		manager.GetConn().Migrator().CreateTable(&Tag{})
 
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateTag)

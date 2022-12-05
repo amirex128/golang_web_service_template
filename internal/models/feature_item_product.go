@@ -10,5 +10,5 @@ type FeatureItemProduct struct {
 }
 
 func initFeatureItemProduct(manager *MysqlManager) {
-	manager.GetConn().AutoMigrate(&FeatureItemProduct{})
+	manager.GetConn().Migrator().CreateTable(&FeatureItemProduct{})
 }

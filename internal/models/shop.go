@@ -40,7 +40,7 @@ func initShop(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&Shop{}) {
 
-		manager.GetConn().AutoMigrate(&Shop{})
+		manager.GetConn().Migrator().CreateTable(&Shop{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateShop)
 			gofakeit.Struct(model)

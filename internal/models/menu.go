@@ -19,7 +19,7 @@ type Menu struct {
 
 func initMenu(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Menu{}) {
-		manager.GetConn().AutoMigrate(&Menu{})
+		manager.GetConn().Migrator().CreateTable(&Menu{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateMenu)
 			gofakeit.Struct(model)

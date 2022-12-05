@@ -28,7 +28,7 @@ type Discount struct {
 
 func initDiscount(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Discount{}) {
-		manager.GetConn().AutoMigrate(&Discount{})
+		manager.GetConn().Migrator().CreateTable(&Discount{})
 
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateDiscount)

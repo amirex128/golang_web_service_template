@@ -20,7 +20,7 @@ type FeatureItem struct {
 
 func initFeatureItem(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&FeatureItem{}) {
-		manager.GetConn().AutoMigrate(&FeatureItem{})
+		manager.GetConn().Migrator().CreateTable(&FeatureItem{})
 		initFeatureItemProduct(manager)
 		featureItems := utils.ReadCsvFile("./csv/feature_items.csv")
 		manager.CreateAllFeatureItems(featureItems)

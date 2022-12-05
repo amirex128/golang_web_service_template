@@ -24,7 +24,7 @@ type Customer struct {
 
 func initCustomer(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Customer{}) {
-		manager.GetConn().AutoMigrate(&Customer{})
+		manager.GetConn().Migrator().CreateTable(&Customer{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateUpdateCustomer)
 			gofakeit.Struct(model)

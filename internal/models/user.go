@@ -24,8 +24,6 @@ type User struct {
 	Financial     []Financial `gorm:"foreignKey:user_id" json:"financial" fake:"skip"`
 	LastSendSMSAt string      `json:"last_send_sms_at" fake:"{date}"`
 	Password      string      `json:"password" fake:"{password:true,false,false,true,false,10}"`
-	GalleryID     *uint64     `gorm:"default:null" json:"gallery_id" fake:"skip"`
-	Gallery       *Gallery    `gorm:"foreignKey:gallery_id" json:"gallery" fake:"skip"`
 	UpdatedAt     string      `json:"updated_at" fake:"{date}"`
 	CreatedAt     string      `json:"created_at" fake:"{date}"`
 }
@@ -33,7 +31,7 @@ type User struct {
 func initUser(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&User{}) {
-		manager.GetConn().AutoMigrate(&User{})
+		manager.GetConn().Migrator().CreateTable(&User{})
 
 		for i := 0; i < 100; i++ {
 			model := new(User)
@@ -141,9 +139,6 @@ func (m *MysqlManager) UpdateUser(user *User) error {
 	}
 	if user.Shaba != "" {
 		newUser.Shaba = user.Shaba
-	}
-	if user.GalleryID != nil && *(user.GalleryID) != 0 {
-		newUser.GalleryID = user.GalleryID
 	}
 	if user.LastSendSMSAt != "" {
 		newUser.LastSendSMSAt = user.LastSendSMSAt

@@ -20,7 +20,7 @@ type Page struct {
 
 func initPage(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Page{}) {
-		manager.GetConn().AutoMigrate(&Page{})
+		manager.GetConn().Migrator().CreateTable(&Page{})
 
 	}
 

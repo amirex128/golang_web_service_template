@@ -37,7 +37,7 @@ func (c Product) GetID() uint64 {
 
 func InitProduct(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Product{}) {
-		manager.GetConn().AutoMigrate(&Product{})
+		manager.GetConn().Migrator().CreateTable(&Product{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateProduct)
 			gofakeit.Struct(model)

@@ -32,7 +32,7 @@ type CategoryRelated struct {
 
 func initCategory(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Category{}) {
-		manager.GetConn().AutoMigrate(&Category{})
+		manager.GetConn().Migrator().CreateTable(&Category{})
 		categories := utils.ReadCsvFile("./csv/categories.csv")
 		manager.CreateAllCategories(categories)
 
@@ -44,7 +44,7 @@ func initCategory(manager *MysqlManager) {
 		}
 	}
 	if !manager.GetConn().Migrator().HasTable(&CategoryRelated{}) {
-		manager.GetConn().AutoMigrate(&CategoryRelated{})
+		manager.GetConn().Migrator().CreateTable(&CategoryRelated{})
 		categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
 		manager.CreateAllCategoryRelated(categoryRelated)
 	}

@@ -17,7 +17,7 @@ type Domain struct {
 
 func initDomain(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Domain{}) {
-		manager.GetConn().AutoMigrate(&Domain{})
+		manager.GetConn().Migrator().CreateTable(&Domain{})
 		manager.CreateDomain(DTOs.CreateDomain{
 			Name:   "localhost:8585",
 			ShopID: 1,

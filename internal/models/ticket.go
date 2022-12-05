@@ -26,7 +26,7 @@ type Ticket struct {
 
 func InitTicket(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Ticket{}) {
-		manager.GetConn().AutoMigrate(&Ticket{})
+		manager.GetConn().Migrator().CreateTable(&Ticket{})
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateTicket)
 			gofakeit.Struct(model)
