@@ -37,6 +37,8 @@ jobs:
             docker compose -f docker-compose-server.yml up -d --build
             rm /etc/resolv.conf
             echo -e "nameserver 8.8.8.8 \nnameserver 8.8.4.4 \noptions edns0" >> /etc/resolv.conf
+            docker compose -f docker-compose-server.yml run --rm certbot renew
+
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:
