@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
@@ -9,6 +10,7 @@ import (
 
 type Menu struct {
 	ID       uint64  `gorm:"primary_key;auto_increment" json:"id"`
+	UserID   *uint64 `json:"user_id"`
 	Name     string  `json:"name"`
 	Link     string  `json:"link"`
 	ShopID   *uint64 `gorm:"default:null" json:"shop_id"`
@@ -44,6 +46,7 @@ func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) (*Menu, error) {
 	menu := &Menu{
 		Name:     dto.Name,
 		Link:     dto.Link,
+		UserID:   GetUserID(m.Ctx),
 		ShopID:   &dto.ShopID,
 		ParentID: dto.ParentID,
 		Position: dto.Position,
@@ -63,7 +66,9 @@ func (m *MysqlManager) UpdateMenu(dto DTOs.UpdateMenu) error {
 	if err != nil {
 		return errorx.New("منو یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, menu.UserID); err != nil {
+		return err
+	}
 	if dto.Name != "" {
 		menu.Name = dto.Name
 	}
@@ -93,7 +98,9 @@ func (m *MysqlManager) DeleteMenu(menuID uint64) error {
 	if err != nil {
 		return errorx.New("منو یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, menu.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&menu).Error
 	if err != nil {
 		return errorx.New("خطا در حذف منو", "model", err)
@@ -109,9 +116,9 @@ func (m *MysqlManager) GetAllMenuWithPagination(dto DTOs.IndexMenu) (*DTOs.Pagin
 
 	conn = conn.Scopes(DTOs.Paginate("menus", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&menus).Error
+	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&menus).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت منو ها", "model", err)
 	}
@@ -126,6 +133,9 @@ func (m *MysqlManager) FindMenuByID(id uint64) (*Menu, error) {
 	err := m.GetConn().Where("id = ?", id).First(menu).Error
 	if err != nil {
 		return menu, errorx.New("منو مورد نظر یافت نشد", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, menu.UserID); err != nil {
+		return nil, err
 	}
 	return menu, nil
 }

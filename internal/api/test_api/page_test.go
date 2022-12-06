@@ -9,6 +9,7 @@ import (
 var pageID *string
 
 func TestCreatePage(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "body": "<p>متن صفحه درباره ما</p>",
@@ -29,6 +30,7 @@ func TestCreatePage(t *testing.T) {
 }
 
 func TestUpdatePage(t *testing.T) {
+
 	assert.NotNilf(t, pageID, "page id is nil")
 	recorder := callApi([]byte(`
 {
@@ -49,6 +51,7 @@ func TestUpdatePage(t *testing.T) {
 }
 
 func TestShowPage(t *testing.T) {
+
 	assert.NotNilf(t, pageID, "page id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/page/show/"+*pageID,
@@ -61,6 +64,7 @@ func TestShowPage(t *testing.T) {
 }
 
 func TestIndexPage(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/page/list",
 		"GET")

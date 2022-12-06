@@ -20,7 +20,12 @@ func initCity(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&City{}) {
 		manager.GetConn().Migrator().CreateTable(&City{})
-		cities := utils.ReadCsvFile("./csv/cities.csv")
+		var cities [][]string
+		if utils.IsTest() {
+			cities = utils.ReadCsvFile("../../../csv/cities.csv")
+		} else {
+			cities = utils.ReadCsvFile("./csv/cities.csv")
+		}
 		manager.CreateAllCities(cities)
 	}
 

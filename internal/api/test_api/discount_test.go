@@ -9,6 +9,7 @@ import (
 var discountID *string
 
 func TestCreateDiscount(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "amount": 0,
@@ -35,6 +36,7 @@ func TestCreateDiscount(t *testing.T) {
 }
 
 func TestUpdateDiscount(t *testing.T) {
+
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(`
 {
@@ -62,6 +64,7 @@ func TestUpdateDiscount(t *testing.T) {
 }
 
 func TestShowDiscount(t *testing.T) {
+
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/discount/show/"+*discountID,
@@ -74,6 +77,7 @@ func TestShowDiscount(t *testing.T) {
 }
 
 func TestCheckDiscount(t *testing.T) {
+
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(`
 {
@@ -98,6 +102,7 @@ func TestCheckDiscount(t *testing.T) {
 }
 
 func TestIndexDiscount(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/discount/list",
 		"GET")
@@ -109,6 +114,7 @@ func TestIndexDiscount(t *testing.T) {
 }
 
 func TestDeleteDiscount(t *testing.T) {
+
 	assert.NotNilf(t, discountID, "discountID is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/discount/delete/"+*discountID,

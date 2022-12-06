@@ -21,7 +21,7 @@ func ShowDiscount(c *gin.Context) {
 	c.Request.WithContext(ctx)
 	defer span.End()
 	id := utils.StringToUint64(c.Param("id"))
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 
 	discount, err := models.NewMysqlManager(c).FindDiscountById(id)
 	if err != nil {

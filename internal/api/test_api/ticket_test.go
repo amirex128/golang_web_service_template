@@ -9,6 +9,7 @@ import (
 var ticketID *string
 
 func TestCreateTicket(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "body": "متن پیام",
@@ -30,6 +31,7 @@ func TestCreateTicket(t *testing.T) {
 }
 
 func TestShowTicket(t *testing.T) {
+
 	assert.NotNilf(t, ticketID, "ticket id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/ticket/show/"+*ticketID,
@@ -42,6 +44,7 @@ func TestShowTicket(t *testing.T) {
 }
 
 func TestIndexTicket(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/ticket/list",
 		"GET")

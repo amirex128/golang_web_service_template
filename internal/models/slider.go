@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
@@ -9,6 +10,7 @@ import (
 
 type Slider struct {
 	ID          uint64  `gorm:"primary_key;auto_increment" json:"id"`
+	UserID      *uint64 `json:"user_id"`
 	ShopID      *uint64 `json:"shop_id"`
 	Link        string  `json:"link"`
 	Title       string  `json:"title"`
@@ -49,6 +51,7 @@ func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) (*Slider, error) {
 		GalleryID:   &dto.GalleryID,
 		Description: dto.Description,
 		Link:        dto.Link,
+		UserID:      GetUserID(m.Ctx),
 		ShopID:      &dto.ShopID,
 		Position:    dto.Position,
 		Sort:        lastSort.Sort + 1,
@@ -67,7 +70,9 @@ func (m *MysqlManager) UpdateSlider(dto DTOs.UpdateSlider) error {
 	if err != nil {
 		return errorx.New("اسلایدر یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, slider.UserID); err != nil {
+		return err
+	}
 	if dto.Title != "" {
 		slider.Title = dto.Title
 	}
@@ -100,7 +105,9 @@ func (m *MysqlManager) DeleteSlider(sliderID uint64) error {
 	if err != nil {
 		return errorx.New("اسلایدر یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, slider.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&slider).Error
 	if err != nil {
 		return errorx.New("خطا در حذف اسلایدر", "model", err)
@@ -116,9 +123,9 @@ func (m *MysqlManager) GetAllSliderWithPagination(dto DTOs.IndexSlider) (*DTOs.P
 
 	conn = conn.Scopes(DTOs.Paginate("sliders", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&sliders).Error
+	err := conn.Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&sliders).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت اسلایدر ها", "model", err)
 	}
@@ -133,6 +140,9 @@ func (m *MysqlManager) FindSliderByID(sliderID uint64) (*Slider, error) {
 	err := m.GetConn().Where("id = ?", sliderID).First(slider).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن اسلایدر پیش آمده است", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, slider.UserID); err != nil {
+		return nil, err
 	}
 	return slider, nil
 }

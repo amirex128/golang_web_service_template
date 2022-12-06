@@ -9,6 +9,7 @@ import (
 var addressID *string
 
 func TestCreateAddress(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
  "address": "ادرس کامل",
@@ -33,6 +34,7 @@ func TestCreateAddress(t *testing.T) {
 }
 
 func TestUpdateAddress(t *testing.T) {
+
 	assert.NotNilf(t, addressID, "address id is nil")
 	recorder := callApi([]byte(`
 {
@@ -58,6 +60,7 @@ func TestUpdateAddress(t *testing.T) {
 }
 
 func TestShowAddress(t *testing.T) {
+
 	assert.NotNilf(t, addressID, "address id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/address/show/"+*addressID,
@@ -70,6 +73,7 @@ func TestShowAddress(t *testing.T) {
 }
 
 func TestIndexAddress(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/address/list",
 		"GET")

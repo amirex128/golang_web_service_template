@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
@@ -9,6 +10,7 @@ import (
 
 type Tag struct {
 	ID       uint64    `json:"id"`
+	UserID   *uint64   `json:"user_id"`
 	Name     string    `json:"name"`
 	Slug     string    `json:"slug"`
 	Posts    []Post    `gorm:"many2many:post_tag;" json:"posts"`
@@ -33,8 +35,9 @@ func (m *MysqlManager) CreateTag(dto DTOs.CreateTag) (*Tag, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateTag", "model")
 	defer span.End()
 	tag := &Tag{
-		Name: dto.Name,
-		Slug: dto.Slug,
+		Name:   dto.Name,
+		UserID: GetUserID(m.Ctx),
+		Slug:   dto.Slug,
 	}
 	err := m.GetConn().Create(tag).Error
 	if err != nil {
@@ -52,9 +55,9 @@ func (m *MysqlManager) GetAllTagsWithPagination(dto DTOs.IndexTag) (pagination *
 
 	conn = conn.Scopes(DTOs.Paginate("tags", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err = conn.Find(&tags).Error
+	err = conn.Order("id DESC").Find(&tags).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}
@@ -65,7 +68,15 @@ func (m *MysqlManager) GetAllTagsWithPagination(dto DTOs.IndexTag) (pagination *
 func (m *MysqlManager) DeleteTag(id uint64) (err error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteTag", "model")
 	defer span.End()
-	err = m.GetConn().Where("id = ?", id).Delete(&Tag{}).Error
+	tag := &Tag{}
+	err = m.GetConn().Where("id = ?", id).First(tag).Error
+	if err != nil {
+		return errorx.New("خطا در یافتن تگ", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, tag.UserID); err != nil {
+		return err
+	}
+	err = m.GetConn().Delete(tag).Error
 	if err != nil {
 		return errorx.New("خطا در حذف تگ", "model", err)
 	}

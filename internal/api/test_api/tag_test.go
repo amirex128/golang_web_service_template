@@ -9,6 +9,7 @@ import (
 var tagID *string
 
 func TestCreateTag(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "name": "عنوان تگ",
@@ -25,6 +26,7 @@ func TestCreateTag(t *testing.T) {
 
 }
 func TestAddTag(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "name": "عنوان تگ",
@@ -42,6 +44,7 @@ func TestAddTag(t *testing.T) {
 }
 
 func TestShowTag(t *testing.T) {
+
 	assert.NotNilf(t, tagID, "tag id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/tag/show/"+*tagID,
@@ -54,6 +57,7 @@ func TestShowTag(t *testing.T) {
 }
 
 func TestIndexTag(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/tag/list",
 		"GET")
@@ -65,6 +69,7 @@ func TestIndexTag(t *testing.T) {
 }
 
 func TestDeleteTag(t *testing.T) {
+
 	assert.NotNilf(t, tagID, "tag id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/tag/delete/"+*tagID,

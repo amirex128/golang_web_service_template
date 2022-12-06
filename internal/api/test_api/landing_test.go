@@ -7,6 +7,7 @@ import (
 )
 
 func TestBlogLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/blog",
 		"GET")
@@ -16,6 +17,7 @@ func TestBlogLanding(t *testing.T) {
 }
 
 func TestCategoryLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/category/1",
 		"GET")
@@ -25,6 +27,7 @@ func TestCategoryLanding(t *testing.T) {
 }
 
 func TestDetailsLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/blog/test",
 		"GET")
@@ -34,6 +37,7 @@ func TestDetailsLanding(t *testing.T) {
 }
 
 func TestIndexLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/",
 		"GET")
@@ -43,6 +47,7 @@ func TestIndexLanding(t *testing.T) {
 }
 
 func TestPageLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/page/test",
 		"GET")
@@ -52,6 +57,7 @@ func TestPageLanding(t *testing.T) {
 }
 
 func TestSearchLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/search/test",
 		"GET")
@@ -61,6 +67,7 @@ func TestSearchLanding(t *testing.T) {
 }
 
 func TestTagLanding(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/tag/test",
 		"GET")

@@ -21,25 +21,6 @@ func Initialize(ctx context.Context) {
 	logrus.SetOutput(os.Stdout)
 	viper.AutomaticEnv()
 
-	viper.SetDefault("CGO_ENABLED", "1")
-	viper.SetDefault("GO111MODULE", "on")
-	viper.SetDefault("ELASTIC_APM_ENVIRONMENT", "staging")
-	viper.SetDefault("ELASTIC_APM_SERVER_URL", "http://localhost:8200")
-	viper.SetDefault("ELASTIC_APM_SERVICE_NAME", "selloora_backend")
-	viper.SetDefault("SELLOORA_ELASTIC_HOST", "localhost")
-	viper.SetDefault("SELLOORA_ELASTIC_PORT", "9200")
-	viper.SetDefault("SELLOORA_MYSQL_MAIN_DB", "selloora")
-	viper.SetDefault("SELLOORA_MYSQL_MAIN_HOST", "localhost")
-	viper.SetDefault("SELLOORA_MYSQL_MAIN_PASSWORD", "q6766581Amirex")
-	viper.SetDefault("SELLOORA_MYSQL_MAIN_PORT", "3306")
-	viper.SetDefault("SELLOORA_MYSQL_MAIN_USER", "selloora")
-	viper.SetDefault("SELLOORA_REDIS_DB", "1")
-	viper.SetDefault("SELLOORA_REDIS_HOST", "localhost")
-	viper.SetDefault("SELLOORA_REDIS_PORT", "6379")
-	viper.SetDefault("SERVER_HOST", "0.0.0.0")
-	viper.SetDefault("SERVER_PORT", "8585")
-	viper.SetDefault("SERVER_URL", "http://localhost:8585")
-
 	// mysql
 	do.ProvideNamed[*MysqlProvider](Injector, "main_mysql", func(i *do.Injector) (*MysqlProvider, error) {
 		return NewMysql(i, ctx)

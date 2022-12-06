@@ -23,11 +23,7 @@ func authMiddleware() *jwt.GinJWTMiddleware {
 			if v, ok := data.(*models.User); ok {
 				return jwt.MapClaims{
 					"id":        v.ID,
-					"email":     v.Email,
-					"mobile":    v.Mobile,
-					"status":    v.Status,
-					"firstname": v.Firstname,
-					"lastname":  v.Lastname,
+					"is_admin":  v.IsAdmin,
 					"expire_at": v.ExpireAt,
 				}
 			}
@@ -36,13 +32,9 @@ func authMiddleware() *jwt.GinJWTMiddleware {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &models.User{
-				ID:        uint64(claims["id"].(float64)),
-				Email:     claims["email"].(string),
-				Mobile:    claims["mobile"].(string),
-				Status:    claims["status"].(string),
-				Firstname: claims["firstname"].(string),
-				Lastname:  claims["lastname"].(string),
-				ExpireAt:  claims["expire_at"].(string),
+				ID:       uint64(claims["id"].(float64)),
+				ExpireAt: claims["expire_at"].(string),
+				IsAdmin:  claims["is_admin"].(bool),
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
@@ -69,9 +61,23 @@ func authMiddleware() *jwt.GinJWTMiddleware {
 			}
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			//if v, ok := data.(*models.User); ok && v.Mobile == "09024809750" {
-			//	return true
-			//}
+			v, ok := data.(*models.User)
+			if !ok {
+				return false
+			}
+			if v.IsAdmin {
+				return true
+			}
+			if v.ExpireAt == "" {
+				return true
+			}
+			expireAt, err := time.Parse("2006-01-02 15:04:05", v.ExpireAt)
+			if err != nil {
+				return false
+			}
+			if time.Now().After(expireAt) {
+				return false
+			}
 
 			return true
 		},

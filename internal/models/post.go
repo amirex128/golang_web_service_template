@@ -51,7 +51,7 @@ func (m *MysqlManager) CheckSlug(slug string) error {
 func (m *MysqlManager) CreatePost(dto DTOs.CreatePost) (*Post, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePost", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
+	userID := GetUserID(m.Ctx)
 	post := &Post{
 		Title: dto.Title,
 		Body:  dto.Body,
@@ -81,6 +81,9 @@ func (m *MysqlManager) UpdatePost(dto DTOs.UpdatePost) (err error) {
 	if err != nil {
 		return errorx.New("مشکلی در ویرایش پست پیش آمده است", "model", err)
 	}
+	if err := utils.CheckAccess(m.Ctx, post.UserID); err != nil {
+		return err
+	}
 	if dto.Title != "" {
 		post.Title = dto.Title
 	}
@@ -104,7 +107,15 @@ func (m *MysqlManager) UpdatePost(dto DTOs.UpdatePost) (err error) {
 func (m *MysqlManager) DeletePost(postID uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeletePost", "model")
 	defer span.End()
-	err := m.GetConn().Where("id = ?", postID).Delete(&Post{}).Error
+	post := &Post{}
+	err := m.GetConn().Where("id = ?", postID).First(&post).Error
+	if err != nil {
+		return errorx.New("مشکلی در حذف پست پیش آمده است", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, post.UserID); err != nil {
+		return err
+	}
+	err = m.GetConn().Delete(post).Error
 	if err != nil {
 		return errorx.New("مشکلی در حذف پست پیش آمده است", "model", err)
 	}
@@ -118,6 +129,9 @@ func (m *MysqlManager) FindPostByID(postID uint64) (*Post, error) {
 	err := m.GetConn().Where("id = ?", postID).Preload("User").Preload("Categories").First(post).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست پیش آمده است", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, post.UserID); err != nil {
+		return nil, err
 	}
 	return post, nil
 }
@@ -144,7 +158,7 @@ func (m *MysqlManager) GetAllPostWithPagination(dto DTOs.IndexPost) (*DTOs.Pagin
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("shop_id = ? ", dto.ShopID).Find(&posts).Error
+	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Find(&posts).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}

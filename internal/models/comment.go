@@ -9,15 +9,16 @@ import (
 )
 
 type Comment struct {
-	ID        uint64 `gorm:"primary_key;auto_increment" json:"id"`
-	PostID    uint64 `json:"post_id"`
-	Post      Post   `gorm:"foreignKey:post_id" json:"post"`
-	Name      string `json:"title"`
-	EmailHash string `gorm:"-:all" json:"email_hash"`
-	Body      string `json:"body"`
-	Email     string `json:"email"`
-	Approve   bool   `json:"accept"`
-	CreatedAt string `json:"created_at"`
+	ID        uint64  `gorm:"primary_key;auto_increment" json:"id"`
+	UserID    *uint64 `json:"user_id"`
+	PostID    uint64  `json:"post_id"`
+	Post      Post    `gorm:"foreignKey:post_id" json:"post"`
+	Name      string  `json:"title"`
+	EmailHash string  `gorm:"-:all" json:"email_hash"`
+	Body      string  `json:"body"`
+	Email     string  `json:"email"`
+	Approve   bool    `json:"accept"`
+	CreatedAt string  `json:"created_at"`
 }
 
 func InitComment(manager *MysqlManager) {
@@ -39,6 +40,7 @@ func (m *MysqlManager) CreateComment(dto DTOs.CreateComment) (*Comment, error) {
 	comment := &Comment{
 		PostID:    dto.PostID,
 		Name:      dto.Name,
+		UserID:    &dto.UserID,
 		Body:      dto.Body,
 		Email:     dto.Email,
 		CreatedAt: utils.NowTime(),
@@ -59,9 +61,9 @@ func (m *MysqlManager) GetAllCommentWithPagination(dto DTOs.IndexComment) (pagin
 
 	conn = conn.Scopes(DTOs.Paginate("comments", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Order("id DESC")
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err = conn.Find(&comments).Error
+	err = conn.Where("user_id = ?", GetUserID(m.Ctx)).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}
@@ -85,7 +87,15 @@ func (m *MysqlManager) DeleteComment(id uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteComment", "model")
 	defer span.End()
 	conn := m.GetConn()
-	err := conn.Where("id = ?", id).Delete(&Comment{}).Error
+	comment := &Comment{}
+	err := conn.Where("id = ?", id).First(comment).Error
+	if err != nil {
+		return errorx.New("خطا در یافتن دیدگاه", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, comment.UserID); err != nil {
+		return err
+	}
+	err = conn.Delete(comment).Error
 	if err != nil {
 		return errorx.New("خطا در حذف دیدگاه", "model", err)
 	}
@@ -96,6 +106,9 @@ func (m *MysqlManager) ApproveComment(id uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:ApproveComment", "model")
 	defer span.End()
 	conn := m.GetConn()
+	if err := utils.CheckAccess(m.Ctx, &id); err != nil {
+		return err
+	}
 	err := conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
 	if err != nil {
 		return errorx.New("خطا در تایید دیدگاه", "model", err)
@@ -106,10 +119,13 @@ func (m *MysqlManager) ApproveComment(id uint64) error {
 func (m *MysqlManager) FindCommentByID(id uint64) (*Comment, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:FindCommentByID", "model")
 	defer span.End()
-	menu := &Comment{}
-	err := m.GetConn().Where("id = ?", id).First(menu).Error
+	comment := &Comment{}
+	err := m.GetConn().Where("id = ?", id).First(comment).Error
 	if err != nil {
-		return menu, errorx.New("دیدگاه مورد نظر یافت نشد", "model", err)
+		return comment, errorx.New("دیدگاه مورد نظر یافت نشد", "model", err)
 	}
-	return menu, nil
+	if err := utils.CheckAccess(m.Ctx, comment.UserID); err != nil {
+		return nil, err
+	}
+	return comment, nil
 }

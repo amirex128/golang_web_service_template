@@ -21,7 +21,13 @@ func initProvince(manager *MysqlManager) {
 
 	if !manager.GetConn().Migrator().HasTable(&Province{}) {
 		manager.GetConn().Migrator().CreateTable(&Province{})
-		provinces := utils.ReadCsvFile("./csv/provinces.csv")
+		var provinces [][]string
+		if utils.IsTest() {
+			provinces = utils.ReadCsvFile("../../../csv/provinces.csv")
+		} else {
+			provinces = utils.ReadCsvFile("./csv/provinces.csv")
+		}
+
 		manager.CreateAllProvinces(provinces)
 
 	}

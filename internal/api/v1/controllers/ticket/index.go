@@ -19,7 +19,7 @@ func IndexTicket(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexTicket", "request")
 	c.Request.WithContext(ctx)
 	defer span.End()
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 	dto, err := validations.IndexTicket(c)
 	shops, err := models.NewMysqlManager(c).GetAllTicketWithPagination(dto, *userID)
 	if err != nil {

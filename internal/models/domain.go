@@ -2,12 +2,14 @@ package models
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"go.elastic.co/apm/v2"
 )
 
 type Domain struct {
 	ID        uint64  `gorm:"primary_key;auto_increment" json:"id"`
+	UserID    *uint64 `json:"user_id"`
 	ShopID    *uint64 `gorm:"default:null" json:"shop_id"`
 	Shop      *Shop   `json:"shop"`
 	Name      string  `json:"name"`
@@ -19,7 +21,7 @@ func initDomain(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Domain{}) {
 		manager.GetConn().Migrator().CreateTable(&Domain{})
 		manager.CreateDomain(DTOs.CreateDomain{
-			Name:   "localhost:8585",
+			Name:   "selloora.com",
 			ShopID: 1,
 			Type:   "domain",
 		})
@@ -43,6 +45,11 @@ func initDomain(manager *MysqlManager) {
 			ShopID: 5,
 			Type:   "subdomain",
 		})
+		manager.CreateDomain(DTOs.CreateDomain{
+			Name:   "localhost:8585",
+			ShopID: 6,
+			Type:   "domain",
+		})
 	}
 
 }
@@ -53,6 +60,7 @@ func (m *MysqlManager) CreateDomain(dto DTOs.CreateDomain) (*Domain, error) {
 	domain := &Domain{
 		ShopID:    &dto.ShopID,
 		Name:      dto.Name,
+		UserID:    GetUserID(m.Ctx),
 		Type:      dto.Type,
 		DnsStatus: "pending",
 	}
@@ -81,7 +89,9 @@ func (m *MysqlManager) DeleteDomain(domainID uint64) error {
 	if err != nil {
 		return errorx.New("دامنه یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, domain.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&domain).Error
 	if err != nil {
 		return errorx.New("خطا در حذف دامنه", "model", err)
@@ -97,9 +107,9 @@ func (m *MysqlManager) GetAllDomainWithPagination(dto DTOs.IndexDomain) (*DTOs.P
 
 	conn = conn.Scopes(DTOs.Paginate("domains", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&domains).Error
+	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&domains).Error
 	if err != nil {
 		return pagination, errorx.New("خطا در دریافت دامنه ها", "model", err)
 	}
@@ -114,6 +124,9 @@ func (m *MysqlManager) FindDomainByID(domainID uint64) (*Domain, error) {
 	err := m.GetConn().Where("id = ?", domainID).First(domain).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن دامنه پیش آمده است", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, domain.UserID); err != nil {
+		return nil, err
 	}
 	return domain, nil
 }

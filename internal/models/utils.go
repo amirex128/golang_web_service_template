@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetUser(c *gin.Context) *uint64 {
+func GetUserID(c *gin.Context) *uint64 {
 	var userID *uint64
 	defer func() {
 		if r := recover(); r != nil {
@@ -41,14 +41,4 @@ func mSha512(s string) []byte {
 	h := sha512.New()
 	h.Write([]byte(s))
 	return h.Sum(nil)
-}
-
-func IsAdmin(c *gin.Context) bool {
-	userID := GetUser(c)
-	user, err := NewMysqlManager(c).FindUserByID(*userID)
-	if err != nil {
-		return false
-	}
-
-	return user.IsAdmin
 }

@@ -25,7 +25,7 @@ func ChangePassword(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 	err = models.NewMysqlManager(c).UpdateUser(&models.User{
 		ID:       *userID,
 		Password: models.GeneratePasswordHash(dto.Password),

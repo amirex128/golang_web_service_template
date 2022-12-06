@@ -9,6 +9,7 @@ import (
 var productID *string
 
 func TestCreateProduct(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "categoryID": 1,
@@ -38,6 +39,7 @@ func TestCreateProduct(t *testing.T) {
 }
 
 func TestUpdateProduct(t *testing.T) {
+
 	assert.NotNilf(t, productID, "product id is nil")
 	recorder := callApi([]byte(`
 {
@@ -69,6 +71,7 @@ func TestUpdateProduct(t *testing.T) {
 }
 
 func TestShowProduct(t *testing.T) {
+
 	assert.NotNilf(t, productID, "product id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/product/show/"+*productID,
@@ -81,6 +84,7 @@ func TestShowProduct(t *testing.T) {
 }
 
 func TestIndexProduct(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/product/list",
 		"GET")

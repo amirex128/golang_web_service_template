@@ -53,7 +53,7 @@ func initShop(manager *MysqlManager) {
 func (m *MysqlManager) CreateShop(dto DTOs.CreateShop) (*Shop, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateShop", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
+	userID := GetUserID(m.Ctx)
 	shop := &Shop{
 		Name:          dto.Name,
 		Type:          dto.Type,
@@ -104,9 +104,8 @@ func (m *MysqlManager) UpdateShop(dto DTOs.UpdateShop) error {
 	if err != nil {
 		return errorx.New("فروشگاه یافت نشد", "model", err)
 	}
-	userID := GetUser(m.Ctx)
-	if *shop.UserID != *userID {
-		return errorx.New("شما اجازه دسترسی به این فروشگاه را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, shop.UserID); err != nil {
+		return err
 	}
 	if dto.Name != "" {
 		shop.Name = dto.Name
@@ -162,8 +161,8 @@ func (m *MysqlManager) DeleteShop(shopID uint64, userID uint64) error {
 	if err != nil {
 		return errorx.New("فروشگاه یافت نشد", "model", err)
 	}
-	if *shop.UserID != userID {
-		return errorx.New("شما اجازه دسترسی به این فروشگاه را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, shop.UserID); err != nil {
+		return err
 	}
 	err = m.GetConn().Delete(shop).Error
 	if err != nil {
@@ -177,14 +176,14 @@ func (m *MysqlManager) GetAllShopWithPagination(dto DTOs.IndexShop) (*DTOs.Pagin
 	defer span.End()
 	conn := m.GetConn()
 	var shops []Shop
-	userID := GetUser(m.Ctx)
+	userID := GetUserID(m.Ctx)
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
 	conn = conn.Scopes(DTOs.Paginate("shops", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", userID).Preload("Gallery").Find(&shops).Error
+	err := conn.Where("user_id = ?", userID).Order("id DESC").Preload("Gallery").Find(&shops).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت فروشگاه ها", "model", err)
 	}
@@ -217,9 +216,8 @@ func (m *MysqlManager) SelectThemeByID(themeID uint64, shopID uint64) error {
 	if err != nil {
 		return err
 	}
-	userID := GetUser(m.Ctx)
-	if *shop.UserID != *userID {
-		return errorx.New("شما اجازه دسترسی به این فروشگاه را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, shop.UserID); err != nil {
+		return err
 	}
 	shop.ThemeID = &themeID
 	err = m.GetConn().Save(shop).Error

@@ -9,6 +9,7 @@ import (
 var domainID *string
 
 func TestCreateDomain(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "name": "example.com",
@@ -27,6 +28,7 @@ func TestCreateDomain(t *testing.T) {
 }
 
 func TestShowDomain(t *testing.T) {
+
 	assert.NotNilf(t, domainID, "domain id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/domain/show/"+*domainID,
@@ -39,6 +41,7 @@ func TestShowDomain(t *testing.T) {
 }
 
 func TestIndexDomain(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/domain/list",
 		"GET")

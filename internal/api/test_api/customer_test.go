@@ -12,6 +12,7 @@ var customerID *string
 var verifyCode string
 
 func TestRequestCreateLoginCustomer(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "mobile": "09024809750",
@@ -29,6 +30,7 @@ func TestRequestCreateLoginCustomer(t *testing.T) {
 }
 
 func TestShowCustomer(t *testing.T) {
+
 	assert.NotNilf(t, customerID, "customer id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/customer/show/"+*customerID,
@@ -50,6 +52,7 @@ func TestShowCustomer(t *testing.T) {
 }
 
 func TestVerifyCreateLoginCustomer(t *testing.T) {
+
 	assert.NotNilf(t, customerID, "customer id is nil")
 	assert.NotEmptyf(t, verifyCode, "verify code is empty")
 	recorder := callApi([]byte(fmt.Sprintf(`
@@ -74,6 +77,7 @@ func TestVerifyCreateLoginCustomer(t *testing.T) {
 }
 
 func TestIndexCustomer(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/customer/list",
 		"GET")

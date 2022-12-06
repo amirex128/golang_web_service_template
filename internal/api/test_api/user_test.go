@@ -9,6 +9,7 @@ import (
 var userID *string
 
 func TestUpdateUser(t *testing.T) {
+
 	assert.NotNilf(t, userID, "user id is nil")
 	recorder := callApi([]byte(`
 {

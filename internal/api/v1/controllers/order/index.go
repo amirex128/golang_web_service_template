@@ -25,7 +25,7 @@ func IndexOrder(c *gin.Context) {
 	c.Request.WithContext(ctx)
 	defer span.End()
 	orderStatus := c.Query("order_status")
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {

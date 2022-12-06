@@ -110,6 +110,9 @@ func (m *MysqlManager) UpdateUser(user *User) error {
 	if err != nil {
 		return errorx.New("کاربر یافت نشد", "model", err)
 	}
+	if err := utils.CheckAccess(m.Ctx, &user.ID); err != nil {
+		return err
+	}
 	if user.Gender != "" {
 		newUser.Gender = user.Gender
 	}

@@ -9,6 +9,7 @@ import (
 var commentID *string
 
 func TestCreateComment(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "body": "متن نظر",
@@ -28,6 +29,7 @@ func TestCreateComment(t *testing.T) {
 }
 
 func TestApproveComment(t *testing.T) {
+
 	assert.NotNilf(t, commentID, "commentID is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/comment/approve/"+*commentID,
@@ -40,6 +42,7 @@ func TestApproveComment(t *testing.T) {
 }
 
 func TestIndexComment(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/comment/list",
 		"GET")

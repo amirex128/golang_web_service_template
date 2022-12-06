@@ -23,7 +23,12 @@ func initGuild(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Guild{}) {
 		manager.GetConn().Migrator().CreateTable(&Guild{})
 		manager.GetConn().Migrator().CreateTable(&GuildProduct{})
-		guilds := utils.ReadCsvFile("./csv/guilds.csv")
+		var guilds [][]string
+		if utils.IsTest() {
+			guilds = utils.ReadCsvFile("../../../csv/guilds.csv")
+		} else {
+			guilds = utils.ReadCsvFile("./csv/guilds.csv")
+		}
 		manager.CreateAllGuilds(guilds)
 
 	}

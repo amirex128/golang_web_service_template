@@ -9,6 +9,7 @@ import (
 var menuID *string
 
 func TestCreateMenu(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "link": "https://example.selloora.com/page/test",
@@ -29,6 +30,7 @@ func TestCreateMenu(t *testing.T) {
 }
 
 func TestUpdateMenu(t *testing.T) {
+
 	assert.NotNilf(t, menuID, "menu id is nil")
 	recorder := callApi([]byte(`
 {
@@ -50,6 +52,7 @@ func TestUpdateMenu(t *testing.T) {
 }
 
 func TestShowMenu(t *testing.T) {
+
 	assert.NotNilf(t, menuID, "menu id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/menu/show/"+*menuID,
@@ -62,6 +65,7 @@ func TestShowMenu(t *testing.T) {
 }
 
 func TestIndexMenu(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/menu/list",
 		"GET")

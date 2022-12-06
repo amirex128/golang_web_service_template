@@ -9,6 +9,7 @@ import (
 var shopID *string
 
 func TestCreateShop(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "description": "توضیحات فروشگاه",
@@ -38,6 +39,7 @@ func TestCreateShop(t *testing.T) {
 }
 
 func TestUpdateShop(t *testing.T) {
+
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(`
 {
@@ -68,6 +70,7 @@ func TestUpdateShop(t *testing.T) {
 }
 
 func TestSendPriceShop(t *testing.T) {
+
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(`
 {
@@ -85,6 +88,7 @@ func TestSendPriceShop(t *testing.T) {
 }
 
 func TestGetInstagramPost(t *testing.T) {
+
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/shop/instagram",
@@ -97,6 +101,7 @@ func TestGetInstagramPost(t *testing.T) {
 }
 
 func TestShowShop(t *testing.T) {
+
 	assert.NotNilf(t, shopID, "shop id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/shop/show/"+*shopID,

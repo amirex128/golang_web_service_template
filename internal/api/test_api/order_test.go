@@ -9,6 +9,7 @@ import (
 var orderID *string
 
 func TestCreateOrder(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
  "order": "ادرس کامل",
@@ -33,6 +34,7 @@ func TestCreateOrder(t *testing.T) {
 }
 
 func TestShowOrder(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/show/"+*orderID,
@@ -45,6 +47,7 @@ func TestShowOrder(t *testing.T) {
 }
 
 func TestIndexCustomerOrders(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/list",
 		"GET")
@@ -56,6 +59,7 @@ func TestIndexCustomerOrders(t *testing.T) {
 }
 
 func TestIndexOrder(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/list",
 		"GET")
@@ -67,6 +71,7 @@ func TestIndexOrder(t *testing.T) {
 }
 
 func TestTrackingOrder(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/delete/"+*orderID,
@@ -79,6 +84,7 @@ func TestTrackingOrder(t *testing.T) {
 }
 
 func TestSendOrder(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/delete/"+*orderID,
@@ -91,6 +97,7 @@ func TestSendOrder(t *testing.T) {
 }
 
 func TestReturnedOrder(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/delete/"+*orderID,
@@ -103,6 +110,7 @@ func TestReturnedOrder(t *testing.T) {
 }
 
 func TestCalculateSendPrice(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/delete/"+*orderID,
@@ -115,6 +123,7 @@ func TestCalculateSendPrice(t *testing.T) {
 }
 
 func TestAcceptReturnedOrder(t *testing.T) {
+
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/order/delete/"+*orderID,

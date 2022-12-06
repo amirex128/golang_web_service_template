@@ -43,17 +43,16 @@ func initDiscount(manager *MysqlManager) {
 func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
-	//for _, pId := range dto.ProductIDs {
-	//	product, err := m.FindProductById(pId)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	if *product.UserID != *userID {
-	//		return nil, errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", nil)
-	//	}
-	//}
-	//TODO Authorize
+	userID := GetUserID(m.Ctx)
+	for _, pId := range dto.ProductIDs {
+		product, err := m.FindProductById(pId)
+		if err != nil {
+			return nil, err
+		}
+		if err := utils.CheckAccess(m.Ctx, product.UserID); err != nil {
+			return nil, err
+		}
+	}
 
 	if m.GetConn().Where("code = ?", dto.Code).First(&Discount{}).RowsAffected > 0 {
 		return nil, errorx.New("کد تخفیف تکراری است", "model", nil)
@@ -82,15 +81,15 @@ func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error
 func (m *MysqlManager) UpdateDiscount(dto DTOs.UpdateDiscount) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
+	userID := GetUserID(m.Ctx)
 
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(pId)
 		if err != nil {
 			return errorx.New("محصول یافت نشد", "model", err)
 		}
-		if *product.UserID != *userID {
-			return errorx.New("شما اجازه ایجاد کد تخفیف برای این محصول را ندارید", "model", err)
+		if err := utils.CheckAccess(m.Ctx, product.UserID); err != nil {
+			return err
 		}
 	}
 
@@ -144,9 +143,8 @@ func (m *MysqlManager) DeleteDiscount(discountID uint64) error {
 	if err != nil {
 		return errorx.New("تخفیف یافت نشد", "model", err)
 	}
-	userID := GetUser(m.Ctx)
-	if *discount.UserID != *userID {
-		return errorx.New("شما اجازه حذف این تخفیف را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, discount.UserID); err != nil {
+		return err
 	}
 
 	err = m.GetConn().Delete(&discount).Error
@@ -161,12 +159,11 @@ func (m *MysqlManager) GetAllDiscountWithPagination(dto DTOs.IndexDiscount) (*DT
 	conn := m.GetConn()
 	var discounts []Discount
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
-	userID := GetUser(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("discounts", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&discounts).Error
+	err := conn.Where("user_id = ? ", GetUserID(m.Ctx)).Order("id DESC").Find(&discounts).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت تخفیف ها", "model", err)
 	}
@@ -174,14 +171,17 @@ func (m *MysqlManager) GetAllDiscountWithPagination(dto DTOs.IndexDiscount) (*DT
 	return pagination, nil
 }
 
-func (m *MysqlManager) FindDiscountById(discountID uint64) (Discount, error) {
+func (m *MysqlManager) FindDiscountById(discountID uint64) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
 
-	discount := Discount{}
-	err := m.GetConn().Where("id = ?", discountID).First(&discount).Error
+	discount := &Discount{}
+	err := m.GetConn().Where("id = ?", discountID).First(discount).Error
 	if err != nil {
 		return discount, errorx.New("کد تخفیف یافت نشد", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, discount.UserID); err != nil {
+		return nil, err
 	}
 	return discount, nil
 }

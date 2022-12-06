@@ -1,11 +1,19 @@
 package utils
 
-import "os"
+import (
+	"github.com/spf13/viper"
+)
 
 type Mode = string
 
-const Production Mode = "production"
-
 func GetMode() string {
-	return os.Getenv("APP_MODE")
+	mode := viper.GetString("APP_MODE")
+	if mode == "" {
+		viper.SetDefault("APP_MODE", "debug")
+		mode = "debug"
+	}
+	return mode
+}
+func IsTest() bool {
+	return GetMode() == "test"
 }

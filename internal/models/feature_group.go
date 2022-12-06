@@ -18,7 +18,12 @@ type FeatureGroup struct {
 func initFeatureGroup(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&FeatureGroup{}) {
 		manager.GetConn().Migrator().CreateTable(&FeatureGroup{})
-		featureGroups := utils.ReadCsvFile("./csv/feature_groups.csv")
+		var featureGroups [][]string
+		if utils.IsTest() {
+			featureGroups = utils.ReadCsvFile("../../../csv/feature_groups.csv")
+		} else {
+			featureGroups = utils.ReadCsvFile("./csv/feature_groups.csv")
+		}
 		manager.CreateAllFeatureGroups(featureGroups)
 
 	}

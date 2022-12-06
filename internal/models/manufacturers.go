@@ -16,7 +16,12 @@ type Manufacturer struct {
 func initManufacturer(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Manufacturer{}) {
 		manager.GetConn().Migrator().CreateTable(&Manufacturer{})
-		manufacturer := utils.ReadCsvFile("./csv/manufacturers.csv")
+		var manufacturer [][]string
+		if utils.IsTest() {
+			manufacturer = utils.ReadCsvFile("../../../csv/manufacturers.csv")
+		} else {
+			manufacturer = utils.ReadCsvFile("./csv/manufacturers.csv")
+		}
 		manager.CreateAllManufacturer(manufacturer)
 
 	}

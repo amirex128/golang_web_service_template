@@ -13,6 +13,7 @@ type Page struct {
 	Body      string  `json:"body"`
 	Slug      string  `json:"slug"`
 	Type      string  `json:"type" sql:"type:ENUM('blank','normal')"`
+	UserID    *uint64 `json:"user_id"`
 	ShopID    *uint64 `gorm:"default:null" json:"shop_id"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt string  `json:"updated_at"`
@@ -33,6 +34,7 @@ func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) (*Page, error) {
 		Title:     dto.Title,
 		Body:      dto.Body,
 		Slug:      dto.Slug,
+		UserID:    GetUserID(m.Ctx),
 		ShopID:    &dto.ShopID,
 		Type:      dto.Type,
 		CreatedAt: utils.NowTime(),
@@ -53,6 +55,9 @@ func (m *MysqlManager) UpdatePage(dto DTOs.UpdatePage) error {
 	err := m.GetConn().Where("id = ?", dto.ID).First(page).Error
 	if err != nil {
 		return errorx.New("صفحه مورد نظر یافت نشد", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, page.UserID); err != nil {
+		return err
 	}
 	if page.Title != dto.Title {
 		page.Title = dto.Title
@@ -90,6 +95,9 @@ func (m *MysqlManager) FindPageByID(id uint64) (*Page, error) {
 	if err != nil {
 		return nil, errorx.New("صفحه مورد نظر یافت نشد", "model", err)
 	}
+	if err := utils.CheckAccess(m.Ctx, page.UserID); err != nil {
+		return nil, err
+	}
 	return page, nil
 }
 func (m *MysqlManager) FindPageByShopID(id uint64) ([]*Page, error) {
@@ -110,7 +118,9 @@ func (m *MysqlManager) DeletePage(pageID uint64) error {
 	if err != nil {
 		return errorx.New("صفحه یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, page.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&page).Error
 	if err != nil {
 		return errorx.New("خطا در حذف صفحه", "model", err)
@@ -127,9 +137,9 @@ func (m *MysqlManager) GetAllPageWithPagination(dto DTOs.IndexPage) (*DTOs.Pagin
 
 	conn = conn.Scopes(DTOs.Paginate("pages", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("shop_id = ? ", dto.ShopID).Order("id DESC")
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&pages).Error
+	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&pages).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت صفحه ها", "model", err)
 	}

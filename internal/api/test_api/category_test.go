@@ -9,6 +9,7 @@ import (
 var categoryID *string
 
 func TestCreateCategory(t *testing.T) {
+
 	recorder := callApi([]byte(`
 
 		{
@@ -32,6 +33,7 @@ func TestCreateCategory(t *testing.T) {
 }
 
 func TestUpdateCategory(t *testing.T) {
+
 	assert.NotNilf(t, categoryID, "categoryID is nil")
 	recorder := callApi([]byte(`
 		{
@@ -54,6 +56,7 @@ func TestUpdateCategory(t *testing.T) {
 }
 
 func TestShowCategory(t *testing.T) {
+
 	assert.NotNilf(t, categoryID, "categoryID is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/category/show/"+*categoryID,
@@ -66,6 +69,7 @@ func TestShowCategory(t *testing.T) {
 }
 
 func TestIndexCategory(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/category/list",
 		"GET")
@@ -77,6 +81,7 @@ func TestIndexCategory(t *testing.T) {
 }
 
 func TestDeleteCategory(t *testing.T) {
+
 	assert.NotNilf(t, categoryID, "categoryID is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/category/delete/"+*categoryID,

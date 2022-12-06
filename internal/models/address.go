@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/amirex128/selloora_backend/internal/DTOs"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/brianvoe/gofakeit/v6"
 	"go.elastic.co/apm/v2"
@@ -39,9 +40,8 @@ func initAddress(manager *MysqlManager) {
 func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) (*Address, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateAddress", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
 	address := &Address{
-		UserID:     userID,
+		UserID:     GetUserID(m.Ctx),
 		Title:      dto.Title,
 		ProvinceID: dto.ProvinceID,
 		CityID:     dto.CityID,
@@ -62,11 +62,17 @@ func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) (*Address, error) {
 func (m *MysqlManager) UpdateAddress(dto DTOs.UpdateAddress) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UpdateAddress", "model")
 	defer span.End()
+
 	address := Address{}
 	err := m.GetConn().First(&address, dto.ID).Error
 	if err != nil {
 		return errorx.New("خطایی در بروزرسانی آدرس رخ داده است", "model", err)
 	}
+
+	if err := utils.CheckAccess(m.Ctx, address.UserID); err != nil {
+		return err
+	}
+
 	if dto.FullName != "" {
 		address.FullName = dto.FullName
 	}
@@ -109,22 +115,14 @@ func (m *MysqlManager) DeleteAddress(addressID uint64) error {
 	if err != nil {
 		return errorx.New("خطایی در حذف آدرس رخ داده است", "model", err)
 	}
+	if err := utils.CheckAccess(m.Ctx, address.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&address).Error
 	if err != nil {
 		return errorx.New("خطایی در حذف آدرس رخ داده است", "model", err)
 	}
 	return err
-}
-
-func (m *MysqlManager) IndexAddress(userID uint64) ([]*Address, error) {
-	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:IndexAddress", "model")
-	defer span.End()
-	var addresses []*Address
-	err := m.GetConn().Where("user_id = ?", userID).Find(&addresses).Error
-	if err != nil {
-		return nil, errorx.New("خطایی در دریافت آدرس ها رخ داده است", "model", err)
-	}
-	return addresses, nil
 }
 
 func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs.Pagination, error) {
@@ -134,12 +132,12 @@ func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs
 	var addresses []Address
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	userID := GetUser(m.Ctx)
+	userID := GetUserID(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("addresses", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%").Where("user_id = ? ", userID).Order("id DESC")
+		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&addresses).Error
+	err := conn.Where("user_id = ? ", userID).Order("id DESC").Find(&addresses).Error
 	if err != nil {
 		return nil, errorx.New("خطایی در دریافت آدرس ها رخ داده است", "model", err)
 	}
@@ -154,6 +152,9 @@ func (m *MysqlManager) FindAddressByID(addressID uint64) (*Address, error) {
 	err := m.GetConn().Where("id = ?", addressID).First(address).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن آدرس پیش آمده است", "model", err)
+	}
+	if err := utils.CheckAccess(m.Ctx, address.UserID); err != nil {
+		return nil, err
 	}
 	return address, nil
 }

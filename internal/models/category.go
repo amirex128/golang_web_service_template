@@ -33,7 +33,14 @@ type CategoryRelated struct {
 func initCategory(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Category{}) {
 		manager.GetConn().Migrator().CreateTable(&Category{})
-		categories := utils.ReadCsvFile("./csv/categories.csv")
+
+		var categories [][]string
+		if utils.IsTest() {
+			categories = utils.ReadCsvFile("../../../csv/categories.csv")
+		} else {
+			categories = utils.ReadCsvFile("./csv/categories.csv")
+		}
+
 		manager.CreateAllCategories(categories)
 
 		for i := 0; i < 100; i++ {
@@ -45,7 +52,12 @@ func initCategory(manager *MysqlManager) {
 	}
 	if !manager.GetConn().Migrator().HasTable(&CategoryRelated{}) {
 		manager.GetConn().Migrator().CreateTable(&CategoryRelated{})
-		categoryRelated := utils.ReadCsvFile("./csv/category_related.csv")
+		var categoryRelated [][]string
+		if utils.IsTest() {
+			categoryRelated = utils.ReadCsvFile("../../../csv/category_related.csv")
+		} else {
+			categoryRelated = utils.ReadCsvFile("./csv/category_related.csv")
+		}
 		manager.CreateAllCategoryRelated(categoryRelated)
 	}
 
@@ -59,11 +71,10 @@ func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) (*Category, error
 	if err != nil {
 		lastSort.Sort = 0
 	}
-	userID := GetUser(m.Ctx)
 	category := &Category{
 		Name:     dto.Name,
 		ParentID: 0,
-		UserID:   userID,
+		UserID:   GetUserID(m.Ctx),
 		Type:     dto.Type,
 		GalleryID: func() *uint64 {
 			if dto.GalleryID == 0 {
@@ -141,7 +152,7 @@ func (m *MysqlManager) GetAllCategoryWithPagination(dto DTOs.IndexCategory) (*DT
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Find(&categories).Error
+	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Find(&categories).Error
 	if err != nil {
 		return nil, errorx.New("در دریافت دسته بندی ها مشکلی به وجود آمده است", "model", err)
 	}
@@ -187,9 +198,8 @@ func (m *MysqlManager) UpdateCategory(dto DTOs.UpdateCategory) error {
 		return nil
 	}
 
-	userID := GetUser(m.Ctx)
-	if *category.UserID != *userID {
-		return errorx.New("شما اجازه ویرایش این دسته بندی را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, category.UserID); err != nil {
+		return err
 	}
 
 	if category.ParentID != dto.ParentID {
@@ -225,9 +235,8 @@ func (m *MysqlManager) DeleteCategory(id uint64) error {
 		return nil
 	}
 
-	userID := GetUser(m.Ctx)
-	if *category.UserID != *userID {
-		return errorx.New("شما اجازه حذف این دسته بندی را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, category.UserID); err != nil {
+		return err
 	}
 
 	err = m.GetConn().Delete(category).Error

@@ -22,7 +22,7 @@ func DeleteShop(c *gin.Context) {
 	c.Request.WithContext(ctx)
 	defer span.End()
 	shopID := utils.StringToUint64(c.Param("id"))
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 	dto, err := validations.DeleteShop(c)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)

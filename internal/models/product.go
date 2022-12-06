@@ -57,9 +57,9 @@ func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs
 
 	conn = conn.Scopes(DTOs.Paginate("products", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%").Order("id DESC")
+		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("shop_id=?", dto.ShopID).Find(&products).Error
+	err := conn.Where("shop_id=?", dto.ShopID).Where("user_id = ?", GetUserID(m.Ctx)).Order("id DESC").Find(&products).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت محصولات", "model", err)
 	}
@@ -70,10 +70,8 @@ func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs
 func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct) (*Product, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateProduct", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
-
 	var product = &Product{
-		UserID:      userID,
+		UserID:      GetUserID(m.Ctx),
 		ShopID:      dto.ShopID,
 		Description: dto.Description,
 		Name:        dto.Name,
@@ -110,11 +108,9 @@ func (m *MysqlManager) UpdateProduct(dto DTOs.UpdateProduct) error {
 		return err
 	}
 
-	userID := GetUser(m.Ctx)
-	if *product.UserID != *userID {
-		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, product.UserID); err != nil {
+		return err
 	}
-
 	if dto.ShopID > 0 {
 		product.ShopID = dto.ShopID
 	}
@@ -150,14 +146,13 @@ func (m *MysqlManager) UpdateProduct(dto DTOs.UpdateProduct) error {
 func (m *MysqlManager) DeleteProduct(id uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteProduct", "model")
 	defer span.End()
-	userID := GetUser(m.Ctx)
 	product := &Product{}
 	err := m.GetConn().Where("id = ?", id).Find(&product).Error
 	if err != nil {
 		return errorx.New("خطا در حذف محصول", "model", err)
 	}
-	if *product.UserID != *userID {
-		return errorx.New("شما دسترسی کافی برای ویرایش این محصول را ندارید", "model", err)
+	if err := utils.CheckAccess(m.Ctx, product.UserID); err != nil {
+		return err
 	}
 	err = m.GetConn().Delete(&Product{}, id).Error
 	if err != nil {
@@ -201,6 +196,9 @@ func (m *MysqlManager) MoveProducts(shopID, newShopID, userID uint64) error {
 func (m *MysqlManager) DeleteProducts(shopID, userID uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:DeleteProducts", "model")
 	defer span.End()
+	if err := utils.CheckAccess(m.Ctx, &userID); err != nil {
+		return err
+	}
 	err := m.GetConn().Where("shop_id = ? AND user_id = ?", shopID, userID).Delete(&Product{}).Error
 	if err != nil {
 		return errorx.New("خطا در حذف محصولات", "model", err)

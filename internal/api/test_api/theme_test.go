@@ -7,6 +7,7 @@ import (
 )
 
 func TestIndexTheme(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/theme/list",
 		"GET")

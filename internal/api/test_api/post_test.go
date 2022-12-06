@@ -9,6 +9,7 @@ import (
 var postID *string
 
 func TestCreatePost(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "body": "<p>متن مقاله</p>",
@@ -29,6 +30,7 @@ func TestCreatePost(t *testing.T) {
 }
 
 func TestUpdatePost(t *testing.T) {
+
 	assert.NotNilf(t, postID, "post id is nil")
 	recorder := callApi([]byte(`
 {
@@ -50,6 +52,7 @@ func TestUpdatePost(t *testing.T) {
 }
 
 func TestShowPost(t *testing.T) {
+
 	assert.NotNilf(t, postID, "post id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/post/show/"+*postID,
@@ -62,6 +65,7 @@ func TestShowPost(t *testing.T) {
 }
 
 func TestIndexPost(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/post/list",
 		"GET")

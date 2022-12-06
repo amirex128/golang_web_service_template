@@ -26,7 +26,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userID := models.GetUser(c)
+	userID := models.GetUserID(c)
 
 	if *userID == dto.ID {
 		c.JSON(http.StatusUnauthorized, gin.H{

@@ -9,6 +9,7 @@ import (
 var sliderID *string
 
 func TestCreateSlider(t *testing.T) {
+
 	recorder := callApi([]byte(`
 {
   "description": "توضیحات اسلایدر",
@@ -30,6 +31,7 @@ func TestCreateSlider(t *testing.T) {
 }
 
 func TestUpdateSlider(t *testing.T) {
+
 	assert.NotNilf(t, sliderID, "slider id is nil")
 	recorder := callApi([]byte(`
 {
@@ -53,6 +55,7 @@ func TestUpdateSlider(t *testing.T) {
 }
 
 func TestShowSlider(t *testing.T) {
+
 	assert.NotNilf(t, sliderID, "slider id is nil")
 	recorder := callApi([]byte(``),
 		"/api/v1/user/slider/show/"+*sliderID,
@@ -65,6 +68,7 @@ func TestShowSlider(t *testing.T) {
 }
 
 func TestIndexSlider(t *testing.T) {
+
 	recorder := callApi([]byte(``),
 		"/api/v1/user/slider/list",
 		"GET")

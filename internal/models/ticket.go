@@ -42,7 +42,7 @@ func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket) (*Ticket, error) {
 	defer span.End()
 	var userID *uint64
 	if dto.GuestMobile == "" {
-		userID = GetUser(m.Ctx)
+		userID = GetUserID(m.Ctx)
 	}
 	var parentTicket Ticket
 	if dto.ParentID != 0 {
@@ -50,8 +50,8 @@ func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket) (*Ticket, error) {
 		if err != nil {
 			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 		}
-		if *parentTicket.UserID != *userID && IsAdmin(m.Ctx) == false {
-			return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
+		if err := utils.CheckAccess(m.Ctx, parentTicket.UserID); err != nil {
+			return nil, err
 		}
 	}
 
@@ -87,9 +87,9 @@ func (m *MysqlManager) GetAllTicketWithPagination(dto DTOs.IndexTicket, userID u
 
 	conn = conn.Scopes(DTOs.Paginate("tickets", pagination, conn))
 	if dto.Search != "" {
-		conn = conn.Where("title LIKE ? OR body LIKE ? ", "%"+dto.Search+"%", "%"+dto.Search+"%").Order("id DESC")
+		conn = conn.Where("title LIKE ? OR body LIKE ? ", "%"+dto.Search+"%", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", userID).Preload("Gallery").Preload("User").Find(&tickets).Error
+	err := conn.Where("user_id = ?", userID).Order("id DESC").Preload("Gallery").Preload("User").Find(&tickets).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت تیکت ها", "model", err)
 	}
@@ -124,7 +124,9 @@ func (m *MysqlManager) DeleteTicket(ticketID uint64) error {
 	if err != nil {
 		return errorx.New("تیکت یافت نشد", "model", err)
 	}
-
+	if err := utils.CheckAccess(m.Ctx, ticket.UserID); err != nil {
+		return err
+	}
 	err = m.GetConn().Delete(&ticket).Error
 	if err != nil {
 		return errorx.New("خطا در حذف تیکت", "model", err)
