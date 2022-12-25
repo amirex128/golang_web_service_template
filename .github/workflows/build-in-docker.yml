@@ -1,10 +1,9 @@
 name: ci_selloora_backend
 
-#on:
-#  push:
-#    tags:
-#      - 'release-*'
-on: push
+on:
+  push:
+    tags:
+      - 'release-*'
 
 
 jobs:
