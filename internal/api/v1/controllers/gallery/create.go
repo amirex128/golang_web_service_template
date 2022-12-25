@@ -52,7 +52,7 @@ func CreateGallery(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "image size is too large", "message": "حجم تصویر بیشتر از 1 مگابایت است"})
 	}
 	gallery := &models.Gallery{
-		UserID:   *userID,
+		UserID:   userID,
 		Size:     size,
 		Path:     relativePath,
 		Width:    dto.Width,
