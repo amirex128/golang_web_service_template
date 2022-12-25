@@ -39,6 +39,8 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		root.GET("page/:slug", landing.PageLanding)
 	}
 	v1 := r.Group("api/v1")
+	webShop := v1.Group("web")
+	webShop.GET("home")
 	v1.POST("/verify", authMiddleware.LoginHandler)
 	v1.POST("/login/register", auth.RegisterLogin)
 	v1.POST("/forget", auth.ForgetPassword)

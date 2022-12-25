@@ -1,4 +1,4 @@
-name: ci_selloora
+name: ci_selloora_backend
 
 #on:
 #  push:
@@ -25,12 +25,12 @@ jobs:
             cd /root
             rm -rf selloora_backend
             rm -rf selloora_frontend
+            rm -rf selloora_frontend_themes
             rm -rf docker-stack
-            git clone git@github.com:amirex128/docker-stack.git
-            git clone git@github.com:amirex128/selloora_frontend.git
             git clone git@github.com:amirex128/selloora_backend.git
-            cd /root/selloora_frontend
-            docker build -t selloora-frontend:latest .
+            git clone git@github.com:amirex128/selloora_frontend.git
+            git clone git@github.com:amirex128/selloora_frontend_themes.git
+            git clone git@github.com:amirex128/docker-stack.git
             cd /root/docker-stack
             rm /etc/resolv.conf
             echo -e "nameserver 178.22.122.100 \nnameserver 185.51.200.2 \noptions edns0" >> /etc/resolv.conf
@@ -49,6 +49,5 @@ jobs:
             Repository: ${{ github.repository }}
             
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-
 
 
