@@ -6,7 +6,7 @@ type CreateDomain struct {
 	//نام دامنه که باید یا به صورت
 	//example.com
 	//یا به صورت ساب دامنه سلورا
-	//example.selloora.com
+	//example.selloora.conf
 	Name string `form:"name" json:"name" validate:"required" example:"example.com" fake:"{domain_name}"`
 	//نوع دامنه که یا ساب دامنه میباشد یا دامنه اختصاصی
 	Type string `form:"type" json:"type" validate:"required" example:"domain" enums:"domain,subdomain" fake:"{custom_enum:domain,subdomain}"`

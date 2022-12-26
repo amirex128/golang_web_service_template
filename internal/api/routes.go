@@ -10,7 +10,6 @@ import (
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/discount"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/domain"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/gallery"
-	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/landing"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/menu"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/order"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/page"
@@ -28,29 +27,34 @@ import (
 
 func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
-	root := r.Group("/")
-	{
-		root.GET("/", landing.IndexLanding)
-		root.GET("blog", landing.BlogLanding)
-		root.GET("category/:id", landing.CategoryLanding)
-		root.GET("tag/:slug", landing.TagLanding)
-		root.GET("blog/:slug", landing.DetailsLanding)
-		root.GET("search/:search", landing.SearchLanding)
-		root.GET("page/:slug", landing.PageLanding)
-	}
+	//root := r.Group("/")
+	//{
+	//	root.GET("/", landing.IndexLanding)
+	//	root.GET("blog", landing.BlogLanding)
+	//	root.GET("category/:id", landing.CategoryLanding)
+	//	root.GET("tag/:slug", landing.TagLanding)
+	//	root.GET("blog/:slug", landing.DetailsLanding)
+	//	root.GET("search/:search", landing.SearchLanding)
+	//	root.GET("page/:slug", landing.PageLanding)
+	//}
+
 	v1 := r.Group("api/v1")
+	{
+		v1.POST("/verify", authMiddleware.LoginHandler)
+		v1.POST("/login/register", auth.RegisterLogin)
+		v1.POST("/forget", auth.ForgetPassword)
+
+		v1.POST("/ticket/create", ticket.CreateTicket)
+		v1.POST("/comment/create", comment.CreateComment)
+
+		v1.GET("/healthcheck", dev_ops.HealthCheck)
+		v1.GET("/metrics", dev_ops.Metrics)
+	}
+
 	webShop := v1.Group("web")
-	webShop.GET("home")
-	v1.POST("/verify", authMiddleware.LoginHandler)
-	v1.POST("/login/register", auth.RegisterLogin)
-	v1.POST("/forget", auth.ForgetPassword)
-
-	v1.POST("/ticket/create", ticket.CreateTicket)
-	v1.POST("/comment/create", comment.CreateComment)
-
-	v1.GET("/healthcheck", dev_ops.HealthCheck)
-	v1.GET("/metrics", dev_ops.Metrics)
-
+	{
+		webShop.GET("home")
+	}
 	_user := v1.Group("user")
 	_user.Use(authMiddleware.MiddlewareFunc())
 	{

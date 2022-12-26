@@ -4,7 +4,7 @@ type CreateMenu struct {
 	//نام منو برای نمایش در لیست ها
 	Name string `form:"name" json:"name" validation:"required" example:"خانه" fake:"{word}"`
 	//لینک منو
-	Link string `form:"link" json:"link" validation:"omitempty" example:"https://example.selloora.com/page/test" fake:"{url}"`
+	Link string `form:"link" json:"link" validation:"omitempty" example:"https://example.selloora.conf/page/test" fake:"{url}"`
 	//شناسه فروشگاه
 	ShopID uint64 `form:"shop_id" json:"shop_id" validation:"required" example:"1" fake:"{number:1,100}"`
 	//شناسه منو بالا سری برای منو های اصلی و باید صفر ارسال شود
@@ -19,7 +19,7 @@ type UpdateMenu struct {
 	//نام منو
 	Name string `form:"name" json:"name" validation:"omitempty" example:"خانه"`
 	//لینک منو
-	Link string `form:"link" json:"link" validation:"omitempty" example:"https://example.selloora.com/page/test"`
+	Link string `form:"link" json:"link" validation:"omitempty" example:"https://example.selloora.conf/page/test"`
 	//شناسه منو بالا سری
 	ParentID uint64 `form:"parent_id" json:"parent_id" validation:"omitempty" example:"0"`
 	//شناسه منو بالا سری برای منو های اصلی و باید صفر ارسال شود

@@ -12,7 +12,7 @@ func TestCreateMenu(t *testing.T) {
 
 	recorder := callApi([]byte(`
 {
-  "link": "https://example.selloora.com/page/test",
+  "link": "https://example.selloora.conf/page/test",
   "name": "خانه",
   "parent_id": 0,
   "position": "top",
@@ -35,7 +35,7 @@ func TestUpdateMenu(t *testing.T) {
 	recorder := callApi([]byte(`
 {
   "id": 1,
-  "link": "https://example.selloora.com/page/test",
+  "link": "https://example.selloora.conf/page/test",
   "name": "خانه",
   "parent_id": 0,
   "position": "top",
