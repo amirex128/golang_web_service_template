@@ -33,7 +33,7 @@ jobs:
             cd /root/docker-stack
             rm /etc/resolv.conf
             echo -e "nameserver 178.22.122.100 \nnameserver 185.51.200.2 \noptions edns0" >> /etc/resolv.conf
-            docker compose -f docker-compose-server.yml up -d --build
+            docker compose -f docker-compose-server.yml up --force-recreate -d --no-deps --build
             rm /etc/resolv.conf
             echo -e "nameserver 8.8.8.8 \nnameserver 8.8.4.4 \noptions edns0" >> /etc/resolv.conf
       - name: send telegram message on push
