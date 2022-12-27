@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/backend.iml" filepath="$PROJECT_DIR$/.idea/backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/../docker-stack/.idea/docker-stack.iml" filepath="$PROJECT_DIR$/../docker-stack/.idea/docker-stack.iml" />
       <module fileurl="file://$PROJECT_DIR$/../.idea/projects.iml" filepath="$PROJECT_DIR$/../.idea/projects.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../selloora_frontend/.idea/selloora_frontend.iml" filepath="$PROJECT_DIR$/../selloora_frontend/.idea/selloora_frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../selloora_frontend_themes/.idea/selloora_frontend_themes.iml" filepath="$PROJECT_DIR$/../selloora_frontend_themes/.idea/selloora_frontend_themes.iml" />
     </modules>
   </component>
 </project>

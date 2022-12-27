@@ -3066,7 +3066,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "name": {
-                    "description": "نام دامنه که باید یا به صورت\nexample.com\nیا به صورت ساب دامنه سلورا\nexample.selloora.conf",
+                    "description": "نام دامنه که باید یا به صورت\nexample.com\nیا به صورت ساب دامنه سلورا\nexample.subdomain.selloora.conf",
                     "type": "string",
                     "example": "example.com"
                 },
@@ -3111,7 +3111,7 @@ const docTemplate = `{
                 "link": {
                     "description": "لینک منو",
                     "type": "string",
-                    "example": "https://example.selloora.conf/page/test"
+                    "example": "https://example.subdomain.selloora.conf/page/test"
                 },
                 "name": {
                     "description": "نام منو برای نمایش در لیست ها",
@@ -3912,7 +3912,7 @@ const docTemplate = `{
                 "link": {
                     "description": "لینک منو",
                     "type": "string",
-                    "example": "https://example.selloora.conf/page/test"
+                    "example": "https://example.subdomain.selloora.conf/page/test"
                 },
                 "name": {
                     "description": "نام منو",

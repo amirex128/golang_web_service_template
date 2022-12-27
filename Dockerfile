@@ -1,12 +1,10 @@
-FROM selloora-frontend:latest as front
-FROM golang:1.19.3-alpine AS back
+FROM golang:1.19.4-alpine
 
 RUN apk update
 RUN apk add build-base
 
 WORKDIR /app
 COPY . ./
-COPY --from=front /app/dist/spa /app/frontend
 RUN go mod download
 RUN go mod vendor
 RUN go mod tidy

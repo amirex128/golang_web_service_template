@@ -21,7 +21,7 @@ func initDomain(manager *MysqlManager) {
 	if !manager.GetConn().Migrator().HasTable(&Domain{}) {
 		manager.GetConn().Migrator().CreateTable(&Domain{})
 		manager.CreateDomain(DTOs.CreateDomain{
-			Name:   "selloora.conf",
+			Name:   "subdomain.selloora.conf",
 			ShopID: 1,
 			Type:   "domain",
 		})

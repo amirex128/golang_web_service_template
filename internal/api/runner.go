@@ -6,7 +6,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/k0kubun/pp/v3"
-	"github.com/mandrigin/gin-spa/spa"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.elastic.co/apm/module/apmgin/v2"
@@ -42,6 +41,6 @@ func Runner() *gin.Engine {
 
 	Routes(r, authMiddleware())
 
-	r.Use(spa.Middleware("/", "./frontend"))
+	//r.Use(spa.Middleware("/", "./frontend"))
 	return r
 }

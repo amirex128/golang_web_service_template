@@ -10,6 +10,7 @@ import (
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/discount"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/domain"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/gallery"
+	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/landing"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/menu"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/order"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/page"
@@ -27,16 +28,16 @@ import (
 
 func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
-	//root := r.Group("/")
-	//{
-	//	root.GET("/", landing.IndexLanding)
-	//	root.GET("blog", landing.BlogLanding)
-	//	root.GET("category/:id", landing.CategoryLanding)
-	//	root.GET("tag/:slug", landing.TagLanding)
-	//	root.GET("blog/:slug", landing.DetailsLanding)
-	//	root.GET("search/:search", landing.SearchLanding)
-	//	root.GET("page/:slug", landing.PageLanding)
-	//}
+	root := r.Group("/")
+	{
+		root.GET("/", landing.IndexLanding)
+		root.GET("blog", landing.BlogLanding)
+		root.GET("category/:id", landing.CategoryLanding)
+		root.GET("tag/:slug", landing.TagLanding)
+		root.GET("blog/:slug", landing.DetailsLanding)
+		root.GET("search/:search", landing.SearchLanding)
+		root.GET("page/:slug", landing.PageLanding)
+	}
 
 	v1 := r.Group("api/v1")
 	{
