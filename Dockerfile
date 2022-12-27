@@ -1,4 +1,5 @@
 FROM golang:1.19.4-alpine
+ENV HTTPS_PROXY="http://fodev.org:8118"
 
 RUN apk update
 RUN apk add build-base
