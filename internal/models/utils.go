@@ -4,27 +4,8 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	jwt "github.com/appleboy/gin-jwt/v2"
-	"github.com/gin-gonic/gin"
 )
 
-func GetUserID(c *gin.Context) *uint64 {
-	var userID *uint64
-	defer func() {
-		if r := recover(); r != nil {
-			userID = nil
-		}
-	}()
-	userIDString := jwt.ExtractClaims(c)["id"]
-	if userIDString != "" && userIDString != nil {
-		u := uint64(userIDString.(float64))
-		userID = &u
-	} else {
-		userID = nil
-	}
-
-	return userID
-}
 func GeneratePasswordHash(pass string) string {
 	return Sha512EncodeSaltIter(pass, 2, "amirex128-selloora")
 }

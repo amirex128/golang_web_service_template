@@ -35,7 +35,7 @@ func CreateGallery(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	userID := models.GetUserID(c)
+	userID := utils.GetUserID(c)
 
 	galleryAddress, userDir, err := createDirectory(c, *userID)
 	if err != nil {

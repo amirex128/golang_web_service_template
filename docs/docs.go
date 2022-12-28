@@ -142,13 +142,6 @@ const docTemplate = `{
                 "summary": "ثبت نام و ورود",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Authentication",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
                         "description": "ورودی",
                         "name": "message",
                         "in": "body",
@@ -2255,6 +2248,34 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/user/shop/select/theme": {
+            "post": {
+                "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
+                "tags": [
+                    "shop"
+                ],
+                "summary": "انتخاب یک قالب جدید برای فروشگاه",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.SelectThemeShop"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/user/shop/send-price/{id}": {
             "post": {
                 "description": "هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد",
@@ -2268,6 +2289,13 @@ const docTemplate = `{
                         "description": "Authentication",
                         "name": "Authorization",
                         "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "شناسه فروشگاه",
+                        "name": "id",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -2766,6 +2794,27 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/verify": {
+            "post": {
+                "description": "بعد از وارد کردن شماره همراه در صورت ثبت نام شما و تنظیم شدن پسورد بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "ورود",
+                "parameters": [
+                    {
+                        "description": "ورودی",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DTOs.Verify"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -2904,7 +2953,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 10,
                     "minLength": 10,
-                    "example": "1111111111"
+                    "example": "9111111111"
                 },
                 "province_id": {
                     "description": "شناسه استان",
@@ -2968,7 +3017,8 @@ const docTemplate = `{
                 "body",
                 "email",
                 "name",
-                "post_id"
+                "post_id",
+                "user_id"
             ],
             "properties": {
                 "body": {
@@ -2988,6 +3038,11 @@ const docTemplate = `{
                 },
                 "post_id": {
                     "description": "شناسه پست",
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "description": "شناسه صاحب فروشگاه",
                     "type": "integer",
                     "example": 1
                 }
@@ -3030,7 +3085,7 @@ const docTemplate = `{
                     "example": 50
                 },
                 "product_ids": {
-                    "description": "شناسه محصولات",
+                    "description": "شناسه محصولات\nfake array products",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -3271,81 +3326,7 @@ const docTemplate = `{
             }
         },
         "DTOs.CreateProduct": {
-            "type": "object",
-            "required": [
-                "categoryID",
-                "gallery_ids",
-                "name",
-                "price",
-                "quantity",
-                "shopID"
-            ],
-            "properties": {
-                "categoryID": {
-                    "description": "شناسه دسته بندی",
-                    "type": "integer",
-                    "example": 1
-                },
-                "description": {
-                    "description": "توضیحات محصول",
-                    "type": "string",
-                    "example": "توضیحات محصول"
-                },
-                "endedAt": {
-                    "description": "تاریخ پایان فروش",
-                    "type": "string",
-                    "example": "2025-01-01 00:00:00"
-                },
-                "gallery_ids": {
-                    "description": "شناسه تصاویر انتخاب شده برای این محصول",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "manufacturer": {
-                    "description": "برند محصول",
-                    "type": "string",
-                    "example": "سامسونگ"
-                },
-                "name": {
-                    "description": "نام محصول",
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 3,
-                    "example": "گوشی موبایل گلگسی نوت ۱۰"
-                },
-                "optionId": {
-                    "description": "شناسه آشپن محصول",
-                    "type": "integer",
-                    "example": 1
-                },
-                "optionItemID": {
-                    "description": "شناسه آیتم انتخاب شده از آپشن",
-                    "type": "integer",
-                    "example": 1
-                },
-                "price": {
-                    "description": "قیمت محصول",
-                    "type": "number",
-                    "example": 1000000
-                },
-                "quantity": {
-                    "description": "تعداد موجودی",
-                    "type": "integer",
-                    "example": 10
-                },
-                "shopID": {
-                    "description": "شناسه فروشگاه",
-                    "type": "integer",
-                    "example": 1
-                },
-                "startedAt": {
-                    "description": "تاریخ شروع فروش",
-                    "type": "string",
-                    "example": "2020-01-01 00:00:00"
-                }
-            }
+            "type": "object"
         },
         "DTOs.CreateShop": {
             "type": "object",
@@ -3404,11 +3385,6 @@ const docTemplate = `{
                     "description": "آیدی تلگرام برای نمایش در فروشگاه برای پشتیبانی",
                     "type": "string",
                     "example": "amirex128"
-                },
-                "theme_id": {
-                    "description": "شناسه قالب",
-                    "type": "integer",
-                    "example": 1
                 },
                 "type": {
                     "description": "نوع فروشگاه که میتواند به صورت اینستاگرامی باشد یا وبسایتی باشد یا روبیکا یا ربات تلگرام",
@@ -3660,6 +3636,25 @@ const docTemplate = `{
                     "maxLength": 11,
                     "minLength": 11,
                     "example": "09024809750"
+                }
+            }
+        },
+        "DTOs.SelectThemeShop": {
+            "type": "object",
+            "required": [
+                "shop_id",
+                "theme_id"
+            ],
+            "properties": {
+                "shop_id": {
+                    "description": "شناسه فروشگاه",
+                    "type": "integer",
+                    "example": 1
+                },
+                "theme_id": {
+                    "description": "شناسه قالب",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -4307,6 +4302,35 @@ const docTemplate = `{
                     "maxLength": 24,
                     "minLength": 24,
                     "example": "IR820540102680020817909002"
+                }
+            }
+        },
+        "DTOs.Verify": {
+            "type": "object",
+            "required": [
+                "mobile"
+            ],
+            "properties": {
+                "mobile": {
+                    "description": "موبایل",
+                    "type": "string",
+                    "maxLength": 11,
+                    "minLength": 11,
+                    "example": "09024809750"
+                },
+                "password": {
+                    "description": "پسورد درصورتی که با پسورد میخواهید وارد شودی",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6,
+                    "example": "123456789"
+                },
+                "verify_code": {
+                    "description": "کد تایید درصورتی که با کد میخواهید وارد شوید",
+                    "type": "string",
+                    "maxLength": 4,
+                    "minLength": 4,
+                    "example": "4563"
                 }
             }
         }

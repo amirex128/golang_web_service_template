@@ -3,6 +3,7 @@ package order
 import (
 	"github.com/amirex128/selloora_backend/internal/constants"
 	"github.com/amirex128/selloora_backend/internal/models"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
@@ -25,7 +26,7 @@ func IndexOrder(c *gin.Context) {
 	c.Request.WithContext(ctx)
 	defer span.End()
 	orderStatus := c.Query("order_status")
-	userID := models.GetUserID(c)
+	userID := utils.GetUserID(c)
 	var orders []*models.Order
 	var err error
 	if orderStatus == "new" {

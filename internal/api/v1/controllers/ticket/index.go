@@ -2,6 +2,7 @@ package ticket
 
 import (
 	"github.com/amirex128/selloora_backend/internal/models"
+	"github.com/amirex128/selloora_backend/internal/utils"
 	"github.com/amirex128/selloora_backend/internal/utils/errorx"
 	"github.com/amirex128/selloora_backend/internal/validations"
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func IndexTicket(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:indexTicket", "request")
 	c.Request.WithContext(ctx)
 	defer span.End()
-	userID := models.GetUserID(c)
+	userID := utils.GetUserID(c)
 	dto, err := validations.IndexTicket(c)
 	shops, err := models.NewMysqlManager(c).GetAllTicketWithPagination(dto, *userID)
 	if err != nil {

@@ -46,7 +46,7 @@ func (m *MysqlManager) CreateMenu(dto DTOs.CreateMenu) (*Menu, error) {
 	menu := &Menu{
 		Name:     dto.Name,
 		Link:     dto.Link,
-		UserID:   GetUserID(m.Ctx),
+		UserID:   utils.GetUserID(m.Ctx),
 		ShopID:   &dto.ShopID,
 		ParentID: dto.ParentID,
 		Position: dto.Position,
@@ -118,7 +118,7 @@ func (m *MysqlManager) GetAllMenuWithPagination(dto DTOs.IndexMenu) (*DTOs.Pagin
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&menus).Error
+	err := conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&menus).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت منو ها", "model", err)
 	}

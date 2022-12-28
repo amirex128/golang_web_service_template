@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+// VerifyLogin
+// @Summary ورود
+// @description بعد از وارد کردن شماره همراه در صورت ثبت نام شما و تنظیم شدن پسورد بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید
+// @Tags auth
+// @Router       /verify [post]
+// @Param	message	body DTOs.Verify 	true "ورودی"
 func authMiddleware() *jwt.GinJWTMiddleware {
 
 	// the jwt middleware

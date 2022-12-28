@@ -10,7 +10,6 @@ import (
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/discount"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/domain"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/gallery"
-	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/landing"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/menu"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/order"
 	"github.com/amirex128/selloora_backend/internal/api/v1/controllers/page"
@@ -28,17 +27,6 @@ import (
 
 func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 
-	root := r.Group("/")
-	{
-		root.GET("/", landing.IndexLanding)
-		root.GET("blog", landing.BlogLanding)
-		root.GET("category/:id", landing.CategoryLanding)
-		root.GET("tag/:slug", landing.TagLanding)
-		root.GET("blog/:slug", landing.DetailsLanding)
-		root.GET("search/:search", landing.SearchLanding)
-		root.GET("page/:slug", landing.PageLanding)
-	}
-
 	v1 := r.Group("api/v1")
 	{
 		v1.POST("/verify", authMiddleware.LoginHandler)
@@ -52,10 +40,14 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 		v1.GET("/metrics", dev_ops.Metrics)
 	}
 
-	webShop := v1.Group("web")
-	{
-		webShop.GET("home")
-	}
+	//_webShop := v1.Group("web")
+	//{
+	//	_webShop.GET("home")
+	//	_webShop.GET("details")
+	//	_webShop.GET("tag/:id")
+	//	_webShop.GET("category/:id")
+	//	_webShop.GET("search/:search")
+	//}
 	_user := v1.Group("user")
 	_user.Use(authMiddleware.MiddlewareFunc())
 	{
@@ -134,7 +126,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_shop.POST("/select/theme", shop.SelectThemeShop)
 			_shop.GET("/instagram", shop.GetInstagramPost)
 		}
-
 		_slider := _user.Group("slider")
 		{
 			_slider.GET("/list", slider.IndexSlider)
@@ -143,7 +134,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_slider.POST("/update/*id", slider.UpdateSlider)
 			_slider.POST("/delete/:id", slider.DeleteSlider)
 		}
-
 		_post := _user.Group("post")
 		{
 			_post.GET("/list", post.IndexPost)

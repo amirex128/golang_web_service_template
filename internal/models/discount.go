@@ -43,7 +43,7 @@ func initDiscount(manager *MysqlManager) {
 func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(pId)
 		if err != nil {
@@ -81,7 +81,7 @@ func (m *MysqlManager) CreateDiscount(dto DTOs.CreateDiscount) (*Discount, error
 func (m *MysqlManager) UpdateDiscount(dto DTOs.UpdateDiscount) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:showDiscount", "model")
 	defer span.End()
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 
 	for _, pId := range dto.ProductIDs {
 		product, err := m.FindProductById(pId)
@@ -163,7 +163,7 @@ func (m *MysqlManager) GetAllDiscountWithPagination(dto DTOs.IndexDiscount) (*DT
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ? ", GetUserID(m.Ctx)).Order("id DESC").Find(&discounts).Error
+	err := conn.Where("user_id = ? ", utils.GetUserID(m.Ctx)).Order("id DESC").Find(&discounts).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت تخفیف ها", "model", err)
 	}

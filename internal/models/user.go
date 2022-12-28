@@ -39,6 +39,11 @@ func initUser(manager *MysqlManager) {
 
 			manager.CreateUser(model)
 		}
+		model := new(User)
+		gofakeit.Struct(model)
+		model.ID = 101
+		manager.CreateUser(model)
+
 	}
 }
 
@@ -109,9 +114,6 @@ func (m *MysqlManager) UpdateUser(user *User) error {
 	err := m.GetConn().Where("id = ?", user.ID).First(&newUser).Error
 	if err != nil {
 		return errorx.New("کاربر یافت نشد", "model", err)
-	}
-	if err := utils.CheckAccess(m.Ctx, &user.ID); err != nil {
-		return err
 	}
 	if user.Gender != "" {
 		newUser.Gender = user.Gender

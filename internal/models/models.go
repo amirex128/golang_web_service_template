@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"net/http/httptest"
 )
 
@@ -56,7 +57,8 @@ func (m *MysqlManager) initializeTables() {
 	logrus.Info("mysql initialized started")
 	defer logrus.Info("mysql initialized finished")
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
-	c.Request = httptest.NewRequest("GET", "/", nil)
+	c.Request = httptest.NewRequest("GET", "/api/v1/post/list", nil)
+	c.Request.Header.Set("Authorization", viper.GetString("token"))
 
 	manager := NewMysqlManager(c)
 

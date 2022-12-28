@@ -17,7 +17,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.13.0
 	github.com/k0kubun/pp/v3 v3.2.0
-	github.com/mandrigin/gin-spa v0.0.0-20200212133200-790d0c0c7335
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/samber/do v1.4.1
 	github.com/sirupsen/logrus v1.9.0
@@ -51,7 +50,6 @@ require (
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect

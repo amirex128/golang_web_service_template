@@ -51,7 +51,7 @@ func (m *MysqlManager) CheckSlug(slug string) error {
 func (m *MysqlManager) CreatePost(dto DTOs.CreatePost) (*Post, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreatePost", "model")
 	defer span.End()
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	post := &Post{
 		Title: dto.Title,
 		Body:  dto.Body,
@@ -158,7 +158,7 @@ func (m *MysqlManager) GetAllPostWithPagination(dto DTOs.IndexPost) (*DTOs.Pagin
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Find(&posts).Error
+	err := conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Find(&posts).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}

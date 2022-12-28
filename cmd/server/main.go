@@ -13,7 +13,7 @@ import (
 
 // @title Selloora Backend API
 // @version 1.0
-// @description Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtaXJleDEyOEBnbWFpbC5jb20iLCJleHAiOjUyNjgzMTg5OTYsImV4cGlyZV9hdCI6IiIsImZpcnN0bmFtZSI6Itin2YXbjNixIiwiaWQiOjEsImxhc3RuYW1lIjoi2LTbjNix2K_ZhNuMIiwibW9iaWxlIjoiMDkwMjQ4MDk3NTAiLCJvcmlnX2lhdCI6MTY2ODMyMjU5Niwic3RhdHVzIjoiIn0.x7BKuxw288cm1JsskGRD178UPmNz-xRwkWHtb0WsU74
+// @description Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUyNzIyMjA0MDcsImV4cGlyZV9hdCI6IiIsImlkIjoxMDEsImlzX2FkbWluIjpmYWxzZSwib3JpZ19pYXQiOjE2NzIyMjQwMDd9.HH7nQlv7qCWElCQv7KYcKk0qhUulx9RjLi-xTS87Cmg
 
 // @contact.name API Support
 // @contact.url https://www.amirshirdel.ir

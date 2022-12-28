@@ -51,7 +51,7 @@ func (m *MysqlManager) CreateSlider(dto DTOs.CreateSlider) (*Slider, error) {
 		GalleryID:   &dto.GalleryID,
 		Description: dto.Description,
 		Link:        dto.Link,
-		UserID:      GetUserID(m.Ctx),
+		UserID:      utils.GetUserID(m.Ctx),
 		ShopID:      &dto.ShopID,
 		Position:    dto.Position,
 		Sort:        lastSort.Sort + 1,

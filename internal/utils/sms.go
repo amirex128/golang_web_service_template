@@ -5,11 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/v2"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -23,7 +20,7 @@ const (
 func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 
 	jsonValue, _ := json.Marshal(jsonData)
-	response, err := http.Post("https://rest.payamak-panel.com/api/SendSMS/"+op, "application/json", bytes.NewBuffer(jsonValue))
+	_, err := http.Post("https://rest.payamak-panel.com/api/SendSMS/"+op, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -32,9 +29,6 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 			"type":    "utils",
 		})
 		return errors.New("sms faild")
-	} else {
-		data, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(string(data))
 	}
 	return nil
 }
@@ -42,7 +36,7 @@ func makeRequest(jsonData map[string]string, op string, c *gin.Context) error {
 func SendSMS(c *gin.Context, ctx context.Context, to string, text string, isFlash bool) error {
 	span, ctx := apm.StartSpan(ctx, "SendSMS", "request")
 	defer span.End()
-	if flag.Lookup("test.v") != nil {
+	if IsTest() == true {
 		return nil
 	}
 	jsonData := map[string]string{

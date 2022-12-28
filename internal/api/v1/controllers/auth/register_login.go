@@ -17,7 +17,6 @@ import (
 // @description بعد از وارد کردن شماره همراه در صورت ثبت نام شما و تنظیم شدن پسورد بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید
 // @Tags auth
 // @Router       /login/register [post]
-// @Param	Authorization	header string	true "Authentication"
 // @Param	message	body DTOs.RequestLoginRegister 	true "ورودی"
 func RegisterLogin(c *gin.Context) {
 	span, ctx := apm.StartSpan(c.Request.Context(), "controller:registerLogin", "request")
@@ -58,6 +57,7 @@ func RegisterLogin(c *gin.Context) {
 		}
 		err = models.NewMysqlManager(c).UpdateUser(&newUser)
 		if err != nil {
+			errorx.ResponseErrorx(c, err)
 			return
 		}
 

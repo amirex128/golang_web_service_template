@@ -1,19 +1,16 @@
 package utils
 
 import (
+	"flag"
 	"github.com/spf13/viper"
 )
 
-type Mode = string
-
-func GetMode() string {
-	mode := viper.GetString("APP_MODE")
-	if mode == "" {
-		viper.SetDefault("APP_MODE", "debug")
-		mode = "debug"
-	}
-	return mode
-}
 func IsTest() bool {
-	return GetMode() == "test"
+	if flag.Lookup("test.v") != nil {
+		return true
+	}
+	if viper.GetString("MODE") == "test" {
+		return true
+	}
+	return false
 }

@@ -36,7 +36,7 @@ func (m *MysqlManager) CreateTag(dto DTOs.CreateTag) (*Tag, error) {
 	defer span.End()
 	tag := &Tag{
 		Name:   dto.Name,
-		UserID: GetUserID(m.Ctx),
+		UserID: utils.GetUserID(m.Ctx),
 		Slug:   dto.Slug,
 	}
 	err := m.GetConn().Create(tag).Error

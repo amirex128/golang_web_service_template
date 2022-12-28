@@ -63,7 +63,7 @@ func (m *MysqlManager) GetAllCommentWithPagination(dto DTOs.IndexComment) (pagin
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err = conn.Where("user_id = ?", GetUserID(m.Ctx)).Order("id DESC").Find(&comments).Error
+	err = conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		return nil, errorx.New("مشکلی در یافتن پست ها پیش آمده است", "model", err)
 	}
@@ -92,9 +92,6 @@ func (m *MysqlManager) DeleteComment(id uint64) error {
 	if err != nil {
 		return errorx.New("خطا در یافتن دیدگاه", "model", err)
 	}
-	if err := utils.CheckAccess(m.Ctx, comment.UserID); err != nil {
-		return err
-	}
 	err = conn.Delete(comment).Error
 	if err != nil {
 		return errorx.New("خطا در حذف دیدگاه", "model", err)
@@ -106,9 +103,6 @@ func (m *MysqlManager) ApproveComment(id uint64) error {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:ApproveComment", "model")
 	defer span.End()
 	conn := m.GetConn()
-	if err := utils.CheckAccess(m.Ctx, &id); err != nil {
-		return err
-	}
 	err := conn.Model(&Comment{}).Where("id = ?", id).Update("approve", true).Error
 	if err != nil {
 		return errorx.New("خطا در تایید دیدگاه", "model", err)
@@ -123,9 +117,6 @@ func (m *MysqlManager) FindCommentByID(id uint64) (*Comment, error) {
 	err := m.GetConn().Where("id = ?", id).First(comment).Error
 	if err != nil {
 		return comment, errorx.New("دیدگاه مورد نظر یافت نشد", "model", err)
-	}
-	if err := utils.CheckAccess(m.Ctx, comment.UserID); err != nil {
-		return nil, err
 	}
 	return comment, nil
 }

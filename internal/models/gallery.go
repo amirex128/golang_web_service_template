@@ -39,7 +39,7 @@ func (m *MysqlManager) UploadImage(gallery *Gallery) (*Gallery, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:UploadImage", "model")
 	defer span.End()
 	gallery.FullPath = viper.GetString("server_url") + gallery.Path
-	gallery.UserID = GetUserID(m.Ctx)
+	gallery.UserID = utils.GetUserID(m.Ctx)
 	err := m.GetConn().Create(gallery).Error
 	if err != nil {
 		return nil, errorx.New("خطا در آپلود تصویر", "model", err)
@@ -99,7 +99,7 @@ func (m *MysqlManager) GetAllGalleryWithPagination(dto DTOs.IndexGallery) (*DTOs
 	var galleries []Gallery
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("galleries", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("user_id = ? ", userID)

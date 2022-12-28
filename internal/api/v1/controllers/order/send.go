@@ -33,7 +33,7 @@ func SendOrder(c *gin.Context) {
 		errorx.ResponseErrorx(c, err)
 		return
 	}
-	if order.UserID != *models.GetUserID(c) {
+	if order.UserID != *utils.GetUserID(c) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "شما اجازه دسترسی به این سفارش را ندارید",
 		})

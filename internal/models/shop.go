@@ -53,7 +53,7 @@ func initShop(manager *MysqlManager) {
 func (m *MysqlManager) CreateShop(dto DTOs.CreateShop) (*Shop, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateShop", "model")
 	defer span.End()
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	shop := &Shop{
 		Name:          dto.Name,
 		Type:          dto.Type,
@@ -176,7 +176,7 @@ func (m *MysqlManager) GetAllShopWithPagination(dto DTOs.IndexShop) (*DTOs.Pagin
 	defer span.End()
 	conn := m.GetConn()
 	var shops []Shop
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
 	conn = conn.Scopes(DTOs.Paginate("shops", pagination, conn))

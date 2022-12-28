@@ -42,7 +42,7 @@ func (m *MysqlManager) CreateTicket(dto DTOs.CreateTicket) (*Ticket, error) {
 	defer span.End()
 	var userID *uint64
 	if dto.GuestMobile == "" {
-		userID = GetUserID(m.Ctx)
+		userID = utils.GetUserID(m.Ctx)
 	}
 	var parentTicket Ticket
 	if dto.ParentID != 0 {

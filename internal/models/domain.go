@@ -60,7 +60,7 @@ func (m *MysqlManager) CreateDomain(dto DTOs.CreateDomain) (*Domain, error) {
 	domain := &Domain{
 		ShopID:    &dto.ShopID,
 		Name:      dto.Name,
-		UserID:    GetUserID(m.Ctx),
+		UserID:    utils.GetUserID(m.Ctx),
 		Type:      dto.Type,
 		DnsStatus: "pending",
 	}
@@ -109,7 +109,7 @@ func (m *MysqlManager) GetAllDomainWithPagination(dto DTOs.IndexDomain) (*DTOs.P
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&domains).Error
+	err := conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&domains).Error
 	if err != nil {
 		return pagination, errorx.New("خطا در دریافت دامنه ها", "model", err)
 	}

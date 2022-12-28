@@ -41,7 +41,7 @@ func (m *MysqlManager) CreateAddress(dto DTOs.CreateAddress) (*Address, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateAddress", "model")
 	defer span.End()
 	address := &Address{
-		UserID:     GetUserID(m.Ctx),
+		UserID:     utils.GetUserID(m.Ctx),
 		Title:      dto.Title,
 		ProvinceID: dto.ProvinceID,
 		CityID:     dto.CityID,
@@ -132,7 +132,7 @@ func (m *MysqlManager) GetAllAddressWithPagination(dto DTOs.IndexAddress) (*DTOs
 	var addresses []Address
 	pagination := &DTOs.Pagination{PageSize: dto.PageSize, Page: dto.Page}
 
-	userID := GetUserID(m.Ctx)
+	userID := utils.GetUserID(m.Ctx)
 	conn = conn.Scopes(DTOs.Paginate("addresses", pagination, conn))
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")

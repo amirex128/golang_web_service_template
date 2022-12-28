@@ -34,7 +34,7 @@ func (m *MysqlManager) CreatePage(dto DTOs.CreatePage) (*Page, error) {
 		Title:     dto.Title,
 		Body:      dto.Body,
 		Slug:      dto.Slug,
-		UserID:    GetUserID(m.Ctx),
+		UserID:    utils.GetUserID(m.Ctx),
 		ShopID:    &dto.ShopID,
 		Type:      dto.Type,
 		CreatedAt: utils.NowTime(),
@@ -139,7 +139,7 @@ func (m *MysqlManager) GetAllPageWithPagination(dto DTOs.IndexPage) (*DTOs.Pagin
 	if dto.Search != "" {
 		conn = conn.Where("title LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&pages).Error
+	err := conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Where("shop_id = ? ", dto.ShopID).Order("id DESC").Find(&pages).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت صفحه ها", "model", err)
 	}

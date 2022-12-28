@@ -22,7 +22,7 @@ func CancelOrder(c *gin.Context) {
 	c.Request.WithContext(ctx)
 	defer span.End()
 	orderID := utils.StringToUint64(c.Param("id"))
-	userID := models.GetUserID(c)
+	userID := utils.GetUserID(c)
 	order, err := models.NewMysqlManager(c).FindOrderByID(orderID)
 	if err != nil {
 		errorx.ResponseErrorx(c, err)

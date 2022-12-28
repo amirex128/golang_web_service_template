@@ -96,7 +96,7 @@ definitions:
         type: string
       postal_code:
         description: کد پستی
-        example: "1111111111"
+        example: "9111111111"
         maxLength: 10
         minLength: 10
         type: string
@@ -169,11 +169,16 @@ definitions:
         description: شناسه پست
         example: 1
         type: integer
+      user_id:
+        description: شناسه صاحب فروشگاه
+        example: 1
+        type: integer
     required:
     - body
     - email
     - name
     - post_id
+    - user_id
     type: object
   DTOs.CreateDiscount:
     properties:
@@ -198,7 +203,9 @@ definitions:
         example: 50
         type: number
       product_ids:
-        description: شناسه محصولات
+        description: |-
+          شناسه محصولات
+          fake array products
         items:
           type: integer
         type: array
@@ -232,7 +239,7 @@ definitions:
           نام دامنه که باید یا به صورت
           example.com
           یا به صورت ساب دامنه سلورا
-          example.selloora.com
+          example.subdomain.selloora.conf
         example: example.com
         type: string
       shop_id:
@@ -269,7 +276,7 @@ definitions:
     properties:
       link:
         description: لینک منو
-        example: https://example.selloora.com/page/test
+        example: https://example.subdomain.selloora.conf/page/test
         type: string
       name:
         description: نام منو برای نمایش در لیست ها
@@ -397,65 +404,6 @@ definitions:
     - title
     type: object
   DTOs.CreateProduct:
-    properties:
-      categoryID:
-        description: شناسه دسته بندی
-        example: 1
-        type: integer
-      description:
-        description: توضیحات محصول
-        example: توضیحات محصول
-        type: string
-      endedAt:
-        description: تاریخ پایان فروش
-        example: "2025-01-01 00:00:00"
-        type: string
-      gallery_ids:
-        description: شناسه تصاویر انتخاب شده برای این محصول
-        items:
-          type: integer
-        type: array
-      manufacturer:
-        description: برند محصول
-        example: سامسونگ
-        type: string
-      name:
-        description: نام محصول
-        example: گوشی موبایل گلگسی نوت ۱۰
-        maxLength: 100
-        minLength: 3
-        type: string
-      optionId:
-        description: شناسه آشپن محصول
-        example: 1
-        type: integer
-      optionItemID:
-        description: شناسه آیتم انتخاب شده از آپشن
-        example: 1
-        type: integer
-      price:
-        description: قیمت محصول
-        example: 1000000
-        type: number
-      quantity:
-        description: تعداد موجودی
-        example: 10
-        type: integer
-      shopID:
-        description: شناسه فروشگاه
-        example: 1
-        type: integer
-      startedAt:
-        description: تاریخ شروع فروش
-        example: "2020-01-01 00:00:00"
-        type: string
-    required:
-    - categoryID
-    - gallery_ids
-    - name
-    - price
-    - quantity
-    - shopID
     type: object
   DTOs.CreateShop:
     properties:
@@ -500,10 +448,6 @@ definitions:
         description: آیدی تلگرام برای نمایش در فروشگاه برای پشتیبانی
         example: amirex128
         type: string
-      theme_id:
-        description: شناسه قالب
-        example: 1
-        type: integer
       type:
         description: نوع فروشگاه که میتواند به صورت اینستاگرامی باشد یا وبسایتی باشد
           یا روبیکا یا ربات تلگرام
@@ -704,6 +648,20 @@ definitions:
     required:
     - mobile
     type: object
+  DTOs.SelectThemeShop:
+    properties:
+      shop_id:
+        description: شناسه فروشگاه
+        example: 1
+        type: integer
+      theme_id:
+        description: شناسه قالب
+        example: 1
+        type: integer
+    required:
+    - shop_id
+    - theme_id
+    type: object
   DTOs.SendOrder:
     properties:
       address_id:
@@ -896,7 +854,7 @@ definitions:
         type: integer
       link:
         description: لینک منو
-        example: https://example.selloora.com/page/test
+        example: https://example.subdomain.selloora.conf/page/test
         type: string
       name:
         description: نام منو
@@ -1212,6 +1170,29 @@ definitions:
     required:
     - id
     type: object
+  DTOs.Verify:
+    properties:
+      mobile:
+        description: موبایل
+        example: "09024809750"
+        maxLength: 11
+        minLength: 11
+        type: string
+      password:
+        description: پسورد درصورتی که با پسورد میخواهید وارد شودی
+        example: "123456789"
+        maxLength: 20
+        minLength: 6
+        type: string
+      verify_code:
+        description: کد تایید درصورتی که با کد میخواهید وارد شوید
+        example: "4563"
+        maxLength: 4
+        minLength: 4
+        type: string
+    required:
+    - mobile
+    type: object
 host: localhost:8585
 info:
   contact:
@@ -1309,11 +1290,6 @@ paths:
         بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت
         باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید
       parameters:
-      - description: Authentication
-        in: header
-        name: Authorization
-        required: true
-        type: string
       - description: ورودی
         in: body
         name: message
@@ -2825,6 +2801,27 @@ paths:
       summary: دریافت پست های اینتستاگرام فروشگاه و تبدیل آن ها به محصول
       tags:
       - shop
+  /user/shop/select/theme:
+    post:
+      description: هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته
+        باشد تا محصولات و مقالات خود را بر روی این فروشگاه ذخیره کند این فروشگاه میتواند
+        ربات تلگرام باشد یا سایت باشد یک نمونه مشابه اینستاگرام باشد
+      parameters:
+      - description: Authentication
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.SelectThemeShop'
+      responses: {}
+      summary: انتخاب یک قالب جدید برای فروشگاه
+      tags:
+      - shop
   /user/shop/send-price/{id}:
     post:
       description: هر کاربر برای این که بتواند محصولی ایجاد کند باید فروشگاه داشته
@@ -2834,6 +2831,11 @@ paths:
       - description: Authentication
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: شناسه فروشگاه
+        in: path
+        name: id
         required: true
         type: string
       - description: ورودی
@@ -3194,6 +3196,22 @@ paths:
       summary: نمایش تیکت های یک موضوع
       tags:
       - ticket
+  /verify:
+    post:
+      description: بعد از وارد کردن شماره همراه در صورت ثبت نام شما و تنظیم شدن پسورد
+        بر روی اکانت شما باید پسورد خود را وارد نمایید برای ورود و در غیر این صورت
+        باید کد تائید ارسال شده را وارد نماید تا توکن را دریافت نمایید
+      parameters:
+      - description: ورودی
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/DTOs.Verify'
+      responses: {}
+      summary: ورود
+      tags:
+      - auth
 schemes:
 - http
 - https

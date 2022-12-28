@@ -74,7 +74,7 @@ func (m *MysqlManager) CreateCategory(dto DTOs.CreateCategory) (*Category, error
 	category := &Category{
 		Name:     dto.Name,
 		ParentID: 0,
-		UserID:   GetUserID(m.Ctx),
+		UserID:   utils.GetUserID(m.Ctx),
 		Type:     dto.Type,
 		GalleryID: func() *uint64 {
 			if dto.GalleryID == 0 {
@@ -152,7 +152,7 @@ func (m *MysqlManager) GetAllCategoryWithPagination(dto DTOs.IndexCategory) (*DT
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("user_id = ?", GetUserID(m.Ctx)).Find(&categories).Error
+	err := conn.Where("user_id = ?", utils.GetUserID(m.Ctx)).Find(&categories).Error
 	if err != nil {
 		return nil, errorx.New("در دریافت دسته بندی ها مشکلی به وجود آمده است", "model", err)
 	}

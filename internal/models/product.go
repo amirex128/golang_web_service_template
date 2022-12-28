@@ -41,7 +41,6 @@ func InitProduct(manager *MysqlManager) {
 		for i := 0; i < 100; i++ {
 			model := new(DTOs.CreateProduct)
 			gofakeit.Struct(model)
-
 			manager.CreateProduct(*model)
 		}
 
@@ -59,7 +58,7 @@ func (m *MysqlManager) GetAllProductWithPagination(dto DTOs.IndexProduct) (*DTOs
 	if dto.Search != "" {
 		conn = conn.Where("name LIKE ?", "%"+dto.Search+"%")
 	}
-	err := conn.Where("shop_id=?", dto.ShopID).Where("user_id = ?", GetUserID(m.Ctx)).Order("id DESC").Find(&products).Error
+	err := conn.Where("shop_id=?", dto.ShopID).Where("user_id = ?", utils.GetUserID(m.Ctx)).Order("id DESC").Find(&products).Error
 	if err != nil {
 		return nil, errorx.New("خطا در دریافت محصولات", "model", err)
 	}
@@ -71,7 +70,7 @@ func (m *MysqlManager) CreateProduct(dto DTOs.CreateProduct) (*Product, error) {
 	span, _ := apm.StartSpan(m.Ctx.Request.Context(), "model:CreateProduct", "model")
 	defer span.End()
 	var product = &Product{
-		UserID:      GetUserID(m.Ctx),
+		UserID:      utils.GetUserID(m.Ctx),
 		ShopID:      dto.ShopID,
 		Description: dto.Description,
 		Name:        dto.Name,
