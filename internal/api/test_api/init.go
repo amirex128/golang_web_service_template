@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"net/http"
 	"net/http/httptest"
+	"runtime/debug"
 	"strings"
 )
 
@@ -46,6 +47,11 @@ func parse(recorder *httptest.ResponseRecorder) map[string]interface{} {
 	var response map[string]interface{}
 	err := json.Unmarshal(recorder.Body.Bytes(), &response)
 	if err != nil {
+		pp.Fatalln("body has contain error")
+		pp.Fatalln("------------------Stack-Trace------------------")
+		debug.PrintStack()
+		pp.Fatalln("------------------Error-Message------------------")
+		pp.Fatalln(err)
 		return nil
 	}
 	return response
@@ -53,7 +59,11 @@ func parse(recorder *httptest.ResponseRecorder) map[string]interface{} {
 func parseErr(recorder *httptest.ResponseRecorder) {
 	if http.StatusOK != recorder.Code || strings.Contains(recorder.Body.String(), "error") {
 		res := parse(recorder)
-		pp.Println(res)
+		pp.Fatalln("error when parsing body")
+		pp.Fatalln("------------------Stack-Trace------------------")
+		debug.PrintStack()
+		pp.Fatalln("------------------Error-Message------------------")
+		pp.Fatalln(res)
 	}
 }
 
@@ -65,6 +75,9 @@ func getID(recorder *httptest.ResponseRecorder) *string {
 	} else {
 		body = parse(recorder)
 		if body == nil {
+			pp.Fatal("body is nil for get id from response")
+			pp.Fatalln("------------------Stack-Trace------------------")
+			debug.PrintStack()
 			return nil
 		}
 	}
@@ -74,6 +87,9 @@ func getID(recorder *httptest.ResponseRecorder) *string {
 		if resID, ok := res["id"]; ok {
 			id = fmt.Sprintf("%v", uint64(resID.(float64)))
 		} else {
+			pp.Fatal("id is invalid")
+			pp.Fatalln("------------------Stack-Trace------------------")
+			debug.PrintStack()
 			return nil
 		}
 	} else {

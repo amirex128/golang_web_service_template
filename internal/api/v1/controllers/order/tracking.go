@@ -10,7 +10,7 @@ import (
 // @Summary پیگیری وضعیت ارسال سفارش
 // @description مشتری میتواند سفارش خود را پیگیری نماید و مشاهده نماید که این سفارش در چه مرحله ای به سر میبرد
 // @Tags order
-// @Router       /user/order/tracking/{id} [get]
+// @Router       /customer/order/tracking/{id} [get]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func TrackingOrder(c *gin.Context) {

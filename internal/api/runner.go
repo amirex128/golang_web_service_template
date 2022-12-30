@@ -25,11 +25,10 @@ func Runner() *gin.Engine {
 		MaxAge:           12 * time.Hour,
 	}))
 	r.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		pp.Println("-------------------------error-----------------------")
 		if err, ok := recovered.(error); ok {
-			//e2 := errorx.New("خطای پانیک رخ داده است", "panic", err)
-			//errorx.ResponseErrorx(c, e2)
+			pp.Fatalln("------------------Stack-Trace------------------")
 			debug.PrintStack()
+			pp.Fatalln("------------------Error-Message------------------")
 			pp.Println(err.Error())
 			return
 		}

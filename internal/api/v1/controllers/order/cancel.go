@@ -14,7 +14,7 @@ import (
 // @Summary کنسل کردن سفارش
 // @description سفارشات میتوانند بعد از ثبت شدن یا تائید شوند یا کنسل و به مرحله انتخاب ارسال کنند روند و در انجا هم نیز امکان کنسل شدن داشته باشند
 // @Tags order
-// @Router       /user/order/cancel/{id} [post]
+// @Router       /customer/order/cancel/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه سفارش" SchemaExample(1)
 func CancelOrder(c *gin.Context) {

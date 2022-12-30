@@ -101,20 +101,6 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_domain.GET("/show/:id", domain.ShowDomain)
 			_domain.POST("/delete/:id", domain.DeleteDomain)
 		}
-		_order := _user.Group("order")
-		{
-			_order.POST("/send/:id", order.SendOrder)
-			_order.GET("/list", order.IndexOrder)
-			_order.POST("/approve/:id", order.ApproveOrder)
-			_order.POST("/cancel/:id", order.CancelOrder)
-			_order.POST("/calculate", order.CalculateSendPrice)
-			_order.POST("/returned/:id", order.ReturnedOrder)
-			_order.POST("/returned/accept/:id", order.AcceptReturnedOrder)
-			_order.GET("/show/:id", order.ShowOrder)
-			_order.GET("/tracking/:id", order.TrackingOrder)
-			_order.POST("/delete/:id", order.DeleteOrder)
-
-		}
 		_shop := _user.Group("shop")
 		{
 			_shop.GET("list", shop.IndexShop)
@@ -191,6 +177,15 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 			_tag.POST("/delete/:id", tag.DeleteTag)
 			_tag.POST("/add", tag.AddTag)
 		}
+		_order := _user.Group("order")
+		{
+			_order.POST("/send/:id", order.SendOrder)
+			_order.GET("/list", order.IndexOrder)
+			_order.POST("/approve/:id", order.ApproveOrder)
+			_order.POST("/returned/accept/:id", order.AcceptReturnedOrder)
+			_order.POST("/delete/:id", order.DeleteOrder)
+
+		}
 	}
 
 	admin := v1.Group("admin")
@@ -203,9 +198,15 @@ func Routes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) {
 	{
 		_customer.POST("login/register", customer.RequestCreateLoginCustomer)
 		_customer.POST("verify", customer.VerifyCreateLoginUpdateCustomer)
-		_customer.POST("orders", order.IndexCustomerOrders)
 		_customer.POST("/sadad/verify", order.SadadPaymentVerify)
-		_customer.POST("/order/create", order.CreateOrder)
 		_customer.POST("/discount/check", discount.CheckDiscount)
+
+		_customer.POST("/order/list", order.IndexCustomerOrders)
+		_customer.POST("/order/create", order.CreateOrder)
+		_customer.GET("/order/show/:id", order.ShowOrder)
+		_customer.GET("/order/tracking/:id", order.TrackingOrder)
+		_customer.POST("/order/returned/:id", order.ReturnedOrder)
+		_customer.POST("/order/cancel/:id", order.CancelOrder)
+
 	}
 }

@@ -12,18 +12,22 @@ func TestCreateOrder(t *testing.T) {
 
 	recorder := callApi([]byte(`
 {
- "order": "ادرس کامل",
- "city_id": 1,
- "full_name": "نام گیرنده",
- "lat": "35.5",
- "long": "36.5",
- "mobile": "09024809750",
- "postal_code": "1111111111",
- "province_id": 1,
- "title": "عنوان"
+  "customer_id": 1,
+  "description": "توضیحات ارسال سفارش",
+  "discount_code": "asdf",
+  "order_items": [
+    {
+      "count": 10,
+      "option_id": 1,
+      "product_id": 1
+    }
+  ],
+  "shop_id": 1,
+  "user_id": 1,
+  "verify_code": "1524"
 }
 	`),
-		"/api/v1/user/order/create",
+		"/api/v1/customer/order/create",
 		"POST")
 	orderID = getID(recorder)
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -37,7 +41,7 @@ func TestShowOrder(t *testing.T) {
 
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/show/"+*orderID,
+		"/api/v1/customer/order/show/"+*orderID,
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -49,7 +53,7 @@ func TestShowOrder(t *testing.T) {
 func TestIndexCustomerOrders(t *testing.T) {
 
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/list",
+		"/api/v1/customer/order/list",
 		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -74,8 +78,8 @@ func TestTrackingOrder(t *testing.T) {
 
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
-		"POST")
+		"/api/v1/customer/order/tracking/"+*orderID,
+		"GET")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
 	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
@@ -86,8 +90,17 @@ func TestTrackingOrder(t *testing.T) {
 func TestSendOrder(t *testing.T) {
 
 	assert.NotNilf(t, orderID, "order id is nil")
-	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
+	recorder := callApi([]byte(`
+{
+  "address_id": 1,
+  "courier": "tipax",
+  "order_id": 1,
+  "package_size": "10x10x10",
+  "value": 10000,
+  "weight": 1000
+}
+`),
+		"/api/v1/user/order/send/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -100,20 +113,7 @@ func TestReturnedOrder(t *testing.T) {
 
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
-		"POST")
-
-	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
-	assert.NotContainsf(t, recorder.Body.String(), "error", "error found in response")
-
-	parseErr(recorder)
-}
-
-func TestCalculateSendPrice(t *testing.T) {
-
-	assert.NotNilf(t, orderID, "order id is nil")
-	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
+		"/api/v1/customer/order/returned/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -126,7 +126,7 @@ func TestAcceptReturnedOrder(t *testing.T) {
 
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
+		"/api/v1/user/order/returned/accept/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -138,7 +138,7 @@ func TestAcceptReturnedOrder(t *testing.T) {
 func TestCancelOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
+		"/api/v1/customer/order/cancel/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")
@@ -150,7 +150,7 @@ func TestCancelOrder(t *testing.T) {
 func TestApproveOrder(t *testing.T) {
 	assert.NotNilf(t, orderID, "order id is nil")
 	recorder := callApi([]byte(``),
-		"/api/v1/user/order/delete/"+*orderID,
+		"/api/v1/user/order/approve/"+*orderID,
 		"POST")
 
 	assert.Equalf(t, http.StatusOK, recorder.Code, "status code is not ok")

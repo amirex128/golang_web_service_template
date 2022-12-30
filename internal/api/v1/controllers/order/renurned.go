@@ -9,7 +9,7 @@ import (
 // @Summary ثبت درخواست مرجوعی توسط مشتری
 // @description مشتری میتواند بعد از دریافت سفارش ان را مرجوع کند
 // @Tags order
-// @Router       /user/order/returned/{id} [post]
+// @Router       /customer/order/returned/{id} [post]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه" SchemaExample(1)
 func ReturnedOrder(c *gin.Context) {

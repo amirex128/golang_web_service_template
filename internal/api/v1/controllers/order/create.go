@@ -17,7 +17,7 @@ import (
 // @Summary ایجاد سفارش جدید
 // @description از این سرویس برای ایجاد سفارش در بخش ادمین و کاربر استفاده میشود
 // @Tags order
-// @Router       /user/order/create [post]
+// @Router       /customer/order/create [post]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	message	 body   DTOs.CreateOrder  	true "ورودی"
 func CreateOrder(c *gin.Context) {

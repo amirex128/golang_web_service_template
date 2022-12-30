@@ -13,7 +13,7 @@ import (
 // @Summary نمایش جزئیات سفارش
 // @description مشتری نیاز دارد سفارش خود را از طریق پنل مشتری مشاهده نماید
 // @Tags order
-// @Router       /user/order/show/{id} [get]
+// @Router       /customer/order/show/{id} [get]
 // @Param	Authorization	 header string	true "Authentication"
 // @Param	id			 path   string	true "شناسه" SchemaExample(1)
 func ShowOrder(c *gin.Context) {
