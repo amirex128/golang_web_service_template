@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  selloora_backend:
+    container_name: selloora_backend
+    build:
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "8585:8585"
+    networks: [ 'stack' ]
+    environment:
+      - CGO_ENABLED=1
+      - GO111MODULE=on
+      - ELASTIC_APM_ENVIRONMENT=staging
+      - ELASTIC_APM_LOG_FILE=stderr
+      - ELASTIC_APM_LOG_LEVEL=debug
+      - ELASTIC_APM_SERVER_URL=http://apm-server:8200
+      - ELASTIC_APM_SERVICE_NAME=selloora_backend
+      - SELLOORA_ELASTIC_HOST=elasticsearch
+      - SELLOORA_ELASTIC_PORT=9200
+      - SELLOORA_MYSQL_MAIN_DB=selloora
+      - SELLOORA_MYSQL_MAIN_HOST=mysql
+      - SELLOORA_MYSQL_MAIN_PASSWORD=@6766581Amirex128
+      - SELLOORA_MYSQL_MAIN_PORT=3306
+      - SELLOORA_MYSQL_MAIN_USER=selloora
+      - SELLOORA_REDIS_DB=1
+      - SELLOORA_REDIS_HOST=redis
+      - SELLOORA_REDIS_PORT=6379
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8585
+      - SERVER_URL=http://localhost:8585
