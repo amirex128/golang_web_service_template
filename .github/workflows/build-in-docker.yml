@@ -22,7 +22,7 @@ jobs:
           command_timeout: "999999m"
           script: |
             cd /root/docker-stack
-            /root/docker-stack/runner.sh server selloora_backend
+            /root/docker-stack/runner-server.sh up selloora_backend
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:
