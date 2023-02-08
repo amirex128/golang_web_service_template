@@ -3,7 +3,9 @@ version: '3.9'
 services:
   selloora_backend:
     container_name: selloora_backend
-    image: registry.hamyarsale.ir/selloora_backend:latest
+    build:
+        context: .
+        dockerfile: Dockerfile
     ports:
       - "8585:8585"
     networks: [ docker-stack_selloora ]
