@@ -45,7 +45,7 @@ jobs:
           command_timeout: "999999m"
           script: |
             cd /home/amirex128/projects/docker-stack
-            /home/amirex128/docker-stack/runner-server.sh up selloora_backend
+            /home/amirex128/projects/docker-stack/runner-server.sh up selloora_backend
 
   report:
     runs-on: ubuntu-latest
